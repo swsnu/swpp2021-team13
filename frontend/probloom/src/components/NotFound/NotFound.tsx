@@ -1,8 +1,8 @@
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
-export type NotFoundProps = {
+export interface NotFoundProps {
   message?: string;
-};
+}
 
 const NotFound_ = (props: NotFoundProps & RouteComponentProps) => {
   const message = props.message ?? 'We could not find the requested page.';
