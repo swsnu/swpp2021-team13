@@ -10,8 +10,8 @@ import ProblemSetDetail from './containers/ProblemSet/ProblemSetDetail/ProblemSe
 
 function App(props) {
   return (
-    <ConnectedRouter history={props.history}>
-      <div className="App">
+    <div className="App">
+      <ConnectedRouter history={props.history}>
         <Switch>
           <Route path="/user/:id/summary" exact component={Profile} />
           <Route
@@ -28,8 +28,8 @@ function App(props) {
           />
           <Route render={() => <h1>Not Found</h1>} />
         </Switch>
-      </div>
-    </ConnectedRouter>
+      </ConnectedRouter>
+    </div>
   );
 }
 

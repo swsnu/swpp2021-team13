@@ -12,18 +12,7 @@ const rootReducer = combineReducers({
   router: connectRouter(history),
 });
 
-const logger = (store) => {
-  return (next) => {
-    return (action) => {
-      // console.log('[Middleware] Dispatching', action);
-      const result = next(action);
-      // console.log('[Middleware] Next State', store.getState());
-      return result;
-    };
-  };
-};
-
-export const middlewares = [logger, thunk, routerMiddleware(history)];
+export const middlewares = [thunk, routerMiddleware(history)];
 
 declare global {
   interface Window {

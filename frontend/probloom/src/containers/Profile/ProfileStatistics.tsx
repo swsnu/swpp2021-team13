@@ -3,26 +3,16 @@ import { withRouter, RouteProps } from 'react-router';
 import { connect } from 'react-redux';
 
 import './ProfileStatistics.css';
-import * as actionCreators from '../../store/actions/actions';
+import * as actionCreators from '../../store/actions/index';
+import {
+  ProfileStatisticsProps,
+  ProfileStatisticsState,
+} from '../../store/reducers/userReducer';
 
-interface UserField {
-  id: number;
-  username: string;
-  email: string;
-  password: string;
-  logged_in: boolean;
-}
-
-interface Props {
-  selectedUser: UserField;
-  onGetUserStatistics: (number) => void;
-}
-
-interface State {
-  // TODO
-}
-
-class ProfileStatistics extends Component<Props & RouteProps, State> {
+class ProfileStatistics extends Component<
+  ProfileStatisticsProps & RouteProps,
+  ProfileStatisticsState
+> {
   componentDidMount() {
     this.props.onGetUserStatistics(this.props.match.params.id);
   }

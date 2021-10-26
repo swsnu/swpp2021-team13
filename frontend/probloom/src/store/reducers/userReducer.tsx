@@ -1,6 +1,6 @@
 import * as actionTypes from '../actions/actionTypes';
 
-interface UserField {
+export interface UserField {
   id: number;
   username: string;
   email: string;
@@ -8,7 +8,7 @@ interface UserField {
   logged_in: boolean;
 }
 
-interface UserStatistics {
+export interface UserStatistics {
   username: string;
   email: string;
   lastActiveDays: number;
@@ -17,17 +17,26 @@ interface UserStatistics {
   // TODO
 }
 
-interface initialState {
+export interface InitialState {
   users: UserField[];
   selectedUser: UserField | null;
   selectedUserStatistics: UserStatistics | null;
 }
 
-const UserState: initialState = {
+const UserState: InitialState = {
   users: [],
   selectedUser: null,
   selectedUserStatistics: null,
 };
+
+export interface ProfileStatisticsProps {
+  selectedUser: UserField;
+  onGetUserStatistics: (number) => void;
+}
+
+export interface ProfileStatisticsState {
+  // TODO
+}
 
 const reducer = (state = UserState, action) => {
   switch (action.type) {
