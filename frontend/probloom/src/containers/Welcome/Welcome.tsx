@@ -40,7 +40,7 @@ class Welcome extends Component<Props, State> {
     this.props.onGetAllUsers();
   }
 
-  clickSignInButton = () => {
+  onClickSignInButton = () => {
     const data = {
       id: this.state.id,
       pw: this.state.pw,
@@ -77,7 +77,7 @@ class Welcome extends Component<Props, State> {
     }
   };
 
-  clickSignUpButton = () => {
+  onClickSignUpButton = () => {
     this.props.history.push('/signup');
   };
 
@@ -105,7 +105,7 @@ class Welcome extends Component<Props, State> {
 
           <button
             className="signInButton"
-            onClick={() => this.clickSignInButton()}
+            onClick={() => this.onClickSignInButton()}
           >
             Sign In
           </button>
@@ -113,7 +113,7 @@ class Welcome extends Component<Props, State> {
 
         <button
           className="signUpButton"
-          onClick={() => this.clickSignUpButton()}
+          onClick={() => this.onClickSignUpButton()}
         >
           Sign Up
         </button>

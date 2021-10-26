@@ -43,7 +43,7 @@ class SignUp extends Component<Props, State> {
     this.props.onGetAllUsers();
   }
 
-  clickSignUpButton = () => {
+  onClickSignUpButton = () => {
     const data = {
       username: this.state.username,
       email: this.state.email,
@@ -102,7 +102,7 @@ class SignUp extends Component<Props, State> {
     }
   };
 
-  clickSignInButton = () => {
+  onClickSignInButton = () => {
     this.props.history.push('/login');
   };
 
@@ -148,7 +148,7 @@ class SignUp extends Component<Props, State> {
 
           <button
             className="signUpButton"
-            onClick={() => this.clickSignUpButton()}
+            onClick={() => this.onClickSignUpButton()}
           >
             Sign Up
           </button>
@@ -156,7 +156,7 @@ class SignUp extends Component<Props, State> {
 
         <button
           className="signInButton"
-          onClick={() => this.clickSignInButton()}
+          onClick={() => this.onClickSignInButton()}
         >
           Sign In
         </button>
