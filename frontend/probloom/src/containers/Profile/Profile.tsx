@@ -2,7 +2,7 @@ import { RouteComponentProps, withRouter } from 'react-router';
 import { NavLink } from 'react-router-dom';
 
 import './Profile.css';
-import { NotFound } from '../../components/NotFound/NotFound';
+import NotFound from '../../components/NotFound/NotFound';
 import ProfileSummary from './ProfileSummary';
 import ProfileStatistics from './ProfileStatistics';
 

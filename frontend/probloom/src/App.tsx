@@ -7,7 +7,7 @@ import './App.css';
 import Profile from './containers/Profile/Profile';
 import ProblemSetSearch from './containers/ProblemSet/ProblemSetSearch/ProblemSetSearch';
 import ProblemSetDetail from './containers/ProblemSet/ProblemSetDetail/ProblemSetDetail';
-import { NotFound } from './components/NotFound/NotFound';
+import NotFound from './components/NotFound/NotFound';
 
 function App(props: { history: History }) {
   return (

@@ -14,7 +14,8 @@ jest.mock('./ProfileStatistics', () => ({
 }));
 
 jest.mock('../../components/NotFound/NotFound', () => ({
-  NotFound: () => <div>TEST_NOT_FOUND</div>,
+  __esModule: true,
+  default: () => <div>TEST_NOT_FOUND</div>,
 }));
 
 describe('<Profile />', () => {
@@ -49,7 +50,7 @@ describe('<Profile />', () => {
   describe('given invalid user id', () => {
     let spy: jest.SpyInstance;
     beforeEach(() => {
-      spy = jest.spyOn(console, 'warn');
+      spy = jest.spyOn(console, 'warn').mockImplementation();
     });
 
     afterEach(() => {
@@ -58,7 +59,7 @@ describe('<Profile />', () => {
 
     it('renders not found page', () => {
       const app = (
-        <MemoryRouter initialEntries={['/user/invalid/statistics']}>
+        <MemoryRouter initialEntries={['/user/INVALID/statistics']}>
           <Route path="/user/:id/:active" exact component={Profile} />
         </MemoryRouter>
       );
@@ -68,13 +69,46 @@ describe('<Profile />', () => {
 
     it('emits warning', () => {
       const app = (
-        <MemoryRouter initialEntries={['/user/invalid/statistics']}>
+        <MemoryRouter initialEntries={['/user/INVALID/statistics']}>
           <Route path="/user/:id/:active" exact component={Profile} />
         </MemoryRouter>
       );
       render(app);
       expect(spy).toHaveBeenCalledWith(
         expect.stringContaining('not a valid user id')
+      );
+    });
+  });
+
+  describe('given invalid tab name', () => {
+    let spy: jest.SpyInstance;
+    beforeEach(() => {
+      spy = jest.spyOn(console, 'warn').mockImplementation();
+    });
+
+    afterEach(() => {
+      spy.mockClear();
+    });
+
+    it('renders not found page', () => {
+      const app = (
+        <MemoryRouter initialEntries={['/user/0/INVALID']}>
+          <Route path="/user/:id/:active" exact component={Profile} />
+        </MemoryRouter>
+      );
+      render(app);
+      expect(screen.getByText('TEST_NOT_FOUND')).toBeInTheDocument();
+    });
+
+    it('emits warning', () => {
+      const app = (
+        <MemoryRouter initialEntries={['/user/0/INVALID']}>
+          <Route path="/user/:id/:active" exact component={Profile} />
+        </MemoryRouter>
+      );
+      render(app);
+      expect(spy).toHaveBeenCalledWith(
+        expect.stringContaining('not a valid tab name')
       );
     });
   });

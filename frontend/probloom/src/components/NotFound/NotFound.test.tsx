@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Switch } from 'react-router';
-import { NotFound } from './NotFound';
+import NotFound from './NotFound';
 
 describe('<NotFound />', () => {
   it('displays title', () => {

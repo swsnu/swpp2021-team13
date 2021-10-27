@@ -4,7 +4,7 @@ export interface NotFoundProps {
   message?: string;
 }
 
-const NotFound_ = (props: NotFoundProps & RouteComponentProps) => {
+const NotFound = (props: NotFoundProps & RouteComponentProps) => {
   const message = props.message ?? 'We could not find the requested page.';
   const goBackHandler = () => {
     props.history.goBack();
@@ -20,4 +20,4 @@ const NotFound_ = (props: NotFoundProps & RouteComponentProps) => {
   );
 };
 
-export const NotFound = withRouter(NotFound_);
+export default withRouter(NotFound);
