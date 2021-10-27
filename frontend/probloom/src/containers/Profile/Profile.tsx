@@ -22,7 +22,7 @@ const Profile = (props: RouteComponentProps<ProfilePathParams>) => {
   let tabContent: JSX.Element | null;
   switch (props.match.params.active) {
     case 'summary':
-      tabContent = <ProfileSummary />;
+      tabContent = <ProfileSummary userId={userId} />;
       break;
     case 'statistics':
       tabContent = <ProfileStatistics userId={userId} />;
