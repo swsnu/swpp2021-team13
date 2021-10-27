@@ -1,1 +1,1 @@
-export { getUserStatistics } from './actions';
+export { getUserStatistics } from './userActions';

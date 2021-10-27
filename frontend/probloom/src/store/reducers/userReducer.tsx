@@ -1,4 +1,4 @@
-import { UserAction } from '../actions/actions';
+import { UserAction } from '../actions/userActions';
 import * as actionTypes from '../actions/actionTypes';
 
 export interface UserField {
