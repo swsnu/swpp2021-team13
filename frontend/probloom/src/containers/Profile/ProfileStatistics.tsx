@@ -1,28 +1,33 @@
 import { Component } from 'react';
-import { withRouter, RouteProps } from 'react-router';
-import { connect } from 'react-redux';
+import { withRouter, RouteComponentProps } from 'react-router';
+import { connect, ConnectedProps } from 'react-redux';
 
 import './ProfileStatistics.css';
 import * as actionCreators from '../../store/actions/index';
-import {
-  ProfileStatisticsProps,
-  ProfileStatisticsState,
-} from '../../store/reducers/userReducer';
+import { AppDispatch, RootState } from '../../store/store';
+
+export interface ProfileStatisticsProps extends PropsFromRedux {
+  userId: number;
+}
+
+export interface ProfileStatisticsState {
+  // TODO
+}
 
 class ProfileStatistics extends Component<
-  ProfileStatisticsProps & RouteProps,
+  ProfileStatisticsProps & RouteComponentProps,
   ProfileStatisticsState
 > {
   componentDidMount() {
-    this.props.onGetUserStatistics(this.props.match.params.id);
+    this.props.onGetUserStatistics(this.props.userId);
   }
 
   clickSummaryHandler = () => {
-    this.props.history.push(`/user/${this.props.match.params.id}/summary`);
+    this.props.history.push(`/user/${this.props.userId}/summary`);
   };
 
   clickStatisticsHandler = () => {
-    this.props.history.push(`/user/${this.props.match.params.id}/statistics`);
+    this.props.history.push(`/user/${this.props.userId}/statistics`);
   };
 
   render() {
@@ -83,20 +88,20 @@ class ProfileStatistics extends Component<
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state: RootState) => {
   return {
     selectedUserStatistics: state.user.selectedUserStatistics,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = (dispatch: AppDispatch) => {
   return {
     onGetUserStatistics: (userId: number) =>
       dispatch(actionCreators.getUserStatistics(userId)),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withRouter(ProfileStatistics));
+const connector = connect(mapStateToProps, mapDispatchToProps);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(withRouter(ProfileStatistics));

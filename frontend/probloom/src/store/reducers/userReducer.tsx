@@ -1,3 +1,4 @@
+import { UserAction } from '../actions/actions';
 import * as actionTypes from '../actions/actionTypes';
 
 export interface UserField {
@@ -17,28 +18,19 @@ export interface UserStatistics {
   // TODO
 }
 
-export interface InitialState {
+export interface UserState {
   users: UserField[];
   selectedUser: UserField | null;
   selectedUserStatistics: UserStatistics | null;
 }
 
-const UserState: InitialState = {
+const initialState: UserState = {
   users: [],
   selectedUser: null,
   selectedUserStatistics: null,
 };
 
-export interface ProfileStatisticsProps {
-  selectedUser: UserField;
-  onGetUserStatistics: (number) => void;
-}
-
-export interface ProfileStatisticsState {
-  // TODO
-}
-
-const reducer = (state = UserState, action) => {
+const reducer = (state = initialState, action: UserAction) => {
   switch (action.type) {
     case actionTypes.GET_USER_STATISTICS:
       return {
