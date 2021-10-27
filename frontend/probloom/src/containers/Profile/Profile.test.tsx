@@ -1,74 +1,79 @@
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter, Route } from 'react-router';
 
-import { Profile } from './Profile';
+import Profile from './Profile';
 
 jest.mock('./ProfileSummary', () => ({
-  ProfileSummary: jest.fn(() => <div>TEST_PROFILE_SUMMARY</div>),
+  __esModule: true,
+  default: () => <div>TEST_PROFILE_SUMMARY</div>,
 }));
 
 jest.mock('./ProfileStatistics', () => ({
-  ProfileStatistics: jest.fn(() => <div>TEST_PROFILE_STATISTICS</div>),
+  __esModule: true,
+  default: () => <div>TEST_PROFILE_STATISTICS</div>,
 }));
 
 jest.mock('../../components/NotFound/NotFound', () => ({
-  ProfileStatistics: jest.fn(() => <div>TEST_NOT_FOUND</div>),
+  NotFound: () => <div>TEST_NOT_FOUND</div>,
 }));
 
 describe('<Profile />', () => {
   describe('given valid user id and active tab name', () => {
-    beforeEach(() => {});
-
-    it('renders summary tab', () => {
+    it('renders summary tab', async () => {
       const app = (
         <MemoryRouter initialEntries={['/user/0/summary']}>
-          <Profile />
+          <Route path="/user/:id/:active" exact component={Profile} />
         </MemoryRouter>
       );
       render(app);
-      expect(screen.getByText('TEST_PROFILE_SUMMARY')).toBeDefined();
-      expect(screen.getByText('TEST_PROFILE_STATISTICS')).toThrow();
+      expect(screen.getByText('TEST_PROFILE_SUMMARY')).toBeInTheDocument();
+      expect(
+        screen.queryByText('TEST_PROFILE_STATISTICS')
+      ).not.toBeInTheDocument();
     });
 
     it('renders statistics tab', () => {
       const app = (
         <MemoryRouter initialEntries={['/user/0/statistics']}>
-          <Profile />
+          <Route path="/user/:id/:active" exact component={Profile} />
         </MemoryRouter>
       );
       render(app);
-      expect(screen.getByText('TEST_PROFILE_SUMMARY')).toThrow();
-      expect(screen.getByText('TEST_PROFILE_STATISTICS')).toBeDefined();
+      expect(screen.getByText('TEST_PROFILE_STATISTICS')).toBeInTheDocument();
+      expect(
+        screen.queryByText('TEST_PROFILE_SUMMARY')
+      ).not.toBeInTheDocument();
     });
   });
 
   describe('given invalid user id', () => {
+    let spy: jest.SpyInstance;
     beforeEach(() => {
-      console.warn = jest.fn();
+      spy = jest.spyOn(console, 'warn');
     });
 
     afterEach(() => {
-      (console.warn as jest.Mock).mockClear();
+      spy.mockClear();
     });
 
     it('renders not found page', () => {
       const app = (
         <MemoryRouter initialEntries={['/user/invalid/statistics']}>
-          <Profile />
+          <Route path="/user/:id/:active" exact component={Profile} />
         </MemoryRouter>
       );
       render(app);
-      expect(screen.getByText('TEST_NOT_FOUND')).toBeDefined();
+      expect(screen.getByText('TEST_NOT_FOUND')).toBeInTheDocument();
     });
 
     it('emits warning', () => {
       const app = (
         <MemoryRouter initialEntries={['/user/invalid/statistics']}>
-          <Profile />
+          <Route path="/user/:id/:active" exact component={Profile} />
         </MemoryRouter>
       );
       render(app);
-      expect(console.warn).toHaveBeenCalledWith(
+      expect(spy).toHaveBeenCalledWith(
         expect.stringContaining('not a valid user id')
       );
     });
