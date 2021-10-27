@@ -30,7 +30,7 @@ const initialState: UserState = {
   selectedUserStatistics: null,
 };
 
-const reducer = (state = initialState, action: UserAction) => {
+const userReducer = (state = initialState, action: UserAction) => {
   switch (action.type) {
     case actionTypes.GET_USER_STATISTICS:
       return {
@@ -44,4 +44,4 @@ const reducer = (state = initialState, action: UserAction) => {
   return state;
 };
 
-export default reducer;
+export default userReducer;
