@@ -1,22 +1,23 @@
 import { connectRouter } from 'connected-react-router';
 import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
-import { UserState } from './store/reducers/userReducer';
+import userReducer, { UserReducer } from './store/reducers/userReducer';
 
 import { history, middlewares } from './store/store';
 
 interface GetMockStoreOptions {
-  mockUserState?: UserState;
+  // mockUserState?: UserState;
+  mockUserReducer?: UserReducer;
 }
 
-const defaultMockUserState: UserState = {
-  users: [],
-  selectedUser: null,
-  selectedUserProfile: null,
-  selectedUserStatistics: null,
-};
+// const defaultMockUserState: UserState = {
+//   users: [],
+//   selectedUser: null,
+//   selectedUserProfile: null,
+//   selectedUserStatistics: null,
+// };
 
-const getMockUserReducer = (initialState: UserState) =>
-  jest.fn((state = initialState, _) => state);
+// const getMockUserReducer = (initialState: UserState) =>
+//   jest.fn((state = initialState, _) => state);
 
 declare global {
   interface Window {
@@ -27,15 +28,14 @@ declare global {
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 const getReducers = ({
-  mockUserState = defaultMockUserState,
+  mockUserReducer = jest.fn(userReducer),
 }: GetMockStoreOptions) => {
-  const mockUserReducer = getMockUserReducer(mockUserState);
   return {
     user: mockUserReducer,
   };
 };
 
-export const getMockStore = (options: GetMockStoreOptions) => {
+export const getMockStore = (options: GetMockStoreOptions = {}) => {
   const reducers = getReducers(options);
   const rootReducer = combineReducers(reducers);
   return createStore(
@@ -44,7 +44,7 @@ export const getMockStore = (options: GetMockStoreOptions) => {
   );
 };
 
-export const getMockStoreWithRouter = (options: GetMockStoreOptions) => {
+export const getMockStoreWithRouter = (options: GetMockStoreOptions = {}) => {
   const reducers = getReducers(options);
   const rootReducer = combineReducers({
     ...reducers,

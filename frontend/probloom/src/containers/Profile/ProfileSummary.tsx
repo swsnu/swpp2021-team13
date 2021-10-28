@@ -86,12 +86,11 @@ class ProfileSummary extends Component<
           cols={30}
           rows={10}
           placeholder="Tell us about yourself..."
+          value={this.state.pendingIntroduction}
           onChange={(event) =>
             this.setState({ pendingIntroduction: event.target.value })
           }
-        >
-          {this.state.pendingIntroduction}
-        </textarea>
+        />
         <button
           type="submit"
           disabled={this.state.pendingIntroduction === ''}

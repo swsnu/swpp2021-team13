@@ -25,7 +25,7 @@ describe('<App />', () => {
     let app: JSX.Element;
     beforeEach(() => {
       app = (
-        <Provider store={getMockStoreWithRouter({})}>
+        <Provider store={getMockStoreWithRouter()}>
           <App history={history} />
         </Provider>
       );
