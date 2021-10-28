@@ -62,6 +62,13 @@
       "last 1 safari version"
     ]
   },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}",
+      "!src/index.js",
+      "!src/reportWebVitals.ts"
+    ]
+  },
   "prettier": {
     "singleQuote": true
   }
