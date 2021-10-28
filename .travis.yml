@@ -5,7 +5,7 @@ dist: bionic
 jobs:
   include:
     - language: python
-      python: "3.7.9"
+      python: "3.8.12"
       addons:
         sonarcloud:
           organization: swpp2021-2-team13
@@ -21,10 +21,10 @@ jobs:
         - cd .. && sonar-scanner
 
     - language: node_js
-      node_js: 14
+      node_js: 16
       install:
         - cd frontend/probloom
-        - yarn install
+        - yarn install --frozen-lockfile
       script:
         - ./node_modules/.bin/eslint src
         - yarn test --coverage --watchAll=false
