@@ -5,19 +5,8 @@ import userReducer, { UserReducer } from './store/reducers/userReducer';
 import { history, middlewares } from './store/store';
 
 interface GetMockStoreOptions {
-  // mockUserState?: UserState;
   mockUserReducer?: UserReducer;
 }
-
-// const defaultMockUserState: UserState = {
-//   users: [],
-//   selectedUser: null,
-//   selectedUserProfile: null,
-//   selectedUserStatistics: null,
-// };
-
-// const getMockUserReducer = (initialState: UserState) =>
-//   jest.fn((state = initialState, _) => state);
 
 declare global {
   interface Window {
