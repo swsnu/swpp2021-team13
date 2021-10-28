@@ -1,80 +1,40 @@
 import { Component } from 'react';
-import { withRouter, RouteProps } from 'react-router';
-import { connect } from 'react-redux';
+import { connect, ConnectedProps } from 'react-redux';
 
 import './ProfileStatistics.css';
 import * as actionCreators from '../../store/actions/index';
-import {
-  ProfileStatisticsProps,
-  ProfileStatisticsState,
-} from '../../store/reducers/userReducer';
+import { AppDispatch, RootState } from '../../store/store';
 
-class ProfileStatistics extends Component<
-  ProfileStatisticsProps & RouteProps,
-  ProfileStatisticsState
-> {
+export interface ProfileStatisticsProps extends PropsFromRedux {
+  userId: number;
+}
+
+class ProfileStatistics extends Component<ProfileStatisticsProps> {
   componentDidMount() {
-    this.props.onGetUserStatistics(this.props.match.params.id);
+    this.props.onGetUserStatistics(this.props.userId);
   }
 
-  clickSummaryHandler = () => {
-    this.props.history.push(`/user/${this.props.match.params.id}/summary`);
-  };
-
-  clickStatisticsHandler = () => {
-    this.props.history.push(`/user/${this.props.match.params.id}/statistics`);
-  };
-
   render() {
-    let username = 'test-username';
-    let email = 'test-email';
-    let lastActiveDays = 0;
-    let problemsCreated = 0;
-    let problemsSolved = 0;
-    if (this.props.selectedUserStatistics) {
-      username = this.props.selectedUserStatistics.username;
-      email = this.props.selectedUserStatistics.email;
-      lastActiveDays = this.props.selectedUserStatistics.lastActiveDays;
-      problemsCreated = this.props.selectedUserStatistics.problemsCreated;
-      problemsSolved = this.props.selectedUserStatistics.problemsSolved;
-    }
+    const lastActiveDays =
+      this.props.selectedUserStatistics?.lastActiveDays ?? 0;
+    const problemsCreated =
+      this.props.selectedUserStatistics?.problemsCreated ?? 0;
+    const problemsSolved =
+      this.props.selectedUserStatistics?.problemsSolved ?? 0;
     return (
       <div className="ProfileStatistics">
-        <p>
-          <button
-            id="summary-tab-button"
-            onClick={() => this.clickSummaryHandler()}
-          >
-            Summary
-          </button>
-          <button
-            id="statistics-tab-button"
-            onClick={() => this.clickStatisticsHandler()}
-          >
-            Statistics
-          </button>
-        </p>
-
         <div className="title">
           <h1>ProfileStatistics Page</h1>
         </div>
-        <div className="username">
-          <h1>username</h1>
-          {username}
-        </div>
-        <div className="email">
-          <h1>email</h1>
-          {email}
-        </div>
-        <div className="email">
+        <div>
           <h1>Last Active</h1>
           {lastActiveDays} days ago
         </div>
-        <div className="email">
+        <div>
           <h1>Problems Created</h1>
           {problemsCreated}
         </div>
-        <div className="email">
+        <div>
           <h1>Problems Solved</h1>
           {problemsSolved}
         </div>
@@ -83,20 +43,20 @@ class ProfileStatistics extends Component<
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state: RootState) => {
   return {
     selectedUserStatistics: state.user.selectedUserStatistics,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = (dispatch: AppDispatch) => {
   return {
     onGetUserStatistics: (userId: number) =>
       dispatch(actionCreators.getUserStatistics(userId)),
   };
 };
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withRouter(ProfileStatistics));
+const connector = connect(mapStateToProps, mapDispatchToProps);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(ProfileStatistics);

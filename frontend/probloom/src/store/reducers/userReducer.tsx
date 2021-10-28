@@ -1,55 +1,77 @@
+import { UserAction } from '../actions/userActions';
 import * as actionTypes from '../actions/actionTypes';
+import { Reducer } from 'redux';
 
 export interface UserField {
   id: number;
   username: string;
   email: string;
-  password: string;
   logged_in: boolean;
+  password: string;
+}
+
+export interface User {
+  id: number;
+  username: string;
+  email: string;
 }
 
 export interface UserStatistics {
-  username: string;
-  email: string;
+  userId: number;
   lastActiveDays: number;
   problemsCreated: number;
   problemsSolved: number;
   // TODO
 }
 
-export interface InitialState {
-  users: UserField[];
-  selectedUser: UserField | null;
+export interface UserProfile {
+  userId: number;
+  introduction: string;
+}
+
+export interface UserState {
+  users: User[];
+  selectedUser: User | null;
+  selectedUserProfile: UserProfile | null;
   selectedUserStatistics: UserStatistics | null;
 }
 
-const UserState: InitialState = {
+const initialState: UserState = {
   users: [],
   selectedUser: null,
+  selectedUserProfile: null,
   selectedUserStatistics: null,
 };
 
-export interface ProfileStatisticsProps {
-  selectedUser: UserField;
-  onGetUserStatistics: (number) => void;
-}
+export type UserReducer = Reducer<UserState, UserAction>;
 
-export interface ProfileStatisticsState {
-  // TODO
-}
-
-const reducer = (state = UserState, action) => {
+const userReducer: UserReducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.GET_USER_STATISTICS:
       return {
         ...state,
         selectedUserStatistics: action.selectedUserStatistics,
       };
-
+    case actionTypes.GET_USER_PROFILE:
+      return {
+        ...state,
+        selectedUserProfile: action.selectedUserProfile,
+      };
+    case actionTypes.UPDATE_USER_INTRODUCTION:
+      if (state.selectedUserProfile === null) {
+        break;
+      }
+      return {
+        ...state,
+        selectedUserProfile: {
+          ...state.selectedUserProfile,
+          introduction: action.newIntroduction,
+        },
+      };
     default:
       break;
   }
   return state;
 };
 
-export default reducer;
+export default userReducer;

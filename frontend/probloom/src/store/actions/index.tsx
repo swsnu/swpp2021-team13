@@ -1,1 +1,5 @@
-export { getUserStatistics } from './actions';
+export {
+  getUserStatistics,
+  getUserProfile,
+  updateUserIntroduction,
+} from './userActions';
