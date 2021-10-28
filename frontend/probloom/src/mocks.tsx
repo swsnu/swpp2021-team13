@@ -1,11 +1,5 @@
 import { connectRouter } from 'connected-react-router';
-import {
-  AnyAction,
-  applyMiddleware,
-  combineReducers,
-  compose,
-  createStore,
-} from 'redux';
+import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import { UserState } from './store/reducers/userReducer';
 
 import { history, middlewares } from './store/store';
@@ -22,7 +16,7 @@ const defaultMockUserState: UserState = {
 };
 
 const getMockUserReducer = (initialState: UserState) =>
-  jest.fn((state = initialState, _: AnyAction) => state);
+  jest.fn((state = initialState, _) => state);
 
 declare global {
   interface Window {

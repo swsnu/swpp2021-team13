@@ -1,5 +1,6 @@
 import { UserAction } from '../actions/userActions';
 import * as actionTypes from '../actions/actionTypes';
+import { Reducer } from 'redux';
 
 export interface UserField {
   id: number;
@@ -35,7 +36,9 @@ const initialState: UserState = {
   selectedUserStatistics: null,
 };
 
-const userReducer = (state = initialState, action: UserAction) => {
+export type UserReducer = Reducer<UserState, UserAction>;
+
+const userReducer: UserReducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.GET_USER_STATISTICS:
       return {

@@ -110,11 +110,12 @@ class ProfileSummary extends Component<
     const introduction =
       this.props.selectedUserProfile?.introduction ?? 'test-introduction';
     const hasIntroduction = introduction !== '';
+    if (this.state.editing) {
+      return <div>{this.renderIntroductionEditor()}</div>;
+    }
     return (
       <div>
-        {this.state.editing
-          ? this.renderIntroductionEditor()
-          : hasIntroduction
+        {hasIntroduction
           ? this.renderIntroduction(introduction)
           : this.renderIntroductionPlaceholder()}
       </div>
