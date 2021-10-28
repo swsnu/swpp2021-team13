@@ -174,7 +174,7 @@ const mapStateToProps = (state: any) => {
 const mapDispatchToProps = (dispatch: any) => {
   return {
     onGetAllUsers: () => dispatch(actionCreators.getAllUsers()),
-    onSignUp: (user: any) => dispatch(actionCreators.logIn(user)),
+    onSignUp: (user: any) => dispatch(actionCreators.signUp(user)),
   };
 };
 
