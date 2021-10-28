@@ -61,7 +61,8 @@ class Welcome extends Component<Props, State> {
     if (isValid) {
       const user = this.props.storedUsers.find(
         (user_) =>
-          user_.email === this.state.id || user_.username === this.state.id
+          (user_.email === this.state.id || user_.username === this.state.id) &&
+          user_.password === this.state.pw
       );
 
       if (user) {
