@@ -7,6 +7,13 @@ export interface UserField {
   username: string;
   email: string;
   logged_in: boolean;
+  password: string;
+}
+
+export interface User {
+  id: number;
+  username: string;
+  email: string;
 }
 
 export interface UserStatistics {
@@ -23,8 +30,8 @@ export interface UserProfile {
 }
 
 export interface UserState {
-  users: UserField[];
-  selectedUser: UserField | null;
+  users: User[];
+  selectedUser: User | null;
   selectedUserProfile: UserProfile | null;
   selectedUserStatistics: UserStatistics | null;
 }
