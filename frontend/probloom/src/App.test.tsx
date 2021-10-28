@@ -37,28 +37,16 @@ describe('<App />', () => {
       expect(screen.getByRole('heading')).toHaveTextContent('TEST_NOT_FOUND');
     });
 
-    it("routes '/user/123/summary to Profile page", () => {
+    it.each([
+      ['/user/123/summary', '123', 'summary'],
+      ['/user/123/statistics', '123', 'statistics'],
+      ['/user/123', '123', 'summary'],
+    ])('routes %s to Profile page', (path, id, active) => {
       render(app);
-      history.push('/user/123/summary');
+      history.push(path);
       expect(screen.getByRole('heading')).toHaveTextContent('TEST_PROFILE');
-      expect(screen.getByText('id: 123')).toBeInTheDocument();
-      expect(screen.getByText('tab name: summary')).toBeInTheDocument();
-    });
-
-    it("routes '/user/123/statistics to Profile page", () => {
-      render(app);
-      history.push('/user/123/statistics');
-      expect(screen.getByRole('heading')).toHaveTextContent('TEST_PROFILE');
-      expect(screen.getByText('id: 123')).toBeInTheDocument();
-      expect(screen.getByText('tab name: statistics')).toBeInTheDocument();
-    });
-
-    it("routes '/user/123 to Profile summary page", () => {
-      render(app);
-      history.push('/user/123');
-      expect(screen.getByRole('heading')).toHaveTextContent('TEST_PROFILE');
-      expect(screen.getByText('id: 123')).toBeInTheDocument();
-      expect(screen.getByText('tab name: summary')).toBeInTheDocument();
+      expect(screen.getByText(`id: ${id}`)).toBeInTheDocument();
+      expect(screen.getByText(`tab name: ${active}`)).toBeInTheDocument();
     });
   });
 });

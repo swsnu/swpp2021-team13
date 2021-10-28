@@ -47,12 +47,15 @@ describe('<Profile />', () => {
     });
   });
 
-  describe('given invalid user id', () => {
+  describe.each([
+    ['user id', '/user/INVALID/statistics'],
+    ['tab name', '/user/0/INVALID'],
+  ])('given invalid %s', (invalidParameterName, path) => {
     let spy: jest.SpyInstance;
     beforeEach(() => {
       spy = jest.spyOn(console, 'warn').mockImplementation();
       const app = (
-        <MemoryRouter initialEntries={['/user/INVALID/statistics']}>
+        <MemoryRouter initialEntries={[path]}>
           <Route path="/user/:id/:active" exact component={Profile} />
         </MemoryRouter>
       );
@@ -69,34 +72,7 @@ describe('<Profile />', () => {
 
     it('emits warning', () => {
       expect(spy).toHaveBeenCalledWith(
-        expect.stringContaining('not a valid user id')
-      );
-    });
-  });
-
-  describe('given invalid tab name', () => {
-    let spy: jest.SpyInstance;
-    beforeEach(() => {
-      spy = jest.spyOn(console, 'warn').mockImplementation();
-      const app = (
-        <MemoryRouter initialEntries={['/user/0/INVALID']}>
-          <Route path="/user/:id/:active" exact component={Profile} />
-        </MemoryRouter>
-      );
-      render(app);
-    });
-
-    afterEach(() => {
-      spy.mockClear();
-    });
-
-    it('renders not found page', () => {
-      expect(screen.getByText('TEST_NOT_FOUND')).toBeInTheDocument();
-    });
-
-    it('emits warning', () => {
-      expect(spy).toHaveBeenCalledWith(
-        expect.stringContaining('not a valid tab name')
+        expect.stringContaining(`not a valid ${invalidParameterName}`)
       );
     });
   });
