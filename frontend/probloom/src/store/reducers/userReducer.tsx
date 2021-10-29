@@ -1,6 +1,8 @@
+import { UserAction } from '../actions/userActions';
 import * as actionTypes from '../actions/actionTypes';
+import { Reducer } from 'redux';
 
-interface UserField {
+export interface UserField {
   id: number;
   username: string;
   email: string;
@@ -8,17 +10,42 @@ interface UserField {
   logged_in: boolean;
 }
 
-interface initialState {
-  users: UserField[];
-  selectedUser: UserField | null;
+export interface User {
+  id: number;
+  username: string;
+  email: string;
 }
 
-const UserState: initialState = {
+export interface UserStatistics {
+  userId: number;
+  lastActiveDays: number;
+  problemsCreated: number;
+  problemsSolved: number;
+  // TODO
+}
+
+export interface UserProfile {
+  userId: number;
+  introduction: string;
+}
+
+export interface UserState {
+  users: UserField[];
+  selectedUser: User | null;
+  selectedUserProfile: UserProfile | null;
+  selectedUserStatistics: UserStatistics | null;
+}
+
+const initialState: UserState = {
   users: [],
   selectedUser: null,
+  selectedUserProfile: null,
+  selectedUserStatistics: null,
 };
 
-const userReducer = (state = UserState, action) => {
+export type UserReducer = Reducer<UserState, UserAction>;
+
+const userReducer: UserReducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.GET_ALL_USERS:
       return { ...state, users: action.users };
@@ -34,16 +61,32 @@ const userReducer = (state = UserState, action) => {
       });
       return { ...state, user: modifiedUser };
     case actionTypes.SIGN_UP:
-      const newUser = {
-        id: action.id,
-        username: action.username,
-        email: action.email,
-        password: action.password,
-        loggend_in: action.logged_in,
+      return { ...state, users: [...state.users, action.target] };
+    case actionTypes.GET_USER_STATISTICS:
+      return {
+        ...state,
+        selectedUserStatistics: action.selectedUserStatistics,
       };
-      return { ...state, users: [...state.users, newUser] };
+    case actionTypes.GET_USER_PROFILE:
+      return {
+        ...state,
+        selectedUserProfile: action.selectedUserProfile,
+      };
+    case actionTypes.UPDATE_USER_INTRODUCTION:
+      if (state.selectedUserProfile === null) {
+        break;
+      }
+      return {
+        ...state,
+        selectedUserProfile: {
+          ...state.selectedUserProfile,
+          introduction: action.newIntroduction,
+        },
+      };
     default:
-      return state;
+      break;
   }
+  return state;
 };
+
 export default userReducer;

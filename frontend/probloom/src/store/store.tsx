@@ -1,22 +1,39 @@
-import { createStore, combineReducers, applyMiddleware } from 'redux';
-import { composeWithDevTools } from 'redux-devtools-extension';
-import thunk from 'redux-thunk';
+import {
+  createStore,
+  combineReducers,
+  applyMiddleware,
+  compose,
+  AnyAction,
+} from 'redux';
+import thunk, { ThunkDispatch } from 'redux-thunk';
 import { connectRouter, routerMiddleware } from 'connected-react-router';
 import { createBrowserHistory } from 'history';
+
 import userReducer from './reducers/userReducer';
 
 export const history = createBrowserHistory();
+
 const rootReducer = combineReducers({
   user: userReducer,
   router: connectRouter(history),
 });
+
 export const middlewares = [thunk, routerMiddleware(history)];
 
-export type AppState = ReturnType<typeof rootReducer>;
+declare global {
+  interface Window {
+    __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: typeof compose;
+  }
+}
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 const store = createStore(
   rootReducer,
-  composeWithDevTools(applyMiddleware(...middlewares))
+  composeEnhancers(applyMiddleware(...middlewares))
 );
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch &
+  ThunkDispatch<RootState, any, AnyAction>;
 
 export default store;

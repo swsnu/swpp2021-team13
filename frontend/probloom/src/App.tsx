@@ -1,14 +1,20 @@
 import React from 'react';
-import './App.css';
 import { Route, Redirect, Switch } from 'react-router-dom';
 import { ConnectedRouter } from 'connected-react-router';
+import { History } from 'history';
+
+import './App.css';
 import Welcome from './containers/Welcome/Welcome';
 import SignUp from './containers/SignUp/SignUp';
+import Profile from './containers/Profile/Profile';
+import ProblemSetSearch from './containers/ProblemSet/ProblemSetSearch/ProblemSetSearch';
+import ProblemSetDetail from './containers/ProblemSet/ProblemSetDetail/ProblemSetDetail';
+import NotFound from './components/NotFound/NotFound';
 
-function App(props) {
+function App(props: { history: History }) {
   return (
-    <ConnectedRouter history={props.history}>
-      <div className="App">
+    <div className="App">
+      <ConnectedRouter history={props.history}>
         <Switch>
           <Route
             path="/login"
@@ -21,10 +27,18 @@ function App(props) {
             render={() => <SignUp history={props.history} />}
           />
           <Redirect exact from="/" to="login" />
-          <Route render={() => <h1>Not Found</h1>} />
+          <Route path="/user/:id/:active" exact component={Profile} />
+          <Redirect from="/user/:id" to="/user/:id/summary" exact />
+          <Route path="/problem/search" exact component={ProblemSetSearch} />
+          <Route
+            path="/problem/:id/detail"
+            exact
+            component={ProblemSetDetail}
+          />
+          <Route component={NotFound} />
         </Switch>
-      </div>
-    </ConnectedRouter>
+      </ConnectedRouter>
+    </div>
   );
 }
 
