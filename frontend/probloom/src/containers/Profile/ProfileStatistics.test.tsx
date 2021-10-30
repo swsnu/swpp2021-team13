@@ -32,11 +32,11 @@ const stubInitialState: UserState = {
   selectedUserStatistics: {
     userId: 1,
     lastActiveDays: 1,
-    createdProblems: [1, 2],
-    solvedProblems: [1, 2, 3],
-    recommendedProblems: [1],
-    createdExplanations: [7, 8],
-    recommendedExplanations: [7],
+    // createdProblems: [1, 2],
+    // solvedProblems: [1, 2, 3],
+    // recommendedProblems: [1],
+    // createdExplanations: [7, 8],
+    // recommendedExplanations: [7],
   },
 };
 

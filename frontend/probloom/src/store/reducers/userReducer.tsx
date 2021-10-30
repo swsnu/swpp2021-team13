@@ -19,11 +19,11 @@ export interface User {
 export interface UserStatistics {
   userId: number;
   lastActiveDays: number;
-  createdProblems: number[];
-  solvedProblems: number[];
-  recommendedProblems: number[];
-  createdExplanations: number[];
-  recommendedExplanations: number[];
+  // createdProblems: number[];
+  // solvedProblems: number[];
+  // recommendedProblems: number[];
+  // createdExplanations: number[];
+  // recommendedExplanations: number[];
 }
 
 export interface UserProfile {

@@ -17,16 +17,16 @@ class ProfileStatistics extends Component<ProfileStatisticsProps> {
   render() {
     const lastActiveDays: number =
       this.props.selectedUserStatistics?.lastActiveDays ?? 0;
-    const createdProblems: number[] = this.props.selectedUserStatistics
-      ?.createdProblems ?? [0];
-    const solvedProblems: number[] = this.props.selectedUserStatistics
-      ?.solvedProblems ?? [0];
-    const recommendedProblems: number[] = this.props.selectedUserStatistics
-      ?.recommendedProblems ?? [0];
-    const createdExplanations: number[] = this.props.selectedUserStatistics
-      ?.createdExplanations ?? [0];
-    const recommendedExplanations: number[] = this.props.selectedUserStatistics
-      ?.recommendedExplanations ?? [0];
+    // const createdProblems: number[] = this.props.selectedUserStatistics;
+    //   ?.createdProblems ?? [0];
+    // const solvedProblems: number[] = this.props.selectedUserStatistics
+    //   ?.solvedProblems ?? [0];
+    // const recommendedProblems: number[] = this.props.selectedUserStatistics
+    //   ?.recommendedProblems ?? [0];
+    // const createdExplanations: number[] = this.props.selectedUserStatistics
+    //   ?.createdExplanations ?? [0];
+    // const recommendedExplanations: number[] = this.props.selectedUserStatistics
+    //   ?.recommendedExplanations ?? [0];
 
     return (
       <div className="ProfileStatistics">
@@ -34,7 +34,7 @@ class ProfileStatistics extends Component<ProfileStatisticsProps> {
           <h1>Last Active</h1>
           {lastActiveDays} days ago
         </div>
-        <div className="created-problems">
+        {/* <div className="created-problems">
           <h1>Created Problems</h1>
           {createdProblems}
         </div>
@@ -53,7 +53,7 @@ class ProfileStatistics extends Component<ProfileStatisticsProps> {
         <div className="recommended-explanations">
           <h1>Recommended Explanations</h1>
           {recommendedExplanations}
-        </div>
+        </div> */}
       </div>
     );
   }
