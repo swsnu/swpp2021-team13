@@ -19,11 +19,15 @@ def userList(request):
             password = json.loads(body)['password']
             logged_in = json.loads(body)['logged_in']
         except(KeyError, JSONDecodeError) as e:
+            if e == KeyError:
+                print("Key")
+            else:
+                print("Json")
             return HttpResponseBadRequest()
         user = User(username=username, email=email, password=password, logged_in=logged_in)
         user.save()
         responseDict = {'id': user.id, 'username': user.username}
-        return JsonResponse(responseDict, status=201)
+        return JsonResponse(responseDict, status=200)
     else:
         return HttpResponseNotAllowed(['GET', 'POST'])
 
@@ -48,7 +52,7 @@ def userInfo(request, id=0):
         targetUser.logged_in = logged_in
         targetUser.save()
         responseDict = {'id': id, 'username': username, 'email': email, 'password': password, 'logged_in': logged_in}
-        return JsonResponse(responseDict, status=201)
+        return JsonResponse(responseDict, status=200)
     else:
         return HttpResponseNotAllowed(['GET', 'PUT'])
 
