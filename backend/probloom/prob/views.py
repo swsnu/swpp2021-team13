@@ -1,9 +1,9 @@
 #from django.shortcuts import render
-from django.http import HttpResponseBadRequest, HttpResponseNotAllowed, JsonResponse, response 
-import json 
+from django.http import HttpResponseBadRequest, HttpResponseNotAllowed, JsonResponse, response
+import json
 from json.decoder import JSONDecodeError
 from django.views.decorators.csrf import ensure_csrf_cookie
-from .models import User
+from .models import User, UserStatistics
 
 # Create your views here.
 @ensure_csrf_cookie
@@ -51,4 +51,9 @@ def userInfo(request, id=0):
         return JsonResponse(responseDict, status=201)
     else:
         return HttpResponseNotAllowed(['GET', 'PUT'])
-    
+
+@ensure_csrf_cookie
+def userStatistics(request, id=0):
+    if request.method == 'GET':
+        userStatistics = UserStatistics.objects.get(id=id)
+        return JsonResponse({"id": userStatistics.id, "lastActiveDays": userStatistics.lastActiveDays}, safe=False)
