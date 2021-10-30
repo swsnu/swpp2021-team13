@@ -9,6 +9,8 @@ import {
 import { AppDispatch, RootState } from '../store';
 import * as actionTypes from './actionTypes';
 
+axios.defaults.xsrfCookieName = 'csrftoken';
+axios.defaults.xsrfHeaderName = 'X-CSFRToken';
 export interface GetAllUsersAction {
   type: typeof actionTypes.GET_ALL_USERS;
   users: UserField[];

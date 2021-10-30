@@ -67,8 +67,9 @@
   "jest": {
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}",
-      "!src/index.js",
-      "!src/reportWebVitals.ts"
+      "!src/index.tsx",
+      "!src/reportWebVitals.ts",
+      "!src/store/actions/index.tsx"
     ]
   },
   "prettier": {

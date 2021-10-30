@@ -1,12 +1,12 @@
 #from django.shortcuts import render
 from django.http import HttpResponseBadRequest, HttpResponseNotAllowed, JsonResponse, response 
-from django.views.decorators.csrf import csrf_exempt
 import json 
 from json.decoder import JSONDecodeError
+from django.views.decorators.csrf import ensure_csrf_cookie
 from .models import User
 
 # Create your views here.
-@csrf_exempt
+@ensure_csrf_cookie
 def userList(request):
     if request.method == 'GET':
         userAllList = [user for user in User.objects.all().values()]
@@ -27,7 +27,7 @@ def userList(request):
     else:
         return HttpResponseNotAllowed(['GET', 'POST'])
 
-@csrf_exempt
+@ensure_csrf_cookie
 def userInfo(request, id=0):
     if request.method == 'GET':
         filteredUserInfo = [user for user in User.objects.filter(id=id).values()]
