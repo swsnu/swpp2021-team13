@@ -3,4 +3,4 @@ from django.db import models
 
 # Create your models here.
 class User(AbstractUser):
-    login = models.BooleanField(default=False)
+    logged_in = models.BooleanField(default=False)
