@@ -19,11 +19,9 @@ export interface User {
 export interface UserStatistics {
   userId: number;
   lastActiveDays: number;
-  createdProblems: number[];
-  solvedProblems: number[];
-  recommendedProblems: number[];
-  createdExplanations: number[];
-  recommendedExplanations: number[];
+  problemsCreated: number;
+  problemsSolved: number;
+  // TODO
 }
 
 export interface UserProfile {

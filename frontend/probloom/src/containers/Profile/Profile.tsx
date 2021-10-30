@@ -5,7 +5,6 @@ import './Profile.css';
 import NotFound from '../../components/NotFound/NotFound';
 import ProfileSummary from './ProfileSummary';
 import ProfileStatistics from './ProfileStatistics';
-import Layout from '../../components/Layout/Layout';
 
 export interface ProfilePathParams {
   id: string;
@@ -45,12 +44,9 @@ const Profile = (props: RouteComponentProps<ProfilePathParams>) => {
           </li>
         </ul>
       </nav>
-      {/* TODO : props as a username */}
-      <Layout username={userId} footer={true}>
-        <h2>John Doe</h2>
-        <h3>john.doe@example.com</h3>
-        {tabContent}
-      </Layout>
+      <h2>John Doe</h2>
+      <h3>john.doe@example.com</h3>
+      {tabContent}
     </div>
   );
 };
