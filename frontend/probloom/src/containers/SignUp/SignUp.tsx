@@ -39,7 +39,7 @@ class SignUp extends Component<Props, State> {
     };
   }
 
-  onClickSignUpButton = () => {
+  onClickSignUpButton = async () => {
     const data = {
       username: this.state.username,
       email: this.state.email,
@@ -72,7 +72,7 @@ class SignUp extends Component<Props, State> {
         email: this.state.email,
         password: this.state.pw,
       };
-      this.props.onSignUp(newUser);
+      await this.props.onSignUp(newUser);
 
       if (this.props.selectedUser) {
         alert('Account created!');

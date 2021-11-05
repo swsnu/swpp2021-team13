@@ -36,7 +36,7 @@ class Welcome extends Component<Props, State> {
     };
   }
 
-  onClickSignInButton = () => {
+  onClickSignInButton = async () => {
     const data = {
       id: this.state.id,
       pw: this.state.pw,
@@ -56,7 +56,7 @@ class Welcome extends Component<Props, State> {
 
     if (isValid) {
       const user = { id: data.id, password: data.pw };
-      this.props.onLogIn(user);
+      await this.props.onLogIn(user);
 
       if (this.props.selectedUser) {
         this.props.history.push('/problem/search');

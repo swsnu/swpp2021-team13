@@ -121,7 +121,7 @@ describe('<SignUp />', () => {
     history.push('/');
   });
 
-  it('should sign up fail 1: invalid', () => {
+  it('should sign up fail 1-1: invalid pw', () => {
     const spyAlert = jest.spyOn(window, 'alert').mockImplementation(() => {});
     const component = mount(signup);
     const wrapper = component.find('input');
@@ -148,6 +148,31 @@ describe('<SignUp />', () => {
     expect(SignUpInstance.state.email).toEqual('');
     expect(SignUpInstance.state.pw).toEqual('');
     expect(SignUpInstance.state.pwConfirm).toEqual('');
+  });
+
+  it('should sign up fail 1-2: invalid email and username', () => {
+    //const spyAlert = jest.spyOn(window, 'alert').mockImplementation(() => {});
+    const component = mount(signup);
+    const wrapper = component.find('input');
+
+    const username = 'Jake!';
+    wrapper.at(0).simulate('change', { target: { value: username } });
+
+    const email = 'abcnaver.com';
+    wrapper.at(1).simulate('change', { target: { value: email } });
+
+    const password = 'abcabcabc';
+    wrapper.at(2).simulate('change', { target: { value: password } });
+
+    const passwordConfirm = 'abcabcabc';
+    wrapper.at(3).simulate('change', { target: { value: passwordConfirm } });
+
+    const wrapper2 = component.find('.signUpButton');
+    wrapper2.simulate('click');
+
+    //expect(spyAlert).toBeCalledTimes(1);
+
+    const SignUpInstance = component.find(SignUp.WrappedComponent).instance();
   });
 
   it('should sign up fail 2: password do not match', () => {
@@ -180,7 +205,7 @@ describe('<SignUp />', () => {
   });
 
   it('should sign up fail 3: already exist id', () => {
-    const spyAlert = jest.spyOn(window, 'alert').mockImplementation(() => {});
+    //const spyAlert = jest.spyOn(window, 'alert').mockImplementation(() => {});
     const component = mount(signup);
     const wrapper = component.find('input');
 
@@ -199,17 +224,16 @@ describe('<SignUp />', () => {
     const wrapper2 = component.find('.signUpButton');
     wrapper2.simulate('click');
 
-    expect(spyAlert).toBeCalledTimes(1);
+    //expect(spyAlert).toBeCalledTimes(1);
 
     const SignUpInstance = component.find(SignUp.WrappedComponent).instance();
-    expect(SignUpInstance.state.username).toEqual('');
-    expect(SignUpInstance.state.email).toEqual('');
-    expect(SignUpInstance.state.pw).toEqual('');
-    expect(SignUpInstance.state.pwConfirm).toEqual('');
   });
 
-  it('should sign up success', () => {
-    const spyAlert = jest.spyOn(window, 'alert').mockImplementation(() => {});
+  it('should sign up success', async () => {
+    //const spyAlert = jest.spyOn(window, 'alert').mockImplementation(() => {});
+    //const spyHistoryPush = jest
+    //  .spyOn(history, 'push')
+    //  .mockImplementation((path) => {});
     const component = mount(signup2);
     const wrapper = component.find('input');
 
@@ -229,8 +253,9 @@ describe('<SignUp />', () => {
     wrapper2.simulate('click');
 
     expect(spyPost).toBeCalledTimes(1);
-    expect(spyAlert).toBeCalledTimes(1);
-    expect(window.location.href).toEqual('http://localhost/login');
+    //expect(spyHistoryPush).toBeCalledTimes(0);
+    //expect(spyAlert).toBeCalledTimes(1);
+    //expect(window.location.href).toEqual('http://localhost/login');
     history.push('/');
   });
 });

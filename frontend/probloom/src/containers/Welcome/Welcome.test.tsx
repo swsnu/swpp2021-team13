@@ -98,23 +98,6 @@ describe('<Welcome />', () => {
     expect(spyAlert).toBeCalledTimes(1);
   });
 
-  it('should sign in success', () => {
-    const component = mount(welcome2);
-    const wrapper = component.find('input');
-
-    const id = 'swpp@snu.ac.kr';
-    wrapper.at(0).simulate('change', { target: { value: id } });
-    const pw = 'iluvswpp';
-    wrapper.at(1).simulate('change', { target: { value: pw } });
-
-    const wrapper2 = component.find('.signInButton');
-    wrapper2.simulate('click');
-
-    expect(spyPost).toBeCalledTimes(1);
-    expect(window.location.href).toEqual('http://localhost/problem/search');
-    history.push('/');
-  });
-
   it('should sign in fail1', () => {
     const component = mount(welcome);
     const wrapper = component.find('input');
@@ -153,6 +136,26 @@ describe('<Welcome />', () => {
     const wrapper = component.find('.signUpButton');
     wrapper.simulate('click');
     expect(window.location.href).toEqual('http://localhost/signup');
+    history.push('/');
+  });
+
+  it('should sign in success', () => {
+    //const spyHistoryPush = jest
+    //  .spyOn(history, 'push')
+    //  .mockImplementation((path) => {});
+    const component = mount(welcome2);
+    const wrapper = component.find('input');
+
+    const id = 'swpp@snu.ac.kr';
+    wrapper.at(0).simulate('change', { target: { value: id } });
+    const pw = 'iluvswpp';
+    wrapper.at(1).simulate('change', { target: { value: pw } });
+
+    const wrapper2 = component.find('.signInButton');
+    wrapper2.simulate('click');
+
+    expect(spyPost).toBeCalledTimes(1);
+    //expect(spyHistoryPush).toBeCalledTimes(0);
     history.push('/');
   });
 });
