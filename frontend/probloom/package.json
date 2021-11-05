@@ -75,6 +75,7 @@
       "!src/index.tsx",
       "!src/mocks.tsx",
       "!src/store/actions/index.tsx",
+      "!src/react-app-env.d.ts",
       "!src/reportWebVitals.ts",
       "!src/test-utils/mocks.ts",
       "!src/containers/ProblemSet/ProblemSetDetail/*.tsx",

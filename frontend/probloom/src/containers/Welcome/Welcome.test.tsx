@@ -15,14 +15,12 @@ const UserstateTest: UserState = {
       id: 1,
       username: 'John',
       email: 'swpp@snu.ac.kr',
-      password: 'iluvswpp',
       logged_in: true,
     },
     {
       id: 2,
       username: 'Jake',
       email: 'abc@naver.com',
-      password: 'abc',
       logged_in: false,
     },
   ],
@@ -31,11 +29,31 @@ const UserstateTest: UserState = {
   selectedUserStatistics: null,
 };
 
+const UserstateTest2: UserState = {
+  users: [
+    {
+      id: 1,
+      username: 'John',
+      email: 'swpp@snu.ac.kr',
+      logged_in: true,
+    },
+  ],
+  selectedUser: {
+    id: 1,
+    username: 'John',
+    email: 'swpp@snu.ac.kr',
+    logged_in: true,
+  },
+  selectedUserProfile: null,
+  selectedUserStatistics: null,
+};
+
 const mockStore = getMockStore(UserstateTest);
+const mockStore2 = getMockStore(UserstateTest2);
 
 describe('<Welcome />', () => {
-  let welcome;
-  let spyGet, spyPut;
+  let welcome, welcome2;
+  let spyPost;
 
   beforeEach(() => {
     welcome = (
@@ -47,47 +65,29 @@ describe('<Welcome />', () => {
         </ConnectedRouter>
       </Provider>
     );
-    spyGet = jest.spyOn(axios, 'get').mockImplementation(async (_) => ({
+    welcome2 = (
+      <Provider store={mockStore2}>
+        <ConnectedRouter history={history}>
+          <Switch>
+            <Route path="/" exact component={Welcome} />
+          </Switch>
+        </ConnectedRouter>
+      </Provider>
+    );
+    spyPost = jest.spyOn(axios, 'post').mockImplementation(async (_) => ({
       status: 200,
-      data: UserstateTest.users,
+      data: UserstateTest.users[0],
     }));
-    spyPut = jest.spyOn(axios, 'put').mockImplementation(async (_) => ({
-      status: 200,
-      data: UserstateTest.users[1],
-    }));
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('should render Welcome', () => {
     const component = mount(welcome);
     const wrapper = component.find('.Welcome');
     expect(wrapper.length).toBe(1);
-    expect(spyGet).toBeCalledTimes(1);
-  });
-
-  it('should set state properly on id input', () => {
-    const component = mount(welcome);
-    const wrapper = component.find('input');
-    expect(wrapper.length).toBe(2);
-
-    const id = 'swpp@snu.ac.kr';
-    wrapper.at(0).simulate('change', { target: { value: id } });
-
-    const WelcomeInstance = component.find(Welcome.WrappedComponent).instance();
-    expect(WelcomeInstance.state.id).toEqual(id);
-    expect(WelcomeInstance.state.pw).toEqual('');
-  });
-
-  it('should set state properly on pw input', () => {
-    const component = mount(welcome);
-    const wrapper = component.find('input');
-    expect(wrapper.length).toBe(2);
-
-    const pw = 'iluvswpp';
-    wrapper.at(1).simulate('change', { target: { value: pw } });
-
-    const WelcomeInstance = component.find(Welcome.WrappedComponent).instance();
-    expect(WelcomeInstance.state.id).toEqual('');
-    expect(WelcomeInstance.state.pw).toEqual(pw);
   });
 
   it('should click sign in button', () => {
@@ -99,6 +99,23 @@ describe('<Welcome />', () => {
   });
 
   it('should sign in success', () => {
+    const component = mount(welcome2);
+    const wrapper = component.find('input');
+
+    const id = 'swpp@snu.ac.kr';
+    wrapper.at(0).simulate('change', { target: { value: id } });
+    const pw = 'iluvswpp';
+    wrapper.at(1).simulate('change', { target: { value: pw } });
+
+    const wrapper2 = component.find('.signInButton');
+    wrapper2.simulate('click');
+
+    expect(spyPost).toBeCalledTimes(1);
+    expect(window.location.href).toEqual('http://localhost/problem/search');
+    history.push('/');
+  });
+
+  it('should sign in fail1', () => {
     const component = mount(welcome);
     const wrapper = component.find('input');
 
@@ -109,11 +126,11 @@ describe('<Welcome />', () => {
     const wrapper2 = component.find('.signInButton');
     wrapper2.simulate('click');
 
-    expect(spyPut).toBeCalledTimes(1);
+    expect(spyPost).toBeCalledTimes(1);
     history.push('/');
   });
 
-  it('should sign in fail', () => {
+  it('should sign in fail2', () => {
     const spyAlert = jest.spyOn(window, 'alert').mockImplementation(() => {});
     const component = mount(welcome);
     const wrapper = component.find('input');
@@ -125,11 +142,10 @@ describe('<Welcome />', () => {
     const wrapper2 = component.find('.signInButton');
     wrapper2.simulate('click');
 
-    expect(spyAlert).toBeCalledTimes(2);
+    expect(spyAlert).toBeCalledTimes(1);
 
     const WelcomeInstance = component.find(Welcome.WrappedComponent).instance();
     expect(WelcomeInstance.state.id).toEqual('');
-    expect(WelcomeInstance.state.pw).toEqual('');
   });
 
   it('should click sign up button', () => {

@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import * as actionCreators from '../../store/actions/index';
 import { returntypeof } from 'react-redux-typescript';
 import './Welcome.css';
+import { User } from '../../store/reducers/userReducer';
 
 interface WelcomeProps {
   logo: string;
@@ -15,12 +16,11 @@ interface WelcomeState {
 }
 
 interface StateFromProps {
-  storedUsers: any;
+  selectedUser: User;
 }
 
 interface DispatchFromProps {
-  onGetAllUsers: () => void;
-  onLogIn: (any) => void;
+  onLogIn: (user: any) => void;
 }
 
 type Props = WelcomeProps & typeof statePropTypes & typeof actionPropTypes;
@@ -34,10 +34,6 @@ class Welcome extends Component<Props, State> {
       id: '',
       pw: '',
     };
-  }
-
-  componentDidMount() {
-    this.props.onGetAllUsers();
   }
 
   onClickSignInButton = () => {
@@ -59,15 +55,11 @@ class Welcome extends Component<Props, State> {
     const isValid = (isProperEmail || isProperUsername) && isProperPW;
 
     if (isValid) {
-      const user = this.props.storedUsers.find(
-        (user_) =>
-          (user_.email === this.state.id || user_.username === this.state.id) &&
-          user_.password === this.state.pw
-      );
+      const user = { id: data.id, password: data.pw };
+      this.props.onLogIn(user);
 
-      if (user) {
-        this.props.onLogIn(user);
-        this.props.history.push('problem/search');
+      if (this.props.selectedUser) {
+        this.props.history.push('/problem/search');
       } else {
         alert('Incorrect username/email or password');
         this.setState({ id: '', pw: '' });
@@ -125,13 +117,12 @@ class Welcome extends Component<Props, State> {
 
 const mapStateToProps = (state: any) => {
   return {
-    storedUsers: state.user.users,
+    selectedUser: state.user.selectedUser,
   };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    onGetAllUsers: () => dispatch(actionCreators.getAllUsers()),
     onLogIn: (user: any) => dispatch(actionCreators.logIn(user)),
   };
 };

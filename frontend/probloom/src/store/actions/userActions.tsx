@@ -1,93 +1,66 @@
 import axios from 'axios';
 import { ThunkAction } from 'redux-thunk';
 
-import {
-  UserField,
-  UserProfile,
-  UserStatistics,
-} from '../reducers/userReducer';
+import { User, UserProfile, UserStatistics } from '../reducers/userReducer';
 import { AppDispatch, RootState } from '../store';
 import * as actionTypes from './actionTypes';
 
 axios.defaults.xsrfCookieName = 'csrftoken';
-axios.defaults.xsrfHeaderName = 'X-CSFRToken';
-export interface GetAllUsersAction {
-  type: typeof actionTypes.GET_ALL_USERS;
-  users: UserField[];
+axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+
+export interface LogInAction {
+  type: typeof actionTypes.LOG_IN;
+  target: User | null;
 }
 
-export const getAllUsers_ = (users) => {
+export const logInSuccess = (user) => {
   return {
-    type: actionTypes.GET_ALL_USERS,
-    users: users,
-  };
-};
-
-export const getAllUsers = () => {
-  return (dispatch) => {
-    return axios
-      .get('/api/user/')
-      .then((res) => dispatch(getAllUsers_(res.data)));
-  };
-};
-
-export interface GetUserAction {
-  type: typeof actionTypes.GET_USER;
-  target: UserField;
-}
-
-export const getUser_ = (user) => {
-  return {
-    type: actionTypes.GET_USER,
+    type: actionTypes.LOG_IN,
     target: user,
   };
 };
 
-export const getUser = (id) => {
-  return (dispatch) => {
-    return axios
-      .get(`/api/user/${id}/`)
-      .then((res) => dispatch(getUser_(res.data)));
-  };
-};
-
-export interface LogInAction {
-  type: typeof actionTypes.LOG_IN;
-  targetID: number;
-}
-
-export const logIn_ = (user: any) => {
+export const logInFail = () => {
   return {
     type: actionTypes.LOG_IN,
-    targetID: user.id,
+    target: null,
   };
 };
 
 export const logIn = (user: any) => {
   return (dispatch) => {
     return axios
-      .put(`/api/user/${user.id}/`, { ...user, logged_in: true })
-      .then((res) => dispatch(logIn_(res.data)));
+      .post('/api/signin/', user)
+      .then((res) => dispatch(logInSuccess(res.data)))
+      .catch((error) => dispatch(logInFail()));
   };
 };
 
 export interface SignUpAction {
   type: typeof actionTypes.SIGN_UP;
-  target: UserField;
+  target: User | null;
 }
 
-export const signUp_ = (user: any) => {
+export const signUpSuccess = (user: any) => {
   return {
     type: actionTypes.SIGN_UP,
     target: user,
   };
 };
 
+export const signUpFail = () => {
+  return {
+    type: actionTypes.SIGN_UP,
+    target: null,
+  };
+};
+
 export const signUp = (user: any) => {
   return (dispatch) => {
     return axios
-      .post(`/api/user/`, user)
-      .then((res) => dispatch(signUp_(res.data)));
+      .post('/api/signup/', user)
+      .then((res) => dispatch(signUpSuccess(res.data)))
+      .catch((error) => dispatch(signUpFail()));
   };
 };
 
@@ -168,6 +141,4 @@ export type UserAction =
   | GetUserProfileAction
   | UpdateUserIntroductionAction
   | SignUpAction
-  | LogInAction
-  | GetUserAction
-  | GetAllUsersAction;
+  | LogInAction;
