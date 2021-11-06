@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import * as actionCreators from '../../store/actions/index';
 import { returntypeof } from 'react-redux-typescript';
 import './SignUp.css';
+import { User } from '../../store/reducers/userReducer';
 
 interface SignUpProps {
   history: any;
@@ -16,11 +17,10 @@ interface SignUpState {
 }
 
 interface StateFromProps {
-  storedUsers: any;
+  selectedUser: User;
 }
 
 interface DispatchFromProps {
-  onGetAllUsers: () => void;
   onSignUp: (any) => void;
 }
 
@@ -39,11 +39,7 @@ class SignUp extends Component<Props, State> {
     };
   }
 
-  componentDidMount() {
-    this.props.onGetAllUsers();
-  }
-
-  onClickSignUpButton = () => {
+  onClickSignUpButton = async () => {
     const data = {
       username: this.state.username,
       email: this.state.email,
@@ -71,30 +67,19 @@ class SignUp extends Component<Props, State> {
         return;
       }
 
-      const userSameEmail = this.props.storedUsers.find(
-        (user) => user.email === this.state.email
-      );
+      const newUser = {
+        username: this.state.username,
+        email: this.state.email,
+        password: this.state.pw,
+      };
+      await this.props.onSignUp(newUser);
 
-      const userSameUsername = this.props.storedUsers.find(
-        (user) => user.username === this.state.username
-      );
-
-      if (userSameEmail) {
-        alert('Email already exists!');
-        this.setState({ username: '', email: '', pw: '', pwConfirm: '' });
-      } else if (userSameUsername) {
-        alert('Username already exists!');
-        this.setState({ username: '', email: '', pw: '', pwConfirm: '' });
-      } else {
-        const newUser = {
-          username: this.state.username,
-          email: this.state.email,
-          password: this.state.pw,
-          logged_in: false,
-        };
-        this.props.onSignUp(newUser);
+      if (this.props.selectedUser) {
         alert('Account created!');
         this.props.history.push('/login');
+      } else {
+        alert('Email or Username already exists!');
+        this.setState({ username: '', email: '', pw: '', pwConfirm: '' });
       }
     } else {
       alert(`You can't sign up. There are invalid username/email or password`);
@@ -167,13 +152,12 @@ class SignUp extends Component<Props, State> {
 
 const mapStateToProps = (state: any) => {
   return {
-    storedUsers: state.user.users,
+    selectedUser: state.user.selectedUser,
   };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    onGetAllUsers: () => dispatch(actionCreators.getAllUsers()),
     onSignUp: (user: any) => dispatch(actionCreators.signUp(user)),
   };
 };

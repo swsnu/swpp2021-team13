@@ -1,6 +1,4 @@
 export {
-  getAllUsers,
-  getUser,
   logIn,
   signUp,
   getUserStatistics,
