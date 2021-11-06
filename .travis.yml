@@ -9,6 +9,7 @@ jobs:
       python: "3.8"
       install:
         - source ~/virtualenv/python3.8/bin/activate
+        - pip install -r requirements.txt
         - yarn install --frozen-lockfile
         - pip install coveralls
         - yarn global add coveralls
@@ -17,10 +18,10 @@ jobs:
         - cd frontend/probloom
         - ./node_modules/.bin/eslint src
         - yarn test --coverage --watchAll=false
+        - coveralls-lcov -v -n coverage/lcov.info > coverage.json  
         - cd ../../backend/probloom
-        - pip install -r requirements.txt
         - pylint -E **/*.py --load-plugins pylint_django
         - coverage run --source='.' manage.py test
         - coverage xml
-        - cd ../.. && sonar-scanner
+        - sonar-scanner
         - coveralls --merge=./frontend/probloom/coverage.json
