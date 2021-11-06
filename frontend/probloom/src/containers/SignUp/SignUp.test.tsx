@@ -172,7 +172,7 @@ describe('<SignUp />', () => {
 
     //expect(spyAlert).toBeCalledTimes(1);
 
-    const SignUpInstance = component.find(SignUp.WrappedComponent).instance();
+    //const SignUpInstance = component.find(SignUp.WrappedComponent).instance();
   });
 
   it('should sign up fail 2: password do not match', () => {
@@ -226,7 +226,7 @@ describe('<SignUp />', () => {
 
     //expect(spyAlert).toBeCalledTimes(1);
 
-    const SignUpInstance = component.find(SignUp.WrappedComponent).instance();
+    //const SignUpInstance = component.find(SignUp.WrappedComponent).instance();
   });
 
   it('should sign up success', async () => {

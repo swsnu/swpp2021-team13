@@ -5,7 +5,7 @@ dist: bionic
 jobs:
   include:
     - language: node_js
-      node_js: 14
+      node_js: 16
       python: "3.8"
       install:
         - source ~/virtualenv/python3.8/bin/activate
@@ -19,8 +19,8 @@ jobs:
         - yarn test --coverage --watchAll=false
         - cd ../../backend/probloom
         - pip install -r requirements.txt
-        - pylint **/*.py --load-plugins pylint_django
+        - pylint -E **/*.py --load-plugins pylint_django
         - coverage run --source='.' manage.py test
         - coverage xml
         - sonar-scanner
-        - coveralls --merge=../../frontend/probloom/coverage.json
+        - coveralls --merge=../../frontend/probloom/coverage/coverage-final.json
