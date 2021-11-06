@@ -9,12 +9,12 @@ jobs:
       python: "3.8"
       install:
         - source ~/virtualenv/python3.8/bin/activate
-        - yarn install --frozen-lockfile
         - pip install coveralls
         - yarn global add coveralls
         - gem install coveralls-lcov
       script:
         - cd frontend/probloom
+        - yarn install --frozen-lockfile
         - ./node_modules/.bin/eslint src
         - yarn test --coverage --watchAll=false
         - coveralls-lcov -v -n coverage/lcov.info > coverage.json  
@@ -24,4 +24,4 @@ jobs:
         - coverage run --source='.' manage.py test
         - coverage xml
         - sonar-scanner
-        - coveralls --merge=./frontend/probloom/coverage.json
+        - coveralls --merge=../../frontend/probloom/coverage.json
