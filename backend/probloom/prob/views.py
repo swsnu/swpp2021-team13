@@ -99,7 +99,7 @@ class UserProfileView(LoginRequiredMixin, SingleObjectMixin, View):
     """View methods related to model `UserProfile`."""
 
     model = UserProfile
-    pk_url_kwarg = "user_id"
+    pk_url_kwarg = "u_id"
 
     def get(self, _: HttpRequest, **kwargs) -> HttpResponse:
         """Get profile of specific user."""
