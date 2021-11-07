@@ -133,7 +133,7 @@ class UserProfileTestCase(TestCase):
         self.turing = User.objects.create_user(username="turing", password="turing")
         self.meitner = User.objects.create_user(username="meitner", password="meitner")
 
-        # Since turing is the second user, self.turing.pk != self.user_profile.pk
+        # Since turing is the second user, self.turing.pk != self.turing_profile.pk
         # if UserProfile has its own primary key
         self.turing_profile = UserProfile.objects.create(
             user=self.turing, introduction="I love SWPP!"
