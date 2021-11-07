@@ -6,10 +6,15 @@ from django.http import (
     JsonResponse,
 )
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
 import json
 from json.decoder import JSONDecodeError
+from django.core.exceptions import BadRequest, PermissionDenied
+from django.http.request import HttpRequest
+from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
-from .models import User, UserStatistics
+from django.views.generic.detail import SingleObjectMixin
+from .models import User, UserProfile, UserStatistics
 
 # Create your views here.
 def signup(request):
@@ -66,10 +71,10 @@ def signin(request):
 
             user_ = User.objects.get(username=username)
             res = {
-            "id": user_.id,
-            "username": user_.username,
-            "email": user_.email,
-            "logged_in": True,
+                "id": user_.id,
+                "username": user_.username,
+                "email": user_.email,
+                "logged_in": True,
             }
             print(res)
             return JsonResponse(res, status=201, safe=False)
@@ -88,6 +93,34 @@ def signout(request):
             return HttpResponse(status=401)
     else:
         return HttpResponseNotAllowed(["GET"])
+
+
+class UserProfileView(LoginRequiredMixin, SingleObjectMixin, View):
+    """View methods related to model `UserProfile`."""
+
+    model = UserProfile
+    pk_url_kwarg = "user_id"
+
+    def get(self, _: HttpRequest, **kwargs) -> HttpResponse:
+        """Get profile of specific user."""
+        user_profile = self.get_object()
+        return JsonResponse(user_profile.to_dict())
+
+    def put(self, request: HttpRequest, **kwargs) -> HttpResponse:
+        """Edit introduction of the user."""
+        try:
+            pending_user_profile = json.loads(request.body)
+            introduction = pending_user_profile["introduction"]
+        except (JSONDecodeError, KeyError) as error:
+            raise BadRequest() from error
+
+        user_profile = self.get_object()
+        if request.user.pk != user_profile.pk:
+            raise PermissionDenied()
+
+        user_profile.introduction = introduction
+        user_profile.save()
+        return HttpResponse()
 
 
 def userStatistics(request, id=0):
