@@ -177,6 +177,27 @@ class UserProfileTestCase(TestCase):
                 )
                 self.assertEqual(response.status_code, http.HTTPStatus.NOT_FOUND)
 
+    def test_all_methods_redirects_anonymous_user(self):
+        pending_profile_data = textwrap.dedent(
+            """\
+            {
+                "introduction": "I changed my introduction!"
+            }
+            """
+        )
+        test_cases = [
+            {"method": "get"},
+            {"method": "put", "data": pending_profile_data},
+        ]
+        self.client.logout()
+        for test_case in test_cases:
+            with self.subTest(method=test_case["method"]):
+                response = self.client.generic(
+                    path=f"/api/user/{self.turing.pk}/profile/", **test_case
+                )
+                self.assertEqual(response.status_code, http.HTTPStatus.FOUND)
+                self.assertEqual(response.url, "/api/signin/")
+
     def test_get_fetches_introduction(self):
         response = self.client.get(f"/api/user/{self.meitner.pk}/profile/")
         self.assertEqual(response.status_code, http.HTTPStatus.OK)

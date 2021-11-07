@@ -98,8 +98,10 @@ def signout(request):
 class UserProfileView(LoginRequiredMixin, SingleObjectMixin, View):
     """View methods related to model `UserProfile`."""
 
+    login_url = "/api/signin/"
     model = UserProfile
     pk_url_kwarg = "u_id"
+    redirect_field_name = None
 
     def get(self, _: HttpRequest, **kwargs) -> HttpResponse:
         """Get profile of specific user."""
