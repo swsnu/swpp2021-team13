@@ -110,7 +110,8 @@ def problems(request):
         for prob in prob_list:
             solved_num = Solved.objects.filter(problem=prob).count()
             recommend_num = prob.recommender.all().count()
-            res.append({'title': prob.title,
+            res.append({'id': prob.id,
+                        'title': prob.title,
                         'date': prob.date,
                         'creator': prob.creator.user.username,
                         'solved': solved_num,
