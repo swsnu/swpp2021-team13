@@ -97,14 +97,19 @@ export const getUserProfile_: (profile: UserProfile) => GetUserProfileAction = (
   selectedUserProfile: profile,
 });
 
+export interface GetUserProfileResponse {
+  introduction: string;
+}
+
 export const getUserProfile: (
   userId: number
 ) => ThunkAction<void, RootState, null, GetUserProfileAction> = (userId) => {
   return async (dispatch: AppDispatch) => {
-    const { data }: { data: UserProfile } = await axios.get(
+    const { data } = await axios.get<GetUserProfileResponse>(
       `/api/user/${userId}/profile`
     );
-    dispatch(getUserProfile_(data));
+    const profile: UserProfile = { userId, ...data };
+    dispatch(getUserProfile_(profile));
   };
 };
 

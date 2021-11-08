@@ -40,13 +40,14 @@ describe('Out of all action creators', () => {
   });
 
   test('getUserProfile fetches user profile correctly', async () => {
+    const introduction = 'TEST_USER_PROFILE_INTRODUCTION';
     const stubUserProfile: UserProfile = {
       userId: 42,
-      introduction: 'TEST_USER_PROFILE_INTRODUCTION',
+      introduction,
     };
     spy = jest.spyOn(axios, 'get').mockImplementation(async (_) => ({
       status: 200,
-      data: stubUserProfile,
+      data: { introduction },
     }));
     await dispatch(getUserProfile(42));
     expect(spy).toHaveBeenCalledWith('/api/user/42/profile');
