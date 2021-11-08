@@ -45,7 +45,7 @@ class Welcome extends Component<Props, State> {
     let emailCheck = new RegExp(
       "^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
     );
-    let usernameCheck = new RegExp('^[A-Za-z0-9_@\\+\\.\\-]{3,150}$');
+    let usernameCheck = new RegExp('^[A-Za-z0-9_\\+\\.\\-]{3,150}$');
     let pwCheck = new RegExp('^[a-zA-Z\\d~!@#$%^&*+-_]{8,150}$');
 
     let isProperEmail = emailCheck.test(data.id);
