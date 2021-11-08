@@ -78,8 +78,7 @@
       "!src/react-app-env.d.ts",
       "!src/reportWebVitals.ts",
       "!src/test-utils/mocks.ts",
-      "!src/containers/ProblemSet/ProblemSetDetail/*.tsx",
-      "!src/containers/ProblemSet/ProblemSetSearch/*.tsx"
+      "!src/containers/ProblemSet/ProblemSetDetail/*.tsx"
     ],
     "resetMocks": false
   },

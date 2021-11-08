@@ -10,11 +10,13 @@ import { connectRouter, routerMiddleware } from 'connected-react-router';
 import { createBrowserHistory } from 'history';
 
 import userReducer from './reducers/userReducer';
+import problemReducer from './reducers/problemReducer';
 
 export const history = createBrowserHistory();
 
 const rootReducer = combineReducers({
   user: userReducer,
+  problem: problemReducer,
   router: connectRouter(history),
 });
 

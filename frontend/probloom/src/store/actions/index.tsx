@@ -5,3 +5,7 @@ export {
   getUserProfile,
   updateUserIntroduction,
 } from './userActions';
+
+export {
+  getProblems,
+} from './problemActions';

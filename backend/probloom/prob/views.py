@@ -10,7 +10,7 @@ from django.contrib.auth import authenticate, login, logout
 import json
 from json.decoder import JSONDecodeError
 from django.views.decorators.csrf import ensure_csrf_cookie
-from .models import User, UserStatistics, Problem, Solved
+from .models import User, UserStatistics, ProblemSet, Solved
 
 # Create your views here.
 def signup(request):
@@ -67,10 +67,10 @@ def signin(request):
 
             user_ = User.objects.get(username=username)
             res = {
-            "id": user_.id,
-            "username": user_.username,
-            "email": user_.email,
-            "logged_in": True,
+                "id": user_.id,
+                "username": user_.username,
+                "email": user_.email,
+                "logged_in": True,
             }
             return JsonResponse(res, status=201, safe=False)
         else:
@@ -100,62 +100,68 @@ def userStatistics(request, id=0):
 
 
 @ensure_csrf_cookie
-def problems(request):
-    if request.method == 'GET':
+def problem_set(request):
+    if request.method == "GET":
         if not request.user.is_authenticated:
             return HttpResponse(status=401)
 
-        prob_list = [prob for prob in Problem.objects.all()]
+        prob_list = [prob for prob in ProblemSet.objects.all()]
         res = []
         for prob in prob_list:
             solved_num = Solved.objects.filter(problem=prob).count()
             recommend_num = prob.recommender.all().count()
-            res.append({'id': prob.id,
-                        'title': prob.title,
-                        'date': prob.date,
-                        'creator': prob.creator.user.username,
-                        'solved': solved_num,
-                        'recommended': recommend_num})
-        
+            res.append(
+                {
+                    "id": prob.id,
+                    "title": prob.title,
+                    "date": prob.date,
+                    "creator": prob.creator.user.username,
+                    "solved": solved_num,
+                    "recommended": recommend_num,
+                }
+            )
+
         return JsonResponse(data=res, safe=False)
 
-    elif request.method == 'POST':
+    elif request.method == "POST":
         try:
             req_data = json.loads(request.body.decode())
-            title = req_data['title']
-            type = req_data['type']
-            tag = req_data['tag']
-            difficulty = req_data['difficulty']
-            content = req_data['content']
-            solution = req_data['solution']
+            title = req_data["title"]
+            type = req_data["type"]
+            tag = req_data["tag"]
+            difficulty = req_data["difficulty"]
+            content = req_data["content"]
         except (KeyError, JSONDecodeError):
-           return HttpResponseBadRequest()
+            return HttpResponseBadRequest()
 
         if not request.user.is_authenticated:
             return HttpResponse(status=401)
 
         creator = UserStatistics.objects.get(user=request.user)
-        prob = Problem(title=title,
-                        type=type,
-                        tag=tag,
-                        difficulty=difficulty,
-                        content=content,
-                        solution=solution,
-                        creator=creator)
+        prob = ProblemSet(
+            title=title,
+            type=type,
+            tag=tag,
+            difficulty=difficulty,
+            content=content,
+            creator=creator,
+        )
         prob.save()
-        res = {'id': prob.id,
-                'title': prob.title,
-                'date': str(prob.date),
-                'creator': prob.creator.user.username}
+        res = {
+            "id": prob.id,
+            "title": prob.title,
+            "date": str(prob.date),
+            "creator": prob.creator.user.username,
+        }
         return JsonResponse(data=res)
 
     else:
-        return HttpResponseNotAllowed(['GET', 'POST'])
+        return HttpResponseNotAllowed(["GET", "POST"])
 
 
 @ensure_csrf_cookie
 def solved_prob(request, u_id=0):
-    if request.method == 'GET':
+    if request.method == "GET":
         if not request.user.is_authenticated:
             return HttpResponse(status=401)
 
@@ -166,35 +172,34 @@ def solved_prob(request, u_id=0):
             return HttpResponseNotFound()
 
         solved_num = Solved.objects.filter(solver=solver_stat).count()
-        return JsonResponse(data={'solved_problem': solved_num})
+        return JsonResponse(data={"solved_problem": solved_num})
 
     else:
-        return HttpResponseNotAllowed(['GET'])
+        return HttpResponseNotAllowed(["GET"])
 
 
 @ensure_csrf_cookie
 def solved_result(request, u_id=0, p_id=0):
-    if request.method == 'GET':
+    if request.method == "GET":
         if not request.user.is_authenticated:
             return HttpResponse(status=401)
 
         try:
             solver = User.objects.get(id=u_id)
             solver_stat = UserStatistics.objects.get(user=solver)
-            problem = Problem.objects.get(id=p_id)
+            problem = ProblemSet.objects.get(id=p_id)
             res = Solved.objects.get(solver=solver_stat, problem=problem)
-        except (User.DoesNotExist, UserStatistics.DoesNotExist, 
-                Problem.DoesNotExist):
+        except (User.DoesNotExist, UserStatistics.DoesNotExist, ProblemSet.DoesNotExist):
             return HttpResponseNotFound()
 
-        return JsonResponse(data={'result': res.result})
+        return JsonResponse(data={"result": res.result})
 
-    elif request.method == 'POST':
+    elif request.method == "POST":
         try:
             req_data = json.loads(request.body.decode())
-            result = req_data['result']
+            result = req_data["result"]
         except (KeyError, JSONDecodeError):
-           return HttpResponseBadRequest()
+            return HttpResponseBadRequest()
 
         if not request.user.is_authenticated:
             return HttpResponse(status=401)
@@ -202,16 +207,16 @@ def solved_result(request, u_id=0, p_id=0):
         try:
             solver = User.objects.get(id=u_id)
             solver_stat = UserStatistics.objects.get(user=solver)
-            problem = Problem.objects.get(id=p_id)
-        except (User.DoesNotExist, Problem.DoesNotExist):
+            problem = ProblemSet.objects.get(id=p_id)
+        except (User.DoesNotExist, UserStatistics.DoesNotExist, ProblemSet.DoesNotExist):
             return HttpResponseNotFound()
 
         res = Solved(solver=solver_stat, problem=problem, result=result)
         res.save()
-        return JsonResponse(data={'result': result})
+        return JsonResponse(data={"result": result})
 
     else:
-        return HttpResponseNotAllowed(['GET', 'POST'])
+        return HttpResponseNotAllowed(["GET", "POST"])
 
 
 @ensure_csrf_cookie
