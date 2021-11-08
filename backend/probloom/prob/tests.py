@@ -89,15 +89,6 @@ class SignTestCase(TestCase):
 
 
 class TokenTestCase(TestCase):
-    def test_token(self):
-        client = Client()
-        response = client.post(
-            "/api/token/",
-            json.dumps({"username": "chris", "password": "chris"}),
-            content_type="application/json",
-        )
-        self.assertEqual(response.status_code, 405)
-
     def test_csrf(self):
         # By default, csrf checks are disabled in test client
         # To test csrf protection we enforce csrf checks here

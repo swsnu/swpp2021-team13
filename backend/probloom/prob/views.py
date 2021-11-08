@@ -192,7 +192,6 @@ class UserProfileView(LoginRequiredMixin, SingleObjectMixin, View):
         user_profile.save()
         return HttpResponse()
 
-
 def userStatistics(request, id=0):
     if request.method == "GET":
         userStatistics = UserStatistics.objects.get(id=id)
@@ -206,5 +205,3 @@ def userStatistics(request, id=0):
 def token(request):
     if request.method == "GET":
         return HttpResponse(status=204)
-    else:
-        return HttpResponseNotAllowed(["GET"])
