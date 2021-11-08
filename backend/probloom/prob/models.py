@@ -1,9 +1,23 @@
 from django.db.models import *
 from django.contrib.auth.models import AbstractUser
+from typing import Any, Dict
 
 # Create your models here.
 class User(AbstractUser):
     pass
+
+
+class UserProfile(Model):
+    user = OneToOneField(
+        User, on_delete=CASCADE, related_name="profile", primary_key=True
+    )
+    introduction = TextField(default="")
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "user": self.user.pk,
+            "introduction": str(self.introduction),
+        }
 
 
 class UserStatistics(Model):

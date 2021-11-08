@@ -9,6 +9,7 @@ import { history } from '../../store/store';
 
 import { UserState } from '../../store/reducers/userReducer';
 import ProfileStatistics from './ProfileStatistics';
+import axios from 'axios';
 
 const stubInitialState: UserState = {
   users: [
@@ -16,28 +17,23 @@ const stubInitialState: UserState = {
       id: 1,
       username: 'test-user-1',
       email: 'test-email-1',
+      logged_in: true,
     },
     {
       id: 2,
       username: 'test-user-2',
       email: 'test-email-2',
+      logged_in: false,
     },
   ],
   selectedUser: {
     id: 1,
     username: 'test-user-1',
     email: 'test-email-1',
+    logged_in: true,
   },
   selectedUserProfile: null,
-  selectedUserStatistics: {
-    userId: 1,
-    lastActiveDays: 1,
-    // createdProblems: [1, 2],
-    // solvedProblems: [1, 2, 3],
-    // recommendedProblems: [1],
-    // createdExplanations: [7, 8],
-    // recommendedExplanations: [7],
-  },
+  selectedUserStatistics: null,
 };
 
 const stubInitialStateNoSelected: UserState = {
@@ -46,18 +42,16 @@ const stubInitialStateNoSelected: UserState = {
       id: 1,
       username: 'test-user-1',
       email: 'test-email-1',
+      logged_in: true,
     },
     {
       id: 2,
       username: 'test-user-2',
       email: 'test-email-2',
+      logged_in: false,
     },
   ],
-  selectedUser: {
-    id: 1,
-    username: 'test-user-1',
-    email: 'test-email-1',
-  },
+  selectedUser: null,
   selectedUserProfile: null,
   selectedUserStatistics: null,
 };
@@ -67,8 +61,18 @@ const mockStoreNoSelected = getMockStore(stubInitialStateNoSelected);
 
 describe('<ProfileStatistics />', () => {
   let newProfileStatistics, newProfileStatisticsNoSelected;
+  let spyGet: jest.SpyInstance;
 
   beforeEach(() => {
+    spyGet = jest.spyOn(axios, 'get').mockImplementation(async () => ({
+      userId: 1,
+      lastActiveDays: 1,
+      // createdProblems: [1, 2],
+      // solvedProblems: [1, 2, 3],
+      // recommendedProblems: [1],
+      // createdExplanations: [7, 8],
+      // recommendedExplanations: [7],
+    }));
     newProfileStatistics = (
       <Provider store={mockStore}>
         <ConnectedRouter history={history}>
@@ -105,6 +109,7 @@ describe('<ProfileStatistics />', () => {
     const component = mount(newProfileStatistics);
     const wrapper = component.find('.ProfileStatistics');
     expect(wrapper.length).toBe(1);
+    expect(spyGet).toHaveBeenCalledTimes(1);
   });
 
   it('should render ProfileStatisticsNoSelected', () => {
