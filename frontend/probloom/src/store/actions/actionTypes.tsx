@@ -1,5 +1,6 @@
 // Action for User
-export const LOG_IN = 'LOG_IN';
+export const SIGN_IN = 'SIGN_IN';
+export const SIGN_OUT = 'SIGN_OUT';
 export const SIGN_UP = 'SIGN_UP';
 export const GET_USER_STATISTICS = 'GET_USER_STATISTICS';
 export const GET_USER_PROFILE = 'GET_USER_PROFILE';

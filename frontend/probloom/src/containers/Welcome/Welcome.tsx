@@ -20,7 +20,7 @@ interface StateFromProps {
 }
 
 interface DispatchFromProps {
-  onLogIn: (user: any) => void;
+  onSignIn: (user: any) => void;
 }
 
 type Props = WelcomeProps & typeof statePropTypes & typeof actionPropTypes;
@@ -56,7 +56,7 @@ class Welcome extends Component<Props, State> {
 
     if (isValid) {
       const user = { id: data.id, password: data.pw };
-      await this.props.onLogIn(user);
+      await this.props.onSignIn(user);
 
       if (this.props.selectedUser) {
         this.props.history.push('/problem/search');
@@ -123,7 +123,7 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    onLogIn: (user: any) => dispatch(actionCreators.logIn(user)),
+    onSignIn: (user: any) => dispatch(actionCreators.signIn(user)),
   };
 };
 

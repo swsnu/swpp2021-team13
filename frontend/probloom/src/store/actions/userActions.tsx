@@ -8,31 +8,59 @@ import * as actionTypes from './actionTypes';
 axios.defaults.xsrfCookieName = 'csrftoken';
 axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 
-export interface LogInAction {
-  type: typeof actionTypes.LOG_IN;
+export interface SignInAction {
+  type: typeof actionTypes.SIGN_IN;
   target: User | null;
 }
 
-export const logInSuccess = (user) => {
+export const signInSuccess = (user) => {
   return {
-    type: actionTypes.LOG_IN,
+    type: actionTypes.SIGN_IN,
     target: user,
   };
 };
 
-export const logInFail = () => {
+export const signInFail = () => {
   return {
-    type: actionTypes.LOG_IN,
+    type: actionTypes.SIGN_IN,
     target: null,
   };
 };
 
-export const logIn = (user: any) => {
+export const signIn = (user: any) => {
   return (dispatch) => {
     return axios
       .post('/api/signin/', user)
-      .then((res) => dispatch(logInSuccess(res.data)))
-      .catch((error) => dispatch(logInFail()));
+      .then((res) => dispatch(signInSuccess(res.data)))
+      .catch((error) => dispatch(signInFail()));
+  };
+};
+
+export interface SignOutAction {
+  type: typeof actionTypes.SIGN_OUT;
+  target: User | null;
+}
+
+export const signOutSuccess = () => {
+  return {
+    type: actionTypes.SIGN_OUT,
+    target: null,
+  };
+};
+
+export const signOutFail = (user: any) => {
+  return {
+    type: actionTypes.SIGN_OUT,
+    target: user,
+  };
+};
+
+export const signOut = (user: any) => {
+  return (dispatch) => {
+    return axios
+      .get('/api/signout/')
+      .then((res) => dispatch(signOutSuccess()))
+      .catch((error) => dispatch(signOutFail(error.data)));
   };
 };
 
@@ -146,4 +174,5 @@ export type UserAction =
   | GetUserProfileAction
   | UpdateUserIntroductionAction
   | SignUpAction
-  | LogInAction;
+  | SignInAction
+  | SignOutAction;

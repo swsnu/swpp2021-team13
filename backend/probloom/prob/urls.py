@@ -11,7 +11,7 @@ urlpatterns = [
         "problem/<int:id>/", views.ProblemSetInfoView.as_view(), name="problem_set_info"
     ),
     path(
-        "problem/<int:id>/solver/",
+        "solved/<int:id>/",
         views.ProblemSetSolverView.as_view(),
         name="problem_set_solver",
     ),

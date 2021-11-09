@@ -42,7 +42,9 @@ export type UserReducer = Reducer<UserState, UserAction>;
 
 const userReducer: UserReducer = (state = initialState, action) => {
   switch (action.type) {
-    case actionTypes.LOG_IN:
+    case actionTypes.SIGN_IN:
+      return { ...state, selectedUser: action.target };
+    case actionTypes.SIGN_OUT:
       return { ...state, selectedUser: action.target };
     case actionTypes.SIGN_UP:
       return { ...state, selectedUser: action.target };

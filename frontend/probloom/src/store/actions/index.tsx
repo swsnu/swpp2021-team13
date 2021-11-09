@@ -1,5 +1,6 @@
 export {
-  logIn,
+  signIn,
+  signOut,
   signUp,
   getUserStatistics,
   getUserProfile,

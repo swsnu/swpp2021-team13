@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getUserProfile, updateUserIntroduction } from '.';
-import { UserStatistics, UserProfile } from '../reducers/userReducer';
+import { User, UserStatistics, UserProfile } from '../reducers/userReducer';
 import store, { AppDispatch } from '../store';
 import * as actionCreators from './userActions';
 
@@ -36,6 +36,127 @@ describe('Out of all action creators', () => {
     expect(newState.user.selectedUserStatistics.data).toEqual(
       stubUserStatistics
     );
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('signIn success', async () => {
+    const stubUser: User = {
+      id: 1,
+      username: 'Test_User',
+      email: 'Test_Email',
+      logged_in: true,
+    };
+
+    spy = jest.spyOn(axios, 'post').mockImplementation(async (_) => ({
+      status: 200,
+      data: stubUser,
+    }));
+
+    try {
+      await dispatch(actionCreators.signIn(stubUser));
+    } catch (err) {}
+    const newState = store.getState();
+
+    expect(newState.user.selectedUser).toEqual(stubUser);
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('signIn fail', async () => {
+    const stubUser: User = {
+      id: 1,
+      username: 'Test_User',
+      email: 'Test_Email',
+      logged_in: true,
+    };
+
+    spy = jest.spyOn(axios, 'post').mockRejectedValue(new Error('some error'));
+
+    try {
+      await dispatch(actionCreators.signIn(stubUser));
+    } catch (err) {}
+    const newState = store.getState();
+
+    expect(newState.user.selectedUser).toEqual(null);
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('signUp success', async () => {
+    const stubUser: User = {
+      id: 1,
+      username: 'Test_User',
+      email: 'Test_Email',
+      logged_in: true,
+    };
+
+    spy = jest.spyOn(axios, 'post').mockImplementation(async (_) => ({
+      status: 200,
+      data: stubUser,
+    }));
+
+    try {
+      await dispatch(actionCreators.signUp(stubUser));
+    } catch (err) {}
+    const newState = store.getState();
+
+    expect(newState.user.selectedUser).toEqual(stubUser);
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('signUp fail', async () => {
+    const stubUser: User = {
+      id: 1,
+      username: 'Test_User',
+      email: 'Test_Email',
+      logged_in: true,
+    };
+
+    spy = jest.spyOn(axios, 'post').mockRejectedValue(new Error('some error'));
+
+    try {
+      await dispatch(actionCreators.signUp(stubUser));
+    } catch (err) {}
+    const newState = store.getState();
+
+    expect(newState.user.selectedUser).toEqual(null);
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('signOut success', async () => {
+    const stubUser: User = {
+      id: 1,
+      username: 'Test_User',
+      email: 'Test_Email',
+      logged_in: true,
+    };
+
+    spy = jest.spyOn(axios, 'get').mockImplementation(async (_) => ({
+      status: 200,
+      data: null,
+    }));
+
+    try {
+      await dispatch(actionCreators.signOut(stubUser));
+    } catch (err) {}
+    const newState = store.getState();
+
+    expect(newState.user.selectedUser).toEqual(null);
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('signOut fail', async () => {
+    const stubUser: User = {
+      id: 1,
+      username: 'Test_User',
+      email: 'Test_Email',
+      logged_in: true,
+    };
+
+    spy = jest.spyOn(axios, 'get').mockRejectedValue(new Error('some error'));
+
+    try {
+      await dispatch(actionCreators.signOut(stubUser));
+    } catch (err) {}
+
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
