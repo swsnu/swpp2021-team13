@@ -59,16 +59,6 @@ class ProblemSet(Model):
             "recommended_num": recommended_num
         }
 
-    def solver_dict(self):
-        sovler_set = self.solver.all()
-        res = []
-        for solver in sovler_set:
-            res.append({
-                "userID": solver.solved_user.user.id, 
-                "username": solver.solved_user.user.username
-            })
-        return res
-
 
 class Solved(Model):
     solver = ForeignKey(

@@ -47,9 +47,12 @@ class SolvedTestCase(TestCase):
         res = client.get("/api/solved/0/")
         self.assertEqual(res.status_code, 404)
 
+        res_ = []
         res = client.get("/api/solved/1/")
         self.assertEqual(res.status_code, 200)
+        res_ = res.json()
         self.assertIn('"userID": 1', res.content.decode())
+        self.assertEqual(res.json(), res_)
 
     def test_solved_prob_not_allowed(self):
         client = Client()
