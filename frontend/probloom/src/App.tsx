@@ -17,21 +17,21 @@ function App(props: { history: History }) {
       <ConnectedRouter history={props.history}>
         <Switch>
           <Route
-            path="/login"
+            path="/login/"
             exact
             render={() => <Welcome history={props.history} logo="ProbLoom" />}
           />
           <Route
-            path="/signup"
+            path="/signup/"
             exact
             render={() => <SignUp history={props.history} />}
           />
-          <Redirect exact from="/" to="login" />
-          <Route path="/user/:id/:active" exact component={Profile} />
-          <Redirect from="/user/:id" to="/user/:id/summary" exact />
-          <Route path="/problem/search" exact component={ProblemSetSearch} />
+          <Redirect exact from="/" to="login/" />
+          <Route path="/user/:id/:active/" exact component={Profile} />
+          <Redirect from="/user/:id/" to="/user/:id/summary/" exact />
+          <Route path="/problem/search/" exact component={ProblemSetSearch} />
           <Route
-            path="/problem/:id/detail"
+            path="/problem/:id/detail/"
             exact
             component={ProblemSetDetail}
           />

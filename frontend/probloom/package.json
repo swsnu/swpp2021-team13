@@ -79,8 +79,8 @@
       "!src/reportWebVitals.ts",
       "!src/test-utils/mocks.ts",
       "!src/containers/ProblemSet/ProblemSetSolve/*.tsx",
-      "!src/containers/ProblemSet/ProblemSetSearch/*.tsx",
       "!src/containers/Explanation/**/*.tsx"
+
     ],
     "resetMocks": false
   },
