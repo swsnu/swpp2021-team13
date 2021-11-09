@@ -1,36 +1,37 @@
-import { ProblemAction } from '../actions/problemActions';
+import { ProblemSetAction } from '../actions/problemActions';
 import * as actionTypes from '../actions/actionTypes';
 import { Reducer } from 'redux';
 
-export interface Problem {
-    id: number;
-    title: string;
-    date: string;
-    is_open: boolean;
-    tag: string;
-    difficulty: number;
-    content: string;
-    userID: number,
-    username: string;
-    solved_num: number;
-    recommended_num: number;
+export interface ProblemSet {
+  id: number;
+  title: string;
+  date: string;
+  is_open: boolean;
+  tag: string;
+  difficulty: number;
+  content: string;
+  userID: number;
+  username: string;
+  solved_num: number;
+  recommended_num: number;
 }
 
-
-export interface ProblemState {
-  problems: Problem[];
+export interface ProblemSetState {
+  problemSets: ProblemSet[];
+  selectedProblemSet: ProblemSet | null;
 }
-    
-const initialState: ProblemState = {
-  problems: [],
+
+const initialState: ProblemSetState = {
+  problemSets: [],
+  selectedProblemSet: null,
 };
-  
-export type ProblemReducer = Reducer<ProblemState, ProblemAction>;
+
+export type ProblemReducer = Reducer<ProblemSetState, ProblemSetAction>;
 
 const problemReducer: ProblemReducer = (state = initialState, action) => {
   switch (action.type) {
-    case actionTypes.GET_PROBLEMS:
-      return { ...state, problems: action.problems };
+    case actionTypes.GET_PROBLEMSETS:
+      return { ...state, problemSets: action.problemSets };
     default:
       break;
   }

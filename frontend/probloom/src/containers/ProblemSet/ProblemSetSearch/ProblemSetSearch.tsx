@@ -2,10 +2,10 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 import { returntypeof } from 'react-redux-typescript';
 import Prob from '../../../components/Prob/Prob';
-import { getProblems } from '../../../store/actions';
+import { getProblemSets } from '../../../store/actions';
 import { AppDispatch } from '../../../store/store';
 import { User } from '../../../store/reducers/userReducer';
-import { Problem } from '../../../store/reducers/problemReducer';
+import { ProblemSet } from '../../../store/reducers/problemReducer';
 import './ProblemSetSearch.css';
 
 export interface ProblemSetSearchProps {
@@ -14,7 +14,7 @@ export interface ProblemSetSearchProps {
 
 export interface StateFromProps {
   user: User;
-  problems: Problem[];
+  problemSets: ProblemSet[];
 }
 
 export interface DispatchFromProps {
@@ -61,7 +61,7 @@ class ProblemSetSearch extends Component<Props, ProblemSetSearchState> {
   };
 
   render() {
-    const problems = this.props.problems
+    const problems = this.props.problemSets
       .filter((prob) => {
         let check = new RegExp(this.state.search);
         switch (this.state.term) {
@@ -177,12 +177,12 @@ class ProblemSetSearch extends Component<Props, ProblemSetSearchState> {
 const mapStateToProps = (state: any) => {
   return {
     user: state.user.selectedUser,
-    problems: state.problem.problems,
+    problemSets: state.problem.problemSets,
   };
 };
 
 const mapDispatchToProps = (dispatch: AppDispatch) => ({
-  onGetAllProblems: () => dispatch(getProblems()),
+  onGetAllProblems: () => dispatch(getProblemSets()),
 });
 
 const statePropTypes = returntypeof(mapStateToProps);

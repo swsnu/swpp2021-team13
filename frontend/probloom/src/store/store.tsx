@@ -11,12 +11,14 @@ import { createBrowserHistory } from 'history';
 
 import userReducer from './reducers/userReducer';
 import problemReducer from './reducers/problemReducer';
+import commentReducer from './reducers/commentReducer';
 
 export const history = createBrowserHistory();
 
 const rootReducer = combineReducers({
   user: userReducer,
-  problem: problemReducer,
+  problemset: problemReducer,
+  comment: commentReducer,
   router: connectRouter(history),
 });
 

@@ -76,7 +76,7 @@ class SignUp extends Component<Props, State> {
 
       if (this.props.selectedUser) {
         alert('Account created!');
-        this.props.history.push('/login');
+        this.props.history.push('/signin');
       } else {
         alert('Email or Username already exists!');
         this.setState({ username: '', email: '', pw: '', pwConfirm: '' });
@@ -88,7 +88,7 @@ class SignUp extends Component<Props, State> {
   };
 
   onClickSignInButton = () => {
-    this.props.history.push('/login');
+    this.props.history.push('/signin');
   };
 
   render() {

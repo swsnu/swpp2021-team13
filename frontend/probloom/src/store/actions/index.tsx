@@ -7,6 +7,6 @@ export {
   updateUserIntroduction,
 } from './userActions';
 
-export {
-  getProblems,
-} from './problemActions';
+export { getProblemSets } from './problemActions';
+
+export { getCommentsOfProblemSet } from './commentActions';
