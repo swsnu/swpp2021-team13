@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { ThunkAction } from 'redux-thunk';
 
-import { SimpleProblem } from '../reducers/problemReducer';
+import { Problem } from '../reducers/problemReducer';
 import { AppDispatch, RootState } from '../store';
 import * as actionTypes from './actionTypes';
 
@@ -10,11 +10,11 @@ axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 
 export interface GetProblemsAction {
   type: typeof actionTypes.GET_PROBLEMS;
-  problems: SimpleProblem[];
+  problems: Problem[];
 }
   
 export const getProblems_: (
-  problems: SimpleProblem[]
+  problems: Problem[]
 ) => GetProblemsAction = (problems) => ({
   type: actionTypes.GET_PROBLEMS,
   problems: problems,
@@ -23,7 +23,7 @@ export const getProblems_: (
 export const getProblems: (
 ) => ThunkAction<void, RootState, null, GetProblemsAction> = () => {
   return async (dispatch: AppDispatch) => {
-    const { data }: { data: SimpleProblem[] } = await axios.get(
+    const { data }: { data: Problem[] } = await axios.get(
       `/api/problem/`
     );
     dispatch(getProblems_(data));

@@ -1,11 +1,11 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import { returntypeof } from 'react-redux-typescript';
-import Problem from '../../../components/Problem/Problem';
+import Prob from '../../../components/Prob/Prob';
 import { getProblems } from '../../../store/actions';
 import { AppDispatch } from '../../../store/store';
 import { User } from '../../../store/reducers/userReducer';
-import { SimpleProblem } from '../../../store/reducers/problemReducer';
+import { Problem } from '../../../store/reducers/problemReducer';
 import './ProblemSetSearch.css';
 
 export interface ProblemSetSearchProps {
@@ -14,7 +14,7 @@ export interface ProblemSetSearchProps {
 
 export interface StateFromProps {
   user: User;
-  problems: SimpleProblem[];
+  problems: Problem[];
 }
 
 export interface DispatchFromProps {
@@ -27,11 +27,8 @@ export interface ProblemSetSearchState {
     search: string;
     term: string;
     creator: string;
-    selectingDetail: boolean;
     tag: string;
-    selectingTag: boolean;
     sort: string;
-    selectingSort: boolean;
 }
 
 class ProblemSetSearch extends Component<
@@ -42,11 +39,8 @@ class ProblemSetSearch extends Component<
     search: '',
     term: 'title+content',
     creator: 'open',
-    selectingDetail: false,
     tag: 'all',
-    selectingTag: false,
     sort: 'date',
-    selectingSort: false,
   }
 
   componentDidMount() {
@@ -78,8 +72,11 @@ class ProblemSetSearch extends Component<
           return check.test(prob.content);
       };
     }).filter(prob => (
-      this.state.creator !== 'own'
-        || prob.creator === this.props.user.username
+      prob.userID === this.props.user.id
+        || prob.is_open
+    )).filter(prob => (
+      prob.userID === this.props.user.id
+        || this.state.creator !== 'own'
     )).filter(prob => (
       this.state.tag === 'all' || prob.tag === this.state.tag
     )).sort((a, b) => {
@@ -87,13 +84,13 @@ class ProblemSetSearch extends Component<
         case 'date':
           return b.date.localeCompare(a.date);
         case 'solved':
-          return b.solved - a.solved;
+          return b.solved_num - a.solved_num;
         case 'recommended':
-          return b.recommended - a.recommended;
+          return b.recommended_num - a.recommended_num;
       };
     }).map(prob => {
       return (
-        <Problem
+        <Prob
           key={prob.id}
           title={prob.title}
           date={prob.date}

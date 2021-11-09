@@ -7,7 +7,7 @@ export interface ProblemProps {
     clickProb: () => void;
 }
 
-const Problem = (props: ProblemProps) => {
+const Prob = (props: ProblemProps) => {
     return (
         <div className="Problem">
             <div className="info">
@@ -25,4 +25,4 @@ const Problem = (props: ProblemProps) => {
         </div>
     )
 }
-export default Problem;
+export default Prob;

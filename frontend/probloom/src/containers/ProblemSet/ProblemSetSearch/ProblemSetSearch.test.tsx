@@ -30,31 +30,40 @@ const ProblemStateTest: ProblemState = {
           id: 1,
           title: 'title1',
           date: '2021-01-01',
+          is_open: false,
           tag: 'math',
-          creator: 'user1',
+          difficulty: 1,
           content: 'content1',
-          solved: 1,
-          recommended: 1,
+          userID: 1,
+          username: 'user1',
+          solved_num: 1,
+          recommended_num: 1,
       },
       {
           id: 2,
           title: 'title2',
           date: '2021-02-02',
+          is_open: true,
           tag: 'math',
-          creator: 'user2',
+          difficulty: 2,
           content: 'content2',
-          solved: 0,
-          recommended: 3,
+          userID: 2,
+          username: 'user2',
+          solved_num: 0,
+          recommended_num: 3,
       },
       {
           id: 3,
           title: 'title12',
           date: '1000-01-01',
+          is_open: true,
           tag: 'history',
-          creator: 'user1',
+          difficulty: 3,
           content: 'content3',
-          solved: 3,
-          recommended: 2,
+          userID: 12,
+          username: 'user12',
+          solved_num: 3,
+          recommended_num: 2,
       }
   ]
 };
@@ -145,7 +154,7 @@ describe('<ProblemSetSearch />', () => {
     const wrapper3 = component.find('#search');
     wrapper3.simulate('click');
     const wrapper4 = component.find('.Problem');
-    expect(wrapper4.length).toBe(2);
+    expect(wrapper4.length).toBe(1);
   })
 
   it('should search by math appropriately', () => {

@@ -2,19 +2,23 @@ import { ProblemAction } from '../actions/problemActions';
 import * as actionTypes from '../actions/actionTypes';
 import { Reducer } from 'redux';
 
-export interface SimpleProblem {
+export interface Problem {
     id: number;
     title: string;
     date: string;
+    is_open: boolean;
     tag: string;
-    creator: string;
+    difficulty: number;
     content: string;
-    solved: number;
-    recommended: number;
+    userID: number,
+    username: string;
+    solved_num: number;
+    recommended_num: number;
 }
 
+
 export interface ProblemState {
-  problems: SimpleProblem[];
+  problems: Problem[];
 }
     
 const initialState: ProblemState = {
