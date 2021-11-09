@@ -128,6 +128,92 @@ def userStatistics(request, id=0):
         )
 
 
+class ProblemSetInfoView(View):
+    def get(self, request: HttpRequest, id, **kwargs):
+        if request.user.is_authenticated:
+            try:
+                problem_set = ProblemSet.objects.get(id=id)
+            except:
+                return HttpResponse(status=404)
+
+            res = problem_set.info_dict()
+            return JsonResponse(res, status=201, safe=False)
+        else:
+            return HttpResponse(status=401)
+
+    def put(self, request: HttpRequest, id, **kwargs):
+        if request.user.is_authenticated:
+            try:
+                problem_set = ProblemSet.objects.get(id=id)
+            except:
+                return HttpResponse(status=404)
+
+            if request.user.id == problem_set.creator.user.id:
+                try:
+                    req_data = json.loads(request.body.decode())
+                    title = req_data["title"]
+                    content = req_data["content"]
+                except (KeyError, JSONDecodeError) as e:
+                    return HttpResponseBadRequest()
+
+                problem_set.title = title
+                problem_set.content = content
+                problem_set.save()
+                res = problem_set.info_dict()
+                return JsonResponse(res, status=200)
+            else:
+                return HttpResponse(status=403)
+        else:
+            return HttpResponse(status=401)
+
+    def delete(self, request: HttpRequest, id, **kwargs):
+        if request.user.is_authenticated:
+            try:
+                problem_set = ProblemSet.objects.get(id=id)
+            except:
+                return HttpResponse(status=404)
+
+            if request.user.id == problem_set.creator.user.id:
+                problem_set.delete()
+                return HttpResponse(status=200)
+            else:
+                return HttpResponse(status=403)
+        else:
+            return HttpResponse(status=401)
+
+
+class ProblemSetSolverView(View):
+    def get(self, request: HttpRequest, id, **kwargs):
+        if request.user.is_authenticated:
+            try:
+                problem_set = ProblemSet.objects.get(id=id)
+            except:
+                return HttpResponse(status=404)
+
+            res = problem_set.solver_dict()
+            return JsonResponse(res, status=201, safe=False)
+        else:
+            return HttpResponse(status=401)
+
+
+class ProblemSetCommentView(View):
+    def get(self, request: HttpRequest, id, **kwargs):
+        if request.user.is_authenticated:
+            try:
+                problem_set = ProblemSet.objects.get(id=id)
+            except:
+                return HttpResponse(status=404)
+
+            comment_set = problem_set.comment.all()
+            res = []
+            for comment in comment_set:
+                res.append(comment.to_dict())
+
+            return JsonResponse(res, status=201, safe=False)
+        else:
+            return HttpResponse(status=401)
+
+
 class CommentListView(View):
     def get(self, request: HttpRequest, **kwargs):
         if request.user.is_authenticated:
