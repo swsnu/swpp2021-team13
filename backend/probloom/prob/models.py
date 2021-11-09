@@ -37,7 +37,7 @@ class ProblemSet(Model):
     tag = CharField(max_length=100, default="default tag")
     difficulty = SmallIntegerField(default=0)
     content = TextField(max_length=1000, default="default content")
-    creator = OneToOneField(
+    creator = ForeignKey(
         UserStatistics, related_name="created_problem", on_delete=CASCADE
     )
     recommender = ManyToManyField(
