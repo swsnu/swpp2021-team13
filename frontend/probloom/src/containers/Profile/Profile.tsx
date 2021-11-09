@@ -38,10 +38,10 @@ const Profile = (props: RouteComponentProps<ProfilePathParams>) => {
       <nav>
         <ul>
           <li>
-            <NavLink to="summary">Summary</NavLink>
+            <NavLink to={`/user/${userId}/summary/`}>Summary</NavLink>
           </li>
           <li>
-            <NavLink to="statistics">Statistics</NavLink>
+            <NavLink to={`/user/${userId}/statistics/`}>Statistics</NavLink>
           </li>
         </ul>
       </nav>
