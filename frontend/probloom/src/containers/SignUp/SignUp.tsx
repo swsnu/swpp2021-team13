@@ -48,10 +48,10 @@ class SignUp extends Component<Props, State> {
     };
 
     let emailCheck = new RegExp(
-      '^[^@\\s]+@[^@\\.\\s]+\\.[a-zA-Z]{2,3}(\\.[a-zA-Z]{2,3})*$'
+      "^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
     );
-    let usernameCheck = new RegExp('[a-zA-Z\\-_\\d]{1,30}');
-    let pwCheck = new RegExp('[a-zA-Z\\d~!@#$%^&*]{8,20}');
+    let usernameCheck = new RegExp('^[A-Za-z0-9_\\+\\.\\-]{3,150}$');
+    let pwCheck = new RegExp('^[a-zA-Z\\d~!@#$%^&*+-_]{8,150}$');
 
     let isProperEmail = emailCheck.test(data.email);
     let isProperUsername = usernameCheck.test(data.username);

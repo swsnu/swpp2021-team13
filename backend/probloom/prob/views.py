@@ -12,13 +12,14 @@ from json.decoder import JSONDecodeError
 from django.core.exceptions import BadRequest, PermissionDenied
 from django.http.request import HttpRequest
 from django.views import View
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic.detail import SingleObjectMixin
-from .models import User, UserProfile, UserStatistics
+from .models import User, UserProfile, UserStatistics, ProblemSet, Comment
 
 # Create your views here.
-def signup(request):
-    if request.method == "POST":
+class SignUpView(View):
+    def post(self, request: HttpRequest, **kwargs) -> HttpResponse:
         try:
             req_data = json.loads(request.body.decode())
             username = req_data["username"]
@@ -41,12 +42,10 @@ def signup(request):
             "logged_in": False,
         }
         return JsonResponse(res, status=201, safe=False)
-    else:
-        return HttpResponseNotAllowed(["POST"])
 
 
-def signin(request):
-    if request.method == "POST":
+class SignInView(View):
+    def post(self, request: HttpRequest, **kwargs) -> HttpResponse:
         try:
             req_data = json.loads(request.body.decode())
             id = req_data["id"]
@@ -55,7 +54,7 @@ def signin(request):
             return HttpResponseBadRequest()
 
         user_set = User.objects.all()
-        isEmail = id.find("@") >= 0
+        isEmail = id.find("@") > 0
         try:
             if isEmail:
                 username = User.objects.get(email=id).username
@@ -76,23 +75,18 @@ def signin(request):
                 "email": user_.email,
                 "logged_in": True,
             }
-            print(res)
             return JsonResponse(res, status=201, safe=False)
         else:
             return HttpResponse(status=401)
-    else:
-        return HttpResponseNotAllowed(["POST"])
 
 
-def signout(request):
-    if request.method == "GET":
+class SignOutView(View):
+    def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
         if request.user.is_authenticated:
             logout(request)
             return HttpResponse(status=204)
         else:
             return HttpResponse(status=401)
-    else:
-        return HttpResponseNotAllowed(["GET"])
 
 
 class UserProfileView(LoginRequiredMixin, SingleObjectMixin, View):
@@ -134,9 +128,181 @@ def userStatistics(request, id=0):
         )
 
 
-@ensure_csrf_cookie
-def token(request):
-    if request.method == "GET":
+class ProblemSetInfoView(View):
+    def get(self, request: HttpRequest, id, **kwargs):
+        if request.user.is_authenticated:
+            try:
+                problem_set = ProblemSet.objects.get(id=id)
+            except:
+                return HttpResponse(status=404)
+
+            res = problem_set.info_dict()
+            return JsonResponse(res, status=201, safe=False)
+        else:
+            return HttpResponse(status=401)
+
+    def put(self, request: HttpRequest, id, **kwargs):
+        if request.user.is_authenticated:
+            try:
+                problem_set = ProblemSet.objects.get(id=id)
+            except:
+                return HttpResponse(status=404)
+
+            if request.user.id == problem_set.creator.user.id:
+                try:
+                    req_data = json.loads(request.body.decode())
+                    title = req_data["title"]
+                    content = req_data["content"]
+                except (KeyError, JSONDecodeError) as e:
+                    return HttpResponseBadRequest()
+
+                problem_set.title = title
+                problem_set.content = content
+                problem_set.save()
+                res = problem_set.info_dict()
+                return JsonResponse(res, status=200)
+            else:
+                return HttpResponse(status=403)
+        else:
+            return HttpResponse(status=401)
+
+    def delete(self, request: HttpRequest, id, **kwargs):
+        if request.user.is_authenticated:
+            try:
+                problem_set = ProblemSet.objects.get(id=id)
+            except:
+                return HttpResponse(status=404)
+
+            if request.user.id == problem_set.creator.user.id:
+                problem_set.delete()
+                return HttpResponse(status=200)
+            else:
+                return HttpResponse(status=403)
+        else:
+            return HttpResponse(status=401)
+
+
+class ProblemSetSolverView(View):
+    def get(self, request: HttpRequest, id, **kwargs):
+        if request.user.is_authenticated:
+            try:
+                problem_set = ProblemSet.objects.get(id=id)
+            except:
+                return HttpResponse(status=404)
+
+            res = problem_set.solver_dict()
+            return JsonResponse(res, status=201, safe=False)
+        else:
+            return HttpResponse(status=401)
+
+
+class ProblemSetCommentView(View):
+    def get(self, request: HttpRequest, id, **kwargs):
+        if request.user.is_authenticated:
+            try:
+                problem_set = ProblemSet.objects.get(id=id)
+            except:
+                return HttpResponse(status=404)
+
+            comment_set = problem_set.comment.all()
+            res = []
+            for comment in comment_set:
+                res.append(comment.to_dict())
+
+            return JsonResponse(res, status=201, safe=False)
+        else:
+            return HttpResponse(status=401)
+
+
+class CommentListView(View):
+    def get(self, request: HttpRequest, **kwargs):
+        if request.user.is_authenticated:
+            comment_set = Comment.objects.all()
+            res = []
+            for comment in comment_set:
+                res.append(comment.to_dict())
+
+            return JsonResponse(res, status=201, safe=False)
+        else:
+            return HttpResponse(status=401)
+
+    def post(self, request: HttpRequest, **kwargs):
+        if request.user.is_authenticated:
+            try:
+                req_data = json.loads(request.body.decode())
+                user_id = req_data["userID"]
+                username = req_data["username"]
+                problem_set_id = req_data["problemSetID"]
+                content = req_data["content"]
+            except (KeyError, JSONDecodeError) as e:
+                return HttpResponseBadRequest()
+
+            user = User.objects.get(username=username)
+            creator = user.statistics
+
+            problem_set = ProblemSet.objects.get(id=problem_set_id)
+            comment = Comment(content=content, creator=creator, problem_set=problem_set)
+            comment.save()
+
+            res = comment.to_dict()
+            return JsonResponse(res, status=201, safe=False)
+        else:
+            return HttpResponse(status=401)
+
+
+class CommentInfoView(View):
+    def get(self, request: HttpRequest, id, **kwargs):
+        if request.user.is_authenticated:
+            try:
+                comment = Comment.objects.get(id=id)
+            except:
+                return HttpResponse(status=404)
+
+            res = comment.to_dict()
+            return JsonResponse(res, status=201, safe=False)
+        else:
+            return HttpResponse(status=401)
+
+    def put(self, request: HttpRequest, id, **kwargs):
+        if request.user.is_authenticated:
+            try:
+                comment = Comment.objects.get(id=id)
+            except:
+                return HttpResponse(status=404)
+
+            if request.user.id == comment.creator.user.id:
+                try:
+                    req_data = json.loads(request.body.decode())
+                    content = req_data["content"]
+                except (KeyError, JSONDecodeError) as e:
+                    return HttpResponseBadRequest()
+
+                comment.content = content
+                comment.save()
+                res = comment.to_dict()
+                return JsonResponse(res, status=200)
+            else:
+                return HttpResponse(status=403)
+        else:
+            return HttpResponse(status=401)
+
+    def delete(self, request: HttpRequest, id, **kwargs):
+        if request.user.is_authenticated:
+            try:
+                comment = Comment.objects.get(id=id)
+            except:
+                return HttpResponse(status=404)
+
+            if request.user.id == comment.creator.user.id:
+                comment.delete()
+                return HttpResponse(status=200)
+            else:
+                return HttpResponse(status=403)
+        else:
+            return HttpResponse(status=401)
+
+
+class TokenView(View):
+    @method_decorator(ensure_csrf_cookie)
+    def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
         return HttpResponse(status=204)
-    else:
-        return HttpResponseNotAllowed(["GET"])
