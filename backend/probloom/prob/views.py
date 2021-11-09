@@ -140,7 +140,7 @@ class ProblemSetListView(View):
         try:
             req_data = json.loads(request.body.decode())
             title = req_data["title"]
-            type = req_data["type"]
+            is_open = req_data["is_open"]
             tag = req_data["tag"]
             difficulty = req_data["difficulty"]
             content = req_data["content"]
@@ -153,7 +153,7 @@ class ProblemSetListView(View):
         creator = UserStatistics.objects.get(user=request.user)
         prob = ProblemSet(
             title=title,
-            type=type,
+            is_open=is_open,
             tag=tag,
             difficulty=difficulty,
             content=content,

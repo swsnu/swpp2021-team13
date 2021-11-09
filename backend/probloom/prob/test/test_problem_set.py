@@ -17,7 +17,7 @@ class ProblemSetTestCase(TestCase):
         user_stat_2 = UserStatistics.objects.create(lastActiveDays=2, user=user_2)
         problem_set_1 = ProblemSet.objects.create(
             title="test_title_1",
-            type=False,
+            is_open=False,
             tag="test_tag_1",
             difficulty=1,
             content="test_content_1",
@@ -26,7 +26,7 @@ class ProblemSetTestCase(TestCase):
         problem_set_1.recommender.add(user_stat_1, user_stat_2)
         problem_set_2 = ProblemSet.objects.create(
             title="test_title_2",
-            type=True,
+            is_open=True,
             tag="test_tag_2",
             difficulty=2,
             content="test_content_2",
