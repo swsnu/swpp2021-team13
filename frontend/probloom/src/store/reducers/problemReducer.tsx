@@ -30,7 +30,7 @@ export type ProblemReducer = Reducer<ProblemSetState, ProblemSetAction>;
 
 const problemReducer: ProblemReducer = (state = initialState, action) => {
   switch (action.type) {
-    case actionTypes.GET_PROBLEMSETS:
+    case actionTypes.GET_ALL_PROBLEMSETS:
       return { ...state, problemSets: action.problemSets };
     default:
       break;

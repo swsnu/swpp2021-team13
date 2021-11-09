@@ -1,4 +1,4 @@
-import { GET_PROBLEMSETS } from '../actions/actionTypes';
+import { GET_ALL_PROBLEMSETS } from '../actions/actionTypes';
 import problemReducer, { ProblemSet } from './problemReducer';
 
 describe('Problem Reducer', () => {
@@ -31,7 +31,7 @@ describe('Problem Reducer', () => {
     };
     const problemSets: ProblemSet[] = [problemset1, problemset2];
     const state = problemReducer(undefined, {
-      type: GET_PROBLEMSETS,
+      type: GET_ALL_PROBLEMSETS,
       problemSets: problemSets,
     });
     expect(state).toEqual({

@@ -9,14 +9,14 @@ axios.defaults.xsrfCookieName = 'csrftoken';
 axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 
 export interface GetCommentsOfProblemSetAction {
-  type: typeof actionTypes.GET_COMMENTS_OF_PROBLEM_SET;
+  type: typeof actionTypes.GET_COMMENTS_OF_PROBLEMSET;
   comments: Comment[];
 }
 
 export const getCommentsOfProblemSet_: (
   comments: Comment[]
 ) => GetCommentsOfProblemSetAction = (comments) => ({
-  type: actionTypes.GET_COMMENTS_OF_PROBLEM_SET,
+  type: actionTypes.GET_COMMENTS_OF_PROBLEMSET,
   comments: comments,
 });
 

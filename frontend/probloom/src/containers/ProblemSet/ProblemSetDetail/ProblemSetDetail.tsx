@@ -56,6 +56,15 @@ class ProblemSetDetail extends Component<Props, State> {
   }
 
   render() {
+    if (this.props.selectedUser === null) {
+      this.props.history.push('/signin');
+    }
+    if (this.props.selectedUser) {
+      if (this.props.selectedUser.logged_in === false) {
+        this.props.history.push('/signin');
+      }
+    }
+
     return (
       <div className="ProblemSetDetail">
         <ProblemSetView />

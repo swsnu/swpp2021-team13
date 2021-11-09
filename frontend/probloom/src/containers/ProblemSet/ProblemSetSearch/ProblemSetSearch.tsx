@@ -2,7 +2,7 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 import { returntypeof } from 'react-redux-typescript';
 import Prob from '../../../components/Prob/Prob';
-import { getProblemSets } from '../../../store/actions';
+import { getAllProblemSets } from '../../../store/actions';
 import { AppDispatch } from '../../../store/store';
 import { User } from '../../../store/reducers/userReducer';
 import { ProblemSet } from '../../../store/reducers/problemReducer';
@@ -182,7 +182,7 @@ const mapStateToProps = (state: any) => {
 };
 
 const mapDispatchToProps = (dispatch: AppDispatch) => ({
-  onGetAllProblems: () => dispatch(getProblemSets()),
+  onGetAllProblems: () => dispatch(getAllProblemSets()),
 });
 
 const statePropTypes = returntypeof(mapStateToProps);

@@ -8,28 +8,28 @@ import * as actionTypes from './actionTypes';
 axios.defaults.xsrfCookieName = 'csrftoken';
 axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 
-export interface GetProblemSetsAction {
-  type: typeof actionTypes.GET_PROBLEMSETS;
+export interface GetAllProblemSetsAction {
+  type: typeof actionTypes.GET_ALL_PROBLEMSETS;
   problemSets: ProblemSet[];
 }
 
-export const getProblemSets_: (
+export const getAllProblemSets_: (
   problemSets: ProblemSet[]
-) => GetProblemSetsAction = (problemSets) => ({
-  type: actionTypes.GET_PROBLEMSETS,
+) => GetAllProblemSetsAction = (problemSets) => ({
+  type: actionTypes.GET_ALL_PROBLEMSETS,
   problemSets: problemSets,
 });
 
-export const getProblemSets: () => ThunkAction<
+export const getAllProblemSets: () => ThunkAction<
   void,
   RootState,
   null,
-  GetProblemSetsAction
+  GetAllProblemSetsAction
 > = () => {
   return async (dispatch: AppDispatch) => {
     const { data }: { data: ProblemSet[] } = await axios.get(`/api/problem/`);
-    dispatch(getProblemSets_(data));
+    dispatch(getAllProblemSets_(data));
   };
 };
 
-export type ProblemSetAction = GetProblemSetsAction;
+export type ProblemSetAction = GetAllProblemSetsAction;

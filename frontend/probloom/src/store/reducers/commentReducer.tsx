@@ -25,7 +25,7 @@ export type CommentReducer = Reducer<CommentState, CommentAction>;
 
 const commentReducer: CommentReducer = (state = initialState, action) => {
   switch (action.type) {
-    case actionTypes.GET_COMMENTS_OF_PROBLEM_SET:
+    case actionTypes.GET_COMMENTS_OF_PROBLEMSET:
       return { ...state, comments: action.comments };
     default:
       break;

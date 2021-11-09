@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getProblemSets } from '.';
+import { getAllProblemSets } from '.';
 import { ProblemSet } from '../reducers/problemReducer';
 import store, { AppDispatch } from '../store';
 
@@ -45,7 +45,7 @@ describe('Get Problem List', () => {
       status: 200,
       data: stubProblems,
     }));
-    await dispatch(getProblemSets());
+    await dispatch(getAllProblemSets());
     expect(spy).toHaveBeenCalledWith('/api/problem/');
     expect(store.getState().problemset.problemSets).toEqual(stubProblems);
   });
