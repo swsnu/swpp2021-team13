@@ -112,7 +112,7 @@ describe('<ProblemSetSearch />', () => {
     expect(spyHistoryPush).toHaveBeenCalledWith('/problem/create/');
   })
 
-  it('should move to ProblemSetCreate', () => {
+  it('should move to ProblemSetDetial', () => {
     const spyHistoryPush = jest.spyOn(history, 'push')
       .mockImplementation(path => {});
     const component = mount(problemSetSearch);
