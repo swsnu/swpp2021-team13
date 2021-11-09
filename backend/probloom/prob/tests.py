@@ -193,7 +193,7 @@ class ProblemSetTestCase(TestCase):
     def test_problem_set_solver(self):
         client1 = Client()
 
-        response = client1.get("/api/problem/1/solver/")
+        response = client1.get("/api/solved/1/")
         self.assertEqual(response.status_code, 401)
 
         # User Sign-in
@@ -205,10 +205,10 @@ class ProblemSetTestCase(TestCase):
             "/api/signin/", request_user1, content_type="application/json"
         )
 
-        response = client1.get("/api/problem/3/solver/")
+        response = client1.get("/api/solved/3/")
         self.assertEqual(response.status_code, 404)
 
-        response = client1.get("/api/problem/1/solver/")
+        response = client1.get("/api/solved/1/")
         self.assertEqual(response.status_code, 201)
 
     def test_problem_set_comment(self):

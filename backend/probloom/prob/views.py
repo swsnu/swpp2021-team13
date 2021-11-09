@@ -86,14 +86,7 @@ class SignOutView(View):
             logout(request)
             return HttpResponse(status=204)
         else:
-            user_ = User.objects.get(id=request.user.id)
-            res = {
-                "id": user_.id,
-                "username": user_.username,
-                "email": user_.email,
-                "logged_in": True,
-            }
-            return HttpResponse(res, status=401)
+            return HttpResponse(status=401)
 
 
 class UserProfileView(LoginRequiredMixin, SingleObjectMixin, View):

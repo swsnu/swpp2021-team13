@@ -48,10 +48,10 @@ export const signOutSuccess = () => {
   };
 };
 
-export const signOutFail = (user: any) => {
+export const signOutFail = () => {
   return {
     type: actionTypes.SIGN_OUT,
-    target: user,
+    target: null,
   };
 };
 
@@ -60,7 +60,7 @@ export const signOut = (user: any) => {
     return axios
       .get('/api/signout/')
       .then((res) => dispatch(signOutSuccess()))
-      .catch((error) => dispatch(signOutFail(error.data)));
+      .catch((error) => dispatch(signOutFail()));
   };
 };
 
