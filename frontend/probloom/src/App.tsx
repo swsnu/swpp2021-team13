@@ -8,6 +8,7 @@ import Welcome from './containers/Welcome/Welcome';
 import SignUp from './containers/SignUp/SignUp';
 import Profile from './containers/Profile/Profile';
 import ProblemSetSearch from './containers/ProblemSet/ProblemSetSearch/ProblemSetSearch';
+import ProblemSetCreate from './containers/ProblemSet/ProblemSetCreate/ProblemSetCreate';
 import ProblemSetDetail from './containers/ProblemSet/ProblemSetDetail/ProblemSetDetail';
 import ProblemSetSolve from './containers/ProblemSet/ProblemSetSolve/ProblemSetSolve';
 import ProblemSetExplanationDetail from './containers/ProblemSet/ProblemSetExplanation/ProblemSetExplanationDetail';
@@ -32,6 +33,7 @@ function App(props: { history: History }) {
           <Route path="/user/:id/:active/" exact component={Profile} />
           <Redirect from="/user/:id/" to="/user/:id/summary/" exact />
           <Route path="/problem/search/" exact component={ProblemSetSearch} />
+          <Route path="/problem/create/" exact component={ProblemSetCreate} />
           <Route
             path="/problem/:id/detail/"
             exact
