@@ -92,9 +92,6 @@ class ProblemSetCreate extends Component<Props, State> {
       this.state.difficulty,
       this.state.problems
     );
-    // TODO : go to problem search page because detail page not available at now
-    // this.props.history.push('/problem/:id/detail/');
-    this.props.history.push('/problem/search/');
   };
 
   render() {

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { ThunkAction } from 'redux-thunk';
+import { push } from 'connected-react-router';
 
 import { ProblemSet, Solver, NewProblemSet } from '../reducers/problemReducer';
 import { AppDispatch, RootState } from '../store';
@@ -84,14 +85,14 @@ export const getAllSolvers: (
 
 export interface CreateProblemSetAction {
   type: typeof actionTypes.CREATE_PROBLEM_SET;
-  problemSets: ProblemSet[];
+  problemSet: ProblemSet;
 }
 
 export const createProblemSet_: (
-  problemSets: ProblemSet[]
-) => CreateProblemSetAction = (problemSets: ProblemSet[]) => ({
+  problemSet: ProblemSet
+) => CreateProblemSetAction = (problemSet: ProblemSet) => ({
   type: actionTypes.CREATE_PROBLEM_SET,
-  problemSets: problemSets,
+  problemSet: problemSet,
 });
 
 export const createProblemSet: (
@@ -110,7 +111,7 @@ export const createProblemSet: (
   problems: NewProblemSet[]
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data }: { data: ProblemSet[] } = await axios.post(`/api/problem/`, {
+    const { data }: { data: ProblemSet } = await axios.post(`/api/problem/`, {
       title: title,
       content: content,
       scope: scope,
@@ -119,6 +120,7 @@ export const createProblemSet: (
       problems: problems,
     });
     dispatch(createProblemSet_(data));
+    dispatch(push(`/problem/${data.id}/detail/`));
   };
 };
 
