@@ -1,8 +1,8 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import { returntypeof } from 'react-redux-typescript';
-import Prob from '../../../components/Prob/Prob';
 import { getAllProblemSets } from '../../../store/actions';
+import ProblemSetSearchResult from '../../../components/ProblemSetSearchResult/ProblemSetSearchResult';
 import { AppDispatch } from '../../../store/store';
 import { User } from '../../../store/reducers/userReducer';
 import { ProblemSet } from '../../../store/reducers/problemReducer';
@@ -88,12 +88,12 @@ class ProblemSetSearch extends Component<Props, ProblemSetSearchState> {
             return b.recommended_num - a.recommended_num;
           case 'date':
           default:
-            return b.date.localeCompare(a.date);
+            return b.created_time.localeCompare(a.created_time);
         }
       })
       .map((prob) => {
         return (
-          <Prob
+          <ProblemSetSearchResult
             key={prob.id}
             title={prob.title}
             date={prob.date}
@@ -110,6 +110,7 @@ class ProblemSetSearch extends Component<Props, ProblemSetSearchState> {
         <button id="create" onClick={() => this.onClickCreateButton()}>
           Create
         </button>
+        <h1>{this.props.user.id}</h1>
         <div>
           <input
             id="search_bar"

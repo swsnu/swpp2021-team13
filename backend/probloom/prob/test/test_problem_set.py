@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from prob.models import User, UserStatistics, ProblemSet
 
+
 class ProblemSetTestCase(TestCase):
     def setUp(self):
         user_1 = User.objects.create_user(

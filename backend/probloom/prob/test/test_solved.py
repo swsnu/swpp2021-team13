@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from prob.models import User, UserStatistics, ProblemSet, Solved
 
+
 class SolvedTestCase(TestCase):
     def setUp(self):
         user_1 = User.objects.create_user(
@@ -33,14 +34,10 @@ class SolvedTestCase(TestCase):
             creator=user_stat_2,
         )
         problem_set_2.recommender.add(user_stat_1)
-        Solved.objects.create(
-            solver=user_stat_1, problem=problem_set_1, result=True
-        )
+        Solved.objects.create(solver=user_stat_1, problem=problem_set_1, result=True)
 
     def test_solved_prob_get(self):
         client = Client()
-        res = client.get("/api/solved/1/")
-        self.assertEqual(res.status_code, 401)
 
         req = {"id": "test_name_1", "password": "test_password_1"}
         res = client.post("/api/signin/", req, content_type="application/json")
@@ -56,6 +53,10 @@ class SolvedTestCase(TestCase):
 
     def test_solved_prob_not_allowed(self):
         client = Client()
+
+        req = {"id": "test_name_1", "password": "test_password_1"}
+        res = client.post("/api/signin/", req, content_type="application/json")
+
         res = client.post("/api/solved/1/", {}, content_type="application/json")
         self.assertEqual(res.status_code, 405)
         res = client.put("/api/solved/1/", {}, content_type="application/json")
@@ -65,8 +66,6 @@ class SolvedTestCase(TestCase):
 
     def test_solved_result_get(self):
         client = Client()
-        res = client.get("/api/solved/1/1/")
-        self.assertEqual(res.status_code, 401)
 
         req = {"id": "test_name_1", "password": "test_password_1"}
         res = client.post("/api/signin/", req, content_type="application/json")
@@ -79,15 +78,13 @@ class SolvedTestCase(TestCase):
 
     def test_solved_result_post(self):
         client = Client()
-        res = client.post("/api/solved/1/2/", {}, content_type="application/json")
-        self.assertEqual(res.status_code, 400)
-
-        req = {"result": True}
-        res = client.post("/api/solved/1/2/", req, content_type="application/json")
-        self.assertEqual(res.status_code, 401)
 
         req = {"id": "test_name_1", "password": "test_password_1"}
         res = client.post("/api/signin/", req, content_type="application/json")
+
+        res = client.post("/api/solved/1/2/", {}, content_type="application/json")
+        self.assertEqual(res.status_code, 400)
+
         req = {"result": True}
         res = client.post("/api/solved/0/2/", req, content_type="application/json")
         self.assertEqual(res.status_code, 404)
@@ -99,6 +96,10 @@ class SolvedTestCase(TestCase):
 
     def test_solved_result_not_allowed(self):
         client = Client()
+
+        req = {"id": "test_name_1", "password": "test_password_1"}
+        res = client.post("/api/signin/", req, content_type="application/json")
+
         res = client.put("/api/solved/1/2/", {}, content_type="application/json")
         self.assertEqual(res.status_code, 405)
         res = client.delete("/api/solved/1/2/")

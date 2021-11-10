@@ -30,7 +30,7 @@ class UserStatistics(Model):
 
 class ProblemSet(Model):
     title = CharField(max_length=100, default="default title")
-    date = DateTimeField(auto_now_add=True, blank=True)
+    created_time = DateTimeField(auto_now_add=True, blank=True)
     is_open = BooleanField(default=False)
     tag = CharField(max_length=100, default="default tag")
     difficulty = SmallIntegerField(default=0)
@@ -48,7 +48,7 @@ class ProblemSet(Model):
         return {
             "id": self.id,
             "title": self.title,
-            "date": self.date,
+            "created_time": self.created_time,
             "is_open": self.is_open,
             "tag": self.tag,
             "difficulty": self.difficulty,
@@ -56,7 +56,7 @@ class ProblemSet(Model):
             "userID": self.creator.user.id,
             "username": self.creator.user.username,
             "solved_num": solved_num,
-            "recommended_num": recommended_num
+            "recommended_num": recommended_num,
         }
 
 
@@ -64,9 +64,7 @@ class Solved(Model):
     solver = ForeignKey(
         UserStatistics, related_name="solved_problem", on_delete=CASCADE
     )
-    problem = ForeignKey(
-        ProblemSet, related_name="solved_user", on_delete=CASCADE
-    )
+    problem = ForeignKey(ProblemSet, related_name="solved_user", on_delete=CASCADE)
     result = BooleanField(default=False)
 
     def to_dict(self):

@@ -17,7 +17,7 @@ describe('Get Problem List', () => {
       {
         id: 1,
         title: 'title1',
-        date: 'date1',
+        created_time: 'create_time1',
         is_open: false,
         tag: 'math',
         difficulty: 1,
@@ -30,7 +30,7 @@ describe('Get Problem List', () => {
       {
         id: 2,
         title: 'title2',
-        date: 'date2',
+        created_time: 'create_time2',
         is_open: false,
         tag: 'math',
         difficulty: 2,
@@ -41,6 +41,7 @@ describe('Get Problem List', () => {
         recommended_num: 2,
       },
     ];
+
     spy = jest.spyOn(axios, 'get').mockImplementation(async (_) => ({
       status: 200,
       data: stubProblems,

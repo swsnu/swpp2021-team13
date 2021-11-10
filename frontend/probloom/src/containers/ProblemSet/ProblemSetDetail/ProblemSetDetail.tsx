@@ -72,8 +72,8 @@ class ProblemSetDetail extends Component<Props, State> {
       }
     }
 
-    const isCreator =
-      this.props.selectedProblemSet.userID === this.props.selectedUser.id;
+    //const isCreator =
+    //  this.props.selectedProblemSet.userID === this.props.selectedUser.id;
     //const isSolver =
 
     return (

@@ -1,4 +1,5 @@
 import unittest
 
-def suite():   
+
+def suite():
     return unittest.TestLoader().discover("prob.tests", pattern="*.py")

@@ -5,7 +5,7 @@ import { Reducer } from 'redux';
 export interface ProblemSet {
   id: number;
   title: string;
-  date: string;
+  created_time: string;
   is_open: boolean;
   tag: string;
   difficulty: number;
