@@ -105,6 +105,7 @@ class ProblemSetSearch extends Component<
     return (
       <div className="ProblemSetSearch">
         <button id='create' onClick={() => this.onClickCreateButton()}>Create</button>
+        <h1>{this.props.user.id}</h1>
         <div>
           <input id='search_bar' type='text' value={this.state.searchBar} 
             onChange={(event) => {this.setState({ searchBar: event.target.value })}} />

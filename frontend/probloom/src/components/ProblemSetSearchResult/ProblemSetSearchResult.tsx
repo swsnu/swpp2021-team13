@@ -7,7 +7,7 @@ export interface ProblemSetSearchResultProps {
     clickProb: () => void;
 }
 
-const Prob = (props: ProblemSetSearchResultProps) => {
+const ProblemSetSearchResult = (props: ProblemSetSearchResultProps) => {
     return (
         <div className="ProblemSetSearchResult">
             <div className="info">
@@ -25,4 +25,4 @@ const Prob = (props: ProblemSetSearchResultProps) => {
         </div>
     )
 }
-export default Prob;
+export default ProblemSetSearchResult;

@@ -20,7 +20,7 @@ export interface ProblemSet {
 export interface ProblemState {
   problemsets: ProblemSet[];
 }
-    
+
 const initialState: ProblemState = {
   problemsets: [],
 };

@@ -24,7 +24,7 @@ const defaultUserState = {
 };
 
 const defaultProblemState = {
-  problems: [],
+  problemsets: [],
 };
 
 export const getMockStore = (
