@@ -1,5 +1,6 @@
 export {
-  logIn,
+  signIn,
+  signOut,
   signUp,
   getUserStatistics,
   getUserProfile,
@@ -7,5 +8,15 @@ export {
 } from './userActions';
 
 export {
-  getProblems,
+  getAllProblemSets,
+  getProblemSet,
+  getAllSolvers,
+  deleteProblemSet,
 } from './problemActions';
+
+export {
+  getCommentsOfProblemSet,
+  createComment,
+  updateComment,
+  deleteComment,
+} from './commentActions';

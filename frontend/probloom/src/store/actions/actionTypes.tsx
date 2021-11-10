@@ -1,8 +1,17 @@
 // Action for User
-export const LOG_IN = 'LOG_IN';
+export const SIGN_IN = 'SIGN_IN';
+export const SIGN_OUT = 'SIGN_OUT';
 export const SIGN_UP = 'SIGN_UP';
 export const GET_USER_STATISTICS = 'GET_USER_STATISTICS';
 export const GET_USER_PROFILE = 'GET_USER_PROFILE';
 export const UPDATE_USER_INTRODUCTION = 'UPDATE_USER_INTRODUCTION';
-// Action for Problem
-export const GET_PROBLEMS = 'GET_PROBLEMS'
+// Action for Problem(Set)
+export const GET_ALL_PROBLEMSETS = 'GET_ALL_PROBLEMSETS';
+export const GET_PROBLEMSET = 'GET_PROBLEMSET';
+export const GET_ALL_SOLVER_OF_PROBLEMSET = 'GET_ALL_SOLVER_OF_PROBLEMSET';
+export const DELETE_PROBLEMSET = 'DELETE_PROBLEMSET';
+// Action for Comment
+export const CREATE_COMMENT = 'CREATE_COMMENT';
+export const UPDATE_COMMENT = 'UPDATE_COMMENT';
+export const DELETE_COMMENT = 'DELETE_COMMENT';
+export const GET_COMMENTS_OF_PROBLEMSET = 'GET_COMMENTS_OF_PROBLEMSET';

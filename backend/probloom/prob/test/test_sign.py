@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from prob.models import User
 
+
 class SignTestCase(TestCase):
     def setUp(self):
         User.objects.create_user(username="John", email="12@asd.com", password="123")

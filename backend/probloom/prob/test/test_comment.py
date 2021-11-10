@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from prob.models import User, UserStatistics, ProblemSet
 
+
 class CommentTestCase(TestCase):
     def setUp(self):
         self.john = User.objects.create_user(

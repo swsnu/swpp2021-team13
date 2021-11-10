@@ -117,7 +117,7 @@ describe('<SignUp />', () => {
     const component = mount(signup);
     const wrapper = component.find('.signInButton');
     wrapper.simulate('click');
-    expect(window.location.href).toEqual('http://localhost/login');
+    expect(window.location.href).toEqual('http://localhost/signin');
     history.push('/');
   });
 
@@ -255,7 +255,7 @@ describe('<SignUp />', () => {
     expect(spyPost).toBeCalledTimes(1);
     //expect(spyHistoryPush).toBeCalledTimes(0);
     //expect(spyAlert).toBeCalledTimes(1);
-    //expect(window.location.href).toEqual('http://localhost/login');
+    //expect(window.location.href).toEqual('http://localhost/signin');
     history.push('/');
   });
 });

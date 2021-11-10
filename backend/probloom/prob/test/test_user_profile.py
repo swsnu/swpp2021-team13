@@ -3,6 +3,7 @@ from prob.models import User, UserProfile
 import http
 import textwrap
 
+
 class UserProfileTestCase(TestCase):
     not_pk = 1399  # This number should not match any of the IDs
 

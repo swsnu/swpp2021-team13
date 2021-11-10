@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from prob.models import User, UserStatistics, ProblemSet, Solved
 
+
 class ProblemSetTestCase(TestCase):
     def setUp(self):
         user_1 = User.objects.create_user(
@@ -33,9 +34,7 @@ class ProblemSetTestCase(TestCase):
             creator=user_stat_2,
         )
         problem_set_2.recommender.add(user_stat_1)
-        Solved.objects.create(
-            solver=user_stat_1, problem=problem_set_1, result=True
-        )
+        Solved.objects.create(solver=user_stat_1, problem=problem_set_1, result=True)
 
     def test_problems_get(self):
         client = Client()
@@ -75,7 +74,7 @@ class ProblemSetTestCase(TestCase):
 
         req = {"id": "test_name_1", "password": "test_password_1"}
         res = client.post("/api/signin/", req, content_type="application/json")
-        
+
         res = client.put("/api/problem/", {}, content_type="application/json")
         self.assertEqual(res.status_code, 405)
         res = client.delete("/api/problem/")

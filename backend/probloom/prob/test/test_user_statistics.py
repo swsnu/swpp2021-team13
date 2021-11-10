@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from prob.models import UserStatistics
 
+
 class UserStatisticsTestCase(TestCase):
     def setUp(self):
         UserStatistics.objects.create(lastActiveDays=1)

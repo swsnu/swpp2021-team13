@@ -181,14 +181,18 @@ class SolvedView(LoginRequiredMixin, View):
 
     login_url = "/api/signin/"
     redirect_field_name = None
-    
+
     def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
         try:
             solver = User.objects.get(id=kwargs["u_id"])
             solver_stat = UserStatistics.objects.get(user=solver)
             problem = ProblemSet.objects.get(id=kwargs["p_id"])
             res = Solved.objects.get(solver=solver_stat, problem=problem)
-        except (User.DoesNotExist, UserStatistics.DoesNotExist, ProblemSet.DoesNotExist):
+        except (
+            User.DoesNotExist,
+            UserStatistics.DoesNotExist,
+            ProblemSet.DoesNotExist,
+        ):
             return HttpResponseNotFound()
 
         return JsonResponse(data={"result": res.result})
@@ -204,7 +208,11 @@ class SolvedView(LoginRequiredMixin, View):
             solver = User.objects.get(id=kwargs["u_id"])
             solver_stat = UserStatistics.objects.get(user=solver)
             problem = ProblemSet.objects.get(id=kwargs["p_id"])
-        except (User.DoesNotExist, UserStatistics.DoesNotExist, ProblemSet.DoesNotExist):
+        except (
+            User.DoesNotExist,
+            UserStatistics.DoesNotExist,
+            ProblemSet.DoesNotExist,
+        ):
             return HttpResponseNotFound()
 
         res = Solved(solver=solver_stat, problem=problem, result=result)
@@ -258,8 +266,9 @@ class ProblemSetInfoView(View):
                 return HttpResponse(status=404)
 
             if request.user.id == problem_set.creator.user.id:
+                res = problem_set.info_dict()
                 problem_set.delete()
-                return HttpResponse(status=200)
+                return HttpResponse(res, status=200)
             else:
                 return HttpResponse(status=403)
         else:
@@ -364,8 +373,9 @@ class CommentInfoView(View):
                 return HttpResponse(status=404)
 
             if request.user.id == comment.creator.user.id:
+                res = comment.to_dict()
                 comment.delete()
-                return HttpResponse(status=200)
+                return HttpResponse(res, status=200)
             else:
                 return HttpResponse(status=403)
         else:
