@@ -56,17 +56,19 @@ class ProblemSet(Model):
             "userID": self.creator.user.id,
             "username": self.creator.user.username,
             "solved_num": solved_num,
-            "recommended_num": recommended_num
+            "recommended_num": recommended_num,
         }
 
     def solver_dict(self):
         sovler_set = self.solver.all()
         res = []
         for solver in sovler_set:
-            res.append({
-                "userID": solver.solved_user.user.id, 
-                "username": solver.solved_user.user.username
-            })
+            res.append(
+                {
+                    "userID": solver.solved_user.user.id,
+                    "username": solver.solved_user.user.username,
+                }
+            )
         return res
 
 
@@ -74,9 +76,7 @@ class Solved(Model):
     solver = ForeignKey(
         UserStatistics, related_name="solved_problem", on_delete=CASCADE
     )
-    problem = ForeignKey(
-        ProblemSet, related_name="solved_user", on_delete=CASCADE
-    )
+    problem = ForeignKey(ProblemSet, related_name="solved_user", on_delete=CASCADE)
     result = BooleanField(default=False)
 
     def to_dict(self):

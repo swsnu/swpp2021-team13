@@ -181,7 +181,7 @@ class SolvedView(LoginRequiredMixin, View):
 
     login_url = "/api/signin/"
     redirect_field_name = None
-    
+
     def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
         try:
             solver = User.objects.get(id=kwargs["u_id"])
