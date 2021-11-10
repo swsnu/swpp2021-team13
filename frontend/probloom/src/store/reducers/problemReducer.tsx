@@ -2,10 +2,10 @@ import { ProblemAction } from '../actions/problemActions';
 import * as actionTypes from '../actions/actionTypes';
 import { Reducer } from 'redux';
 
-export interface Problem {
+export interface ProblemSet {
     id: number;
     title: string;
-    date: string;
+    created_time: string;
     is_open: boolean;
     tag: string;
     difficulty: number;
@@ -18,11 +18,11 @@ export interface Problem {
 
 
 export interface ProblemState {
-  problems: Problem[];
+  problemsets: ProblemSet[];
 }
     
 const initialState: ProblemState = {
-  problems: [],
+  problemsets: [],
 };
   
 export type ProblemReducer = Reducer<ProblemState, ProblemAction>;
@@ -30,7 +30,7 @@ export type ProblemReducer = Reducer<ProblemState, ProblemAction>;
 const problemReducer: ProblemReducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.GET_PROBLEMS:
-      return { ...state, problems: action.problems };
+      return { ...state, problemsets: action.problemsets };
     default:
       break;
   }

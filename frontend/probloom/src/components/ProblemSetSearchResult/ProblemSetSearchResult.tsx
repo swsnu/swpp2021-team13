@@ -1,4 +1,4 @@
-export interface ProblemProps {
+export interface ProblemSetSearchResultProps {
     title: string;
     date: string;
     creator: string;
@@ -7,9 +7,9 @@ export interface ProblemProps {
     clickProb: () => void;
 }
 
-const Prob = (props: ProblemProps) => {
+const Prob = (props: ProblemSetSearchResultProps) => {
     return (
-        <div className="Problem">
+        <div className="ProblemSetSearchResult">
             <div className="info">
                 <button id='detail' 
                     onClick={props.clickProb}>{props.title}</button>

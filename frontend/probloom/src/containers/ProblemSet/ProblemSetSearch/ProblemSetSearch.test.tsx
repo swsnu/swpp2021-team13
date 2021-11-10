@@ -25,11 +25,11 @@ const UserStateTest: UserState = {
 };
 
 const ProblemStateTest: ProblemState = {
-  problems: [
+  problemsets: [
       {
           id: 1,
           title: 'title1',
-          date: '2021-01-01',
+          created_time: '2021-01-01',
           is_open: false,
           tag: 'math',
           difficulty: 1,
@@ -42,7 +42,7 @@ const ProblemStateTest: ProblemState = {
       {
           id: 2,
           title: 'title2',
-          date: '2021-02-02',
+          created_time: '2021-02-02',
           is_open: true,
           tag: 'math',
           difficulty: 2,
@@ -55,7 +55,7 @@ const ProblemStateTest: ProblemState = {
       {
           id: 3,
           title: 'title12',
-          date: '1000-01-01',
+          created_time: '1000-01-01',
           is_open: true,
           tag: 'history',
           difficulty: 3,
@@ -86,7 +86,7 @@ describe('<ProblemSetSearch />', () => {
     );
     spyGet = jest.spyOn(axios, 'get').mockImplementation(async (_) => ({
       status: 200,
-      data: ProblemStateTest.problems[0],
+      data: ProblemStateTest.problemsets[0],
     }));
   });
 
@@ -99,7 +99,7 @@ describe('<ProblemSetSearch />', () => {
     const wrapper = component.find('.ProblemSetSearch');
     expect(wrapper.length).toBe(1);
     expect(spyGet).toBeCalledTimes(1);
-    const wrapper2 = component.find('.Problem');
+    const wrapper2 = component.find('.ProblemSetSearchResult');
     expect(wrapper2.length).toBe(3);
   });
 
@@ -129,7 +129,7 @@ describe('<ProblemSetSearch />', () => {
     wrapper2.simulate('change', { target: { value : 'title' } });
     const wrapper3 = component.find('#search');
     wrapper3.simulate('click');
-    const wrapper4 = component.find('.Problem');
+    const wrapper4 = component.find('.ProblemSetSearchResult');
     expect(wrapper4.length).toBe(2);
   });
 
@@ -141,7 +141,7 @@ describe('<ProblemSetSearch />', () => {
     wrapper2.simulate('change', { target: { value : 'content' } });
     const wrapper3 = component.find('#search');
     wrapper3.simulate('click');
-    const wrapper4 = component.find('.Problem');
+    const wrapper4 = component.find('.ProblemSetSearchResult');
     expect(wrapper4.length).toBe(1);
   })
 
@@ -153,7 +153,7 @@ describe('<ProblemSetSearch />', () => {
     wrapper2.simulate('change', { target: { value : 'own' } });
     const wrapper3 = component.find('#search');
     wrapper3.simulate('click');
-    const wrapper4 = component.find('.Problem');
+    const wrapper4 = component.find('.ProblemSetSearchResult');
     expect(wrapper4.length).toBe(1);
   })
 
@@ -161,7 +161,7 @@ describe('<ProblemSetSearch />', () => {
     const component = mount(problemSetSearch);
     const wrapper2 = component.find('#tag');
     wrapper2.simulate('change', { target: { value : 'math' } });
-    const wrapper4 = component.find('.Problem');
+    const wrapper4 = component.find('.ProblemSetSearchResult');
     expect(wrapper4.length).toBe(2);
   })
 

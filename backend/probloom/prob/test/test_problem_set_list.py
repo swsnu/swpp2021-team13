@@ -39,8 +39,6 @@ class ProblemSetTestCase(TestCase):
 
     def test_problems_get(self):
         client = Client()
-        res = client.get("/api/problem/")
-        self.assertEqual(res.status_code, 401)
 
         req = {"id": "test_name_1", "password": "test_password_1"}
         res = client.post("/api/signin/", req, content_type="application/json")
@@ -51,18 +49,12 @@ class ProblemSetTestCase(TestCase):
 
     def test_problems_post(self):
         client = Client()
+
+        req = {"id": "test_name_1", "password": "test_password_1"}
+        res = client.post("/api/signin/", req, content_type="application/json")
+
         res = client.post("/api/problem/", {}, content_type="application/json")
         self.assertEqual(res.status_code, 400)
-
-        req = {
-            "title": "test_title_3",
-            "is_open": False,
-            "tag": "test_tag_3",
-            "difficulty": 1,
-            "content": "test_content_3",
-        }
-        res = client.post("/api/problem/", req, content_type="application/json")
-        self.assertEqual(res.status_code, 401)
 
         req = {"id": "test_name_1", "password": "test_password_1"}
         client.post("/api/signin/", req, content_type="application/json")
@@ -80,6 +72,10 @@ class ProblemSetTestCase(TestCase):
 
     def test_problems_not_allowed(self):
         client = Client()
+
+        req = {"id": "test_name_1", "password": "test_password_1"}
+        res = client.post("/api/signin/", req, content_type="application/json")
+        
         res = client.put("/api/problem/", {}, content_type="application/json")
         self.assertEqual(res.status_code, 405)
         res = client.delete("/api/problem/")

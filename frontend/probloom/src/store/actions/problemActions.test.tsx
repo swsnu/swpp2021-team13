@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getProblems } from '.';
-import { Problem } from '../reducers/problemReducer';
+import { ProblemSet } from '../reducers/problemReducer';
 import store, { AppDispatch } from '../store';
 
 const dispatch = store.dispatch as AppDispatch;
@@ -13,10 +13,10 @@ describe('Get Problem List', () => {
   });
 
   test('getProblems fetches problems correctly', async () => {
-    const stubProblems: Problem[] = [{
+    const stubProblems: ProblemSet[] = [{
       id: 1,
       title: 'title1',
-      date: 'date1',
+      created_time: 'create_time1',
       is_open: false,
       tag: 'math',
       difficulty: 1,
@@ -28,7 +28,7 @@ describe('Get Problem List', () => {
     },{
       id: 2,
       title: 'title2',
-      date: 'date2',
+      created_time: 'create_time2',
       is_open: false,
       tag: 'math',
       difficulty: 2,
@@ -44,6 +44,6 @@ describe('Get Problem List', () => {
     }));
     await dispatch(getProblems());
     expect(spy).toHaveBeenCalledWith('/api/problem/');
-    expect(store.getState().problem.problems).toEqual(stubProblems);
+    expect(store.getState().problem.problemsets).toEqual(stubProblems);
   });
 });

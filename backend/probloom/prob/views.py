@@ -127,11 +127,12 @@ def userStatistics(request, id=0):
         )
 
 
-class ProblemSetListView(View):
-    def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
-        if not request.user.is_authenticated:
-            return HttpResponse(status=401)
+class ProblemSetListView(LoginRequiredMixin, View):
 
+    login_url = "/api/signin/"
+    redirect_field_name = None
+
+    def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
         res = [prob.info_dict() for prob in ProblemSet.objects.all()]
 
         return JsonResponse(data=res, safe=False)
@@ -147,9 +148,6 @@ class ProblemSetListView(View):
         except (JSONDecodeError, KeyError) as error:
             raise BadRequest() from error
 
-        if not request.user.is_authenticated:
-            return HttpResponse(status=401)
-
         creator = UserStatistics.objects.get(user=request.user)
         prob = ProblemSet(
             title=title,
@@ -163,7 +161,11 @@ class ProblemSetListView(View):
         return JsonResponse(data=prob.info_dict())
 
 
-class SolvedProblemView(View):
+class SolvedProblemView(LoginRequiredMixin, View):
+
+    login_url = "/api/signin/"
+    redirect_field_name = None
+
     def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
         try:
             solver = User.objects.get(id=kwargs["p_id"])
@@ -171,14 +173,15 @@ class SolvedProblemView(View):
         except (User.DoesNotExist, UserStatistics.DoesNotExist):
             return HttpResponseNotFound()
 
-        if not request.user.is_authenticated:
-            return HttpResponse(status=401)
-
         probs = Solved.objects.filter(solver=solver_stat)
         return JsonResponse(data=[prob.to_dict() for prob in probs], safe=False)
 
 
-class SolvedView(View):
+class SolvedView(LoginRequiredMixin, View):
+
+    login_url = "/api/signin/"
+    redirect_field_name = None
+    
     def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
         try:
             solver = User.objects.get(id=kwargs["u_id"])
@@ -188,9 +191,6 @@ class SolvedView(View):
         except (User.DoesNotExist, UserStatistics.DoesNotExist, ProblemSet.DoesNotExist):
             return HttpResponseNotFound()
 
-        if not request.user.is_authenticated:
-            return HttpResponse(status=401)
-
         return JsonResponse(data={"result": res.result})
 
     def post(self, request: HttpRequest, **kwargs) -> HttpResponse:
@@ -199,9 +199,6 @@ class SolvedView(View):
             result = req_data["result"]
         except (JSONDecodeError, KeyError) as error:
             raise BadRequest() from error
-
-        if not request.user.is_authenticated:
-            return HttpResponse(status=401)
 
         try:
             solver = User.objects.get(id=kwargs["u_id"])

@@ -1,14 +1,14 @@
 import {
   GET_PROBLEMS,
 } from '../actions/actionTypes';
-import problemReducer, { Problem } from './problemReducer';
+import problemReducer, { ProblemSet } from './problemReducer';
 
 describe('Problem Reducer', () => {
 test('gets problems', () => {
-  const problem1: Problem = {
+  const problemset1: ProblemSet = {
     id: 1,
     title: 'title1',
-    date: 'date1',
+    created_time: 'create_time1',
     is_open: false,
     tag: 'math',
     difficulty: 1,
@@ -18,10 +18,10 @@ test('gets problems', () => {
     solved_num: 1,
     recommended_num: 1,
   };
-  const problem2: Problem = {
+  const problemset2: ProblemSet = {
     id: 2,
     title: 'title2',
-    date: 'date2',
+    created_time: 'create_time2',
     is_open: false,
     tag: 'math',
     difficulty: 2,
@@ -31,13 +31,13 @@ test('gets problems', () => {
     solved_num: 2,
     recommended_num: 2,
   };
-  const problems: Problem[] = [problem1, problem2];
+  const problemsets: ProblemSet[] = [problemset1, problemset2];
   const state = problemReducer(undefined, {
     type: GET_PROBLEMS,
-    problems: problems,
+    problemsets: problemsets,
   });
   expect(state).toEqual({
-    problems: problems,
+    problemsets: problemsets,
   });
 });
 });

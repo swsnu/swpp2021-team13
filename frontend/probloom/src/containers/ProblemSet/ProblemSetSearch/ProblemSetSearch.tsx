@@ -1,11 +1,11 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import { returntypeof } from 'react-redux-typescript';
-import Prob from '../../../components/Prob/Prob';
+import ProblemSetSearchResult from '../../../components/ProblemSetSearchResult/ProblemSetSearchResult';
 import { getProblems } from '../../../store/actions';
 import { AppDispatch } from '../../../store/store';
 import { User } from '../../../store/reducers/userReducer';
-import { Problem } from '../../../store/reducers/problemReducer';
+import { ProblemSet } from '../../../store/reducers/problemReducer';
 import './ProblemSetSearch.css';
 
 export interface ProblemSetSearchProps {
@@ -14,7 +14,7 @@ export interface ProblemSetSearchProps {
 
 export interface StateFromProps {
   user: User;
-  problems: Problem[];
+  problemsets: ProblemSet[];
 }
 
 export interface DispatchFromProps {
@@ -61,7 +61,7 @@ class ProblemSetSearch extends Component<
   }
 
   render() {
-    const problems = this.props.problems.filter(prob => {
+    const problems = this.props.problemsets.filter(prob => {
       let check = new RegExp(this.state.search);
       switch (this.state.term) {
         case 'title+content':
@@ -82,7 +82,7 @@ class ProblemSetSearch extends Component<
     )).sort((a, b) => {
       switch (this.state.sort) {
         case 'date':
-          return b.date.localeCompare(a.date);
+          return b.created_time.localeCompare(a.created_time);
         case 'solved':
           return b.solved_num - a.solved_num;
         case 'recommended':
@@ -90,7 +90,7 @@ class ProblemSetSearch extends Component<
       };
     }).map(prob => {
       return (
-        <Prob
+        <ProblemSetSearchResult
           key={prob.id}
           title={prob.title}
           date={prob.date}
@@ -144,7 +144,7 @@ class ProblemSetSearch extends Component<
 const mapStateToProps = (state: any) => {
   return {
     user: state.user.selectedUser,
-    problems: state.problem.problems,
+    problemsets: state.problem.problemsets,
   };
 }
 
