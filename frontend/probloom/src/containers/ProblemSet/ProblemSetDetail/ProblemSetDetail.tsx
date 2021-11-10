@@ -117,6 +117,7 @@ class ProblemSetDetail extends Component<Props, State> {
   onClickDeleteCommentButton = (comment: Comment) => {
     this.props.onDeleteComment(comment.id);
     this.props.onGetCommentsOfProblemSet(parseInt(this.props.match.params.id));
+    this.setState({ commentContent: '', isEdit: false, editComment: null });
   };
 
   onClickCommentButton = () => {
