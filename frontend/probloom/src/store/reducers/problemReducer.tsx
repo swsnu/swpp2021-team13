@@ -32,6 +32,8 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.GET_ALL_PROBLEMSETS:
       return { ...state, problemSets: action.problemSets };
+    case actionTypes.GET_PROBLEMSET:
+      return { ...state, selectedProblemSet: action.target };
     default:
       break;
   }

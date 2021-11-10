@@ -21,13 +21,13 @@ export const getCommentsOfProblemSet_: (
 });
 
 export const getCommentsOfProblemSet: (
-  userID: number
+  problemSetID: number
 ) => ThunkAction<void, RootState, null, GetCommentsOfProblemSetAction> = (
-  userID
+  problemSetID
 ) => {
   return async (dispatch: AppDispatch) => {
     const { data }: { data: Comment[] } = await axios.get(
-      `/api/problem/${userID}/comment/`
+      `/api/problem/${problemSetID}/comment/`
     );
     dispatch(getCommentsOfProblemSet_(data));
   };

@@ -32,4 +32,27 @@ export const getAllProblemSets: () => ThunkAction<
   };
 };
 
-export type ProblemSetAction = GetAllProblemSetsAction;
+export interface GetProblemSetAction {
+  type: typeof actionTypes.GET_PROBLEMSET;
+  target: ProblemSet;
+}
+
+export const getProblemSet_: (problemSet: ProblemSet) => GetProblemSetAction = (
+  problemSet
+) => ({
+  type: actionTypes.GET_PROBLEMSET,
+  target: problemSet,
+});
+
+export const getProblemSet: (
+  problemSetID: number
+) => ThunkAction<void, RootState, null, GetProblemSetAction> = (
+  problemSetID
+) => {
+  return async (dispatch: AppDispatch) => {
+    const data: ProblemSet = await axios.get(`/api/problem/${problemSetID}/`);
+    dispatch(getProblemSet_(data));
+  };
+};
+
+export type ProblemSetAction = GetAllProblemSetsAction | GetProblemSetAction;

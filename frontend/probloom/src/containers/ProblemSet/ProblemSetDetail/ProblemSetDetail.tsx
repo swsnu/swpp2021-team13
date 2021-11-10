@@ -8,7 +8,11 @@ import { ProblemSet } from '../../../store/reducers/problemReducer';
 import { Comment } from '../../../store/reducers/commentReducer';
 import { AppDispatch } from '../../../store/store';
 import { RouteComponentProps } from 'react-router';
-import { signOut, getCommentsOfProblemSet } from '../../../store/actions';
+import {
+  signOut,
+  getCommentsOfProblemSet,
+  getProblemSet,
+} from '../../../store/actions';
 import './ProblemSetDetail.css';
 
 interface MatchParams {
@@ -34,6 +38,8 @@ interface StateFromProps {
 
 interface DispatchFromProps {
   onSignOut: (user: any) => any;
+  onGetCommentsOfProblemSet: (problemSetID: number) => any;
+  onGetProblemSet: (problemSetID: number) => any;
 }
 
 type Props = ProblemSetDetailProps &
@@ -52,6 +58,7 @@ class ProblemSetDetail extends Component<Props, State> {
   }
 
   componentDidMount() {
+    this.props.onGetProblemSet(parseInt(this.props.match.params.id));
     this.props.onGetCommentsOfProblemSet(parseInt(this.props.match.params.id));
   }
 
@@ -64,6 +71,10 @@ class ProblemSetDetail extends Component<Props, State> {
         this.props.history.push('/signin');
       }
     }
+
+    const isCreator =
+      this.props.selectedProblemSet.userID === this.props.selectedUser.id;
+    //const isSolver =
 
     return (
       <div className="ProblemSetDetail">
@@ -111,8 +122,10 @@ const mapStateToProps = (state: any) => {
 const mapDispatchToProps = (dispatch: AppDispatch) => {
   return {
     onSignOut: (user: any) => dispatch(signOut(user)),
-    onGetCommentsOfProblemSet: (userID: number) =>
-      dispatch(getCommentsOfProblemSet(userID)),
+    onGetCommentsOfProblemSet: (problemSetID: number) =>
+      dispatch(getCommentsOfProblemSet(problemSetID)),
+    onGetProblemSet: (problemSetID: number) =>
+      dispatch(getProblemSet(problemSetID)),
   };
 };
 
