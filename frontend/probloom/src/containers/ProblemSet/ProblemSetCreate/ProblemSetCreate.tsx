@@ -5,33 +5,25 @@ import { returntypeof } from 'react-redux-typescript';
 
 import './ProblemSetCreate.css';
 import * as actionCreators from '../../../store/actions/index';
+import {
+  NewProblemSet,
+  ProblemSetCreateState,
+} from '../../../store/reducers/problemReducer';
 
 interface ProblemSetCreateProps {
   history: any;
 }
 
-interface ProblemSet {
-  index: number;
-  tag: string;
-  type: string;
-  difficulty: string;
-  problem: string;
-  choice: string[];
-  solution: string;
-  explanation: string;
-}
-
-interface ProblemSetCreateState {
-  title: string;
-  scope: string;
-  problems: ProblemSet[];
-  numberOfProblems: number;
-}
-
 interface StateFromProps {}
 
 interface DispatchFromProps {
-  onProblemSetCreate: () => void;
+  onCreateProblemSet: (
+    title: string,
+    scope: string,
+    tag: string,
+    difficulty: string,
+    problems: NewProblemSet[]
+  ) => void;
 }
 
 type Props = ProblemSetCreateProps &
@@ -46,6 +38,8 @@ class ProblemSetCreate extends Component<Props, State> {
     this.state = {
       title: 'title here...',
       scope: '',
+      tag: '',
+      difficulty: '',
       problems: [],
       numberOfProblems: 0,
     };
@@ -54,9 +48,7 @@ class ProblemSetCreate extends Component<Props, State> {
   addProblemHandler = (index: number) => {
     const newProblem = {
       index: index,
-      tag: '',
       type: '',
-      difficulty: '',
       problem: 'problem here...',
       choice: ['', '', '', ''],
       solution: '',
@@ -76,6 +68,11 @@ class ProblemSetCreate extends Component<Props, State> {
     const deletedProblems = this.state.problems.filter((problem) => {
       return problem.index !== index;
     });
+    deletedProblems.forEach((element) => {
+      if (element.index > index) {
+        element.index -= 1;
+      }
+    });
 
     this.setState({
       ...this.state,
@@ -85,67 +82,30 @@ class ProblemSetCreate extends Component<Props, State> {
   };
 
   submitProblemSetHandler = () => {
-    // this.props.onStoreTodo(this.state.title, this.state.content);
-    // this.props.history.push('/todos');
+    this.props.onCreateProblemSet(
+      this.state.title,
+      this.state.scope,
+      this.state.tag,
+      this.state.difficulty,
+      this.state.problems
+    );
+    // TODO : go to problem search page because detail page not available at now
+    // this.props.history.push('/problem/:id/detail/');
+    this.props.history.push('/problem/search/');
   };
 
   render() {
     const currentProblemSet = this.state.problems.map((problemSet, index) => {
       return (
         <div className="NewProblemSet" id={index.toString()}>
-          <div className="Tag">
-            <label>Tag</label>
-            <select
-              onChange={(event) => {
-                const newProblem: ProblemSet[] = [];
-                const editProblem: ProblemSet = {
-                  index: problemSet.index,
-                  tag: event.target.value,
-                  type: problemSet.type,
-                  difficulty: problemSet.difficulty,
-                  problem: problemSet.problem,
-                  choice: problemSet.choice,
-                  solution: problemSet.solution,
-                  explanation: problemSet.explanation,
-                };
-                this.state.problems.forEach((problem) => {
-                  if (problem.index === index) {
-                    newProblem.push(editProblem);
-                  } else {
-                    newProblem.push(problem);
-                  }
-                });
-
-                this.setState({
-                  ...this.state,
-                  problems: newProblem,
-                });
-              }}
-            >
-              <option value="none">=== select ===</option>
-              <option value="tag-philosophy">philosophy</option>
-              <option value="tag-psychology">psychology</option>
-              <option value="tag-statistics">statistics</option>
-              <option value="tag-economics">economics</option>
-              <option value="tag-mathematics">mathematics</option>
-              <option value="tag-physics">physics</option>
-              <option value="tag-chemistry">chemistry</option>
-              <option value="tag-biology">biology</option>
-              <option value="tag-engineering">engineering</option>
-              <option value="tag-history">history</option>
-            </select>
-          </div>
-
           <div className="Type">
             <label>Type</label>
             <select
               onChange={(event) => {
-                const newProblem: ProblemSet[] = [];
-                const editProblem: ProblemSet = {
+                const newProblem: NewProblemSet[] = [];
+                const editProblem: NewProblemSet = {
                   index: problemSet.index,
-                  tag: problemSet.tag,
                   type: event.target.value,
-                  difficulty: problemSet.difficulty,
                   problem: problemSet.problem,
                   choice: problemSet.choice,
                   solution: problemSet.solution,
@@ -170,54 +130,16 @@ class ProblemSetCreate extends Component<Props, State> {
             </select>
           </div>
 
-          <div className="Difficulty">
-            <label>Difficulty</label>
-            <select
-              onChange={(event) => {
-                const newProblem: ProblemSet[] = [];
-                const editProblem: ProblemSet = {
-                  index: problemSet.index,
-                  tag: problemSet.tag,
-                  type: problemSet.type,
-                  difficulty: event.target.value,
-                  problem: problemSet.problem,
-                  choice: problemSet.choice,
-                  solution: problemSet.solution,
-                  explanation: problemSet.explanation,
-                };
-                this.state.problems.forEach((problem) => {
-                  if (problem.index === index) {
-                    newProblem.push(editProblem);
-                  } else {
-                    newProblem.push(problem);
-                  }
-                });
-
-                this.setState({
-                  ...this.state,
-                  problems: newProblem,
-                });
-              }}
-            >
-              <option value="none">=== select ===</option>
-              <option value="difficulty-basic">basic</option>
-              <option value="difficulty-intermediate">intermediate</option>
-              <option value="difficulty-advanced">advanced</option>
-            </select>
-          </div>
-
           <div className="ProblemStatement">
             <label>Problem statement</label>
             <textarea
               rows={4}
               placeholder={`${problemSet.problem}`}
               onChange={(event) => {
-                const newProblem: ProblemSet[] = [];
-                const editProblem: ProblemSet = {
+                const newProblem: NewProblemSet[] = [];
+                const editProblem: NewProblemSet = {
                   index: problemSet.index,
-                  tag: problemSet.tag,
                   type: problemSet.type,
-                  difficulty: problemSet.difficulty,
                   problem: event.target.value,
                   choice: problemSet.choice,
                   solution: problemSet.solution,
@@ -255,12 +177,10 @@ class ProblemSetCreate extends Component<Props, State> {
                   }
                 });
 
-                const newProblem: ProblemSet[] = [];
-                const editProblem: ProblemSet = {
+                const newProblem: NewProblemSet[] = [];
+                const editProblem: NewProblemSet = {
                   index: problemSet.index,
-                  tag: problemSet.tag,
                   type: problemSet.type,
-                  difficulty: problemSet.difficulty,
                   problem: problemSet.problem,
                   choice: newChoice1,
                   solution: problemSet.solution,
@@ -296,12 +216,10 @@ class ProblemSetCreate extends Component<Props, State> {
                   }
                 });
 
-                const newProblem: ProblemSet[] = [];
-                const editProblem: ProblemSet = {
+                const newProblem: NewProblemSet[] = [];
+                const editProblem: NewProblemSet = {
                   index: problemSet.index,
-                  tag: problemSet.tag,
                   type: problemSet.type,
-                  difficulty: problemSet.difficulty,
                   problem: problemSet.problem,
                   choice: newChoice1,
                   solution: problemSet.solution,
@@ -337,12 +255,10 @@ class ProblemSetCreate extends Component<Props, State> {
                   }
                 });
 
-                const newProblem: ProblemSet[] = [];
-                const editProblem: ProblemSet = {
+                const newProblem: NewProblemSet[] = [];
+                const editProblem: NewProblemSet = {
                   index: problemSet.index,
-                  tag: problemSet.tag,
                   type: problemSet.type,
-                  difficulty: problemSet.difficulty,
                   problem: problemSet.problem,
                   choice: newChoice1,
                   solution: problemSet.solution,
@@ -378,12 +294,10 @@ class ProblemSetCreate extends Component<Props, State> {
                   }
                 });
 
-                const newProblem: ProblemSet[] = [];
-                const editProblem: ProblemSet = {
+                const newProblem: NewProblemSet[] = [];
+                const editProblem: NewProblemSet = {
                   index: problemSet.index,
-                  tag: problemSet.tag,
                   type: problemSet.type,
-                  difficulty: problemSet.difficulty,
                   problem: problemSet.problem,
                   choice: newChoice1,
                   solution: problemSet.solution,
@@ -411,13 +325,12 @@ class ProblemSetCreate extends Component<Props, State> {
               type="radio"
               name={`choice${problemSet.index}${index}`}
               value="1"
+              checked={`${problemSet.solution}` === '1'}
               onChange={(event) => {
-                const newProblem: ProblemSet[] = [];
-                const editProblem: ProblemSet = {
+                const newProblem: NewProblemSet[] = [];
+                const editProblem: NewProblemSet = {
                   index: problemSet.index,
-                  tag: problemSet.tag,
                   type: problemSet.type,
-                  difficulty: problemSet.difficulty,
                   problem: problemSet.problem,
                   choice: problemSet.choice,
                   solution: event.target.value,
@@ -442,13 +355,12 @@ class ProblemSetCreate extends Component<Props, State> {
               type="radio"
               name={`choice${problemSet.index}${index}`}
               value="2"
+              checked={`${problemSet.solution}` === '2'}
               onChange={(event) => {
-                const newProblem: ProblemSet[] = [];
-                const editProblem: ProblemSet = {
+                const newProblem: NewProblemSet[] = [];
+                const editProblem: NewProblemSet = {
                   index: problemSet.index,
-                  tag: problemSet.tag,
                   type: problemSet.type,
-                  difficulty: problemSet.difficulty,
                   problem: problemSet.problem,
                   choice: problemSet.choice,
                   solution: event.target.value,
@@ -473,13 +385,12 @@ class ProblemSetCreate extends Component<Props, State> {
               type="radio"
               name={`choice${problemSet.index}${index}`}
               value="3"
+              checked={`${problemSet.solution}` === '3'}
               onChange={(event) => {
-                const newProblem: ProblemSet[] = [];
-                const editProblem: ProblemSet = {
+                const newProblem: NewProblemSet[] = [];
+                const editProblem: NewProblemSet = {
                   index: problemSet.index,
-                  tag: problemSet.tag,
                   type: problemSet.type,
-                  difficulty: problemSet.difficulty,
                   problem: problemSet.problem,
                   choice: problemSet.choice,
                   solution: event.target.value,
@@ -504,13 +415,12 @@ class ProblemSetCreate extends Component<Props, State> {
               type="radio"
               name={`choice${problemSet.index}${index}`}
               value="4"
+              checked={`${problemSet.solution}` === '4'}
               onChange={(event) => {
-                const newProblem: ProblemSet[] = [];
-                const editProblem: ProblemSet = {
+                const newProblem: NewProblemSet[] = [];
+                const editProblem: NewProblemSet = {
                   index: problemSet.index,
-                  tag: problemSet.tag,
                   type: problemSet.type,
-                  difficulty: problemSet.difficulty,
                   problem: problemSet.problem,
                   choice: problemSet.choice,
                   solution: event.target.value,
@@ -539,12 +449,10 @@ class ProblemSetCreate extends Component<Props, State> {
               rows={4}
               placeholder={`${problemSet.explanation}`}
               onChange={(event) => {
-                const newProblem: ProblemSet[] = [];
-                const editProblem: ProblemSet = {
+                const newProblem: NewProblemSet[] = [];
+                const editProblem: NewProblemSet = {
                   index: problemSet.index,
-                  tag: problemSet.tag,
                   type: problemSet.type,
-                  difficulty: problemSet.difficulty,
                   problem: problemSet.problem,
                   choice: problemSet.choice,
                   solution: problemSet.solution,
@@ -579,6 +487,8 @@ class ProblemSetCreate extends Component<Props, State> {
     // ------------ Just for debugging messages -----------------
     // console.log('this.state.title', this.state.title);
     // console.log('this.state.scope', this.state.scope);
+    // console.log('this.state.tag', this.state.tag);
+    // console.log('this.state.difficulty', this.state.difficulty);
     console.log('this.state.problems', this.state.problems);
     // console.log('this.state.numberOfProblems', this.state.numberOfProblems);
     // ------------ Just for debugging messages -----------------
@@ -587,7 +497,7 @@ class ProblemSetCreate extends Component<Props, State> {
       <div className="ProblemSetCreate">
         <h1>ProblemSetCreate Page</h1>
 
-        <NavLink id="problemsetcreate-back" to={`/problem/search`}>
+        <NavLink id="problemsetcreate-back" to={`/problem/search/`}>
           Back to problem set search
         </NavLink>
 
@@ -620,6 +530,47 @@ class ProblemSetCreate extends Component<Props, State> {
           </select>
         </div>
 
+        <div className="Tag">
+          <label>Tag</label>
+          <select
+            onChange={(event) => {
+              this.setState({
+                ...this.state,
+                tag: event.target.value,
+              });
+            }}
+          >
+            <option value="none">=== select ===</option>
+            <option value="tag-philosophy">philosophy</option>
+            <option value="tag-psychology">psychology</option>
+            <option value="tag-statistics">statistics</option>
+            <option value="tag-economics">economics</option>
+            <option value="tag-mathematics">mathematics</option>
+            <option value="tag-physics">physics</option>
+            <option value="tag-chemistry">chemistry</option>
+            <option value="tag-biology">biology</option>
+            <option value="tag-engineering">engineering</option>
+            <option value="tag-history">history</option>
+          </select>
+        </div>
+
+        <div className="Difficulty">
+          <label>Difficulty</label>
+          <select
+            onChange={(event) => {
+              this.setState({
+                ...this.state,
+                difficulty: event.target.value,
+              });
+            }}
+          >
+            <option value="none">=== select ===</option>
+            <option value="difficulty-basic">basic</option>
+            <option value="difficulty-intermediate">intermediate</option>
+            <option value="difficulty-advanced">advanced</option>
+          </select>
+        </div>
+
         {currentProblemSet}
 
         <div className="AddProblemButton">
@@ -644,8 +595,16 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    onProblemSetCreate: () => {
-      // dispatch(actionCreators.postTodo({ title: title, content: content }));
+    onCreateProblemSet: (
+      title: string,
+      scope: string,
+      tag: string,
+      difficulty: string,
+      problems: NewProblemSet[]
+    ) => {
+      dispatch(
+        actionCreators.createProblemSet(title, scope, tag, difficulty, problems)
+      );
     },
   };
 };

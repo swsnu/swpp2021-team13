@@ -4,5 +4,8 @@ export const SIGN_UP = 'SIGN_UP';
 export const GET_USER_STATISTICS = 'GET_USER_STATISTICS';
 export const GET_USER_PROFILE = 'GET_USER_PROFILE';
 export const UPDATE_USER_INTRODUCTION = 'UPDATE_USER_INTRODUCTION';
-// Action for Problem
-export const GET_PROBLEMS = 'GET_PROBLEMS'
+
+// Action for ProblemSet
+export const GET_PROBLEMS = 'GET_PROBLEMS';
+export const CREATE_PROBLEM_SET = 'CREATE_PROBLEM_SET';
+export const EDIT_PROBLEM_SET = 'EDIT_PROBLEM_SET';

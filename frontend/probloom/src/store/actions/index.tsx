@@ -6,6 +6,4 @@ export {
   updateUserIntroduction,
 } from './userActions';
 
-export {
-  getProblems,
-} from './problemActions';
+export { getProblems, createProblemSet } from './problemActions';
