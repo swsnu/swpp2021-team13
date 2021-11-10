@@ -59,7 +59,7 @@ class Welcome extends Component<Props, State> {
       await this.props.onSignIn(user);
 
       if (this.props.selectedUser) {
-        this.props.history.push('/problem/search');
+        this.props.history.push('/problem/search/');
       } else {
         alert('Incorrect username/email or password');
         this.setState({ id: '', pw: '' });

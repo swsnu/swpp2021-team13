@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { ThunkAction } from 'redux-thunk';
 
-import { ProblemSet } from '../reducers/problemReducer';
+import { ProblemSet, Solver } from '../reducers/problemReducer';
 import { AppDispatch, RootState } from '../store';
 import * as actionTypes from './actionTypes';
 
@@ -50,9 +50,65 @@ export const getProblemSet: (
   problemSetID
 ) => {
   return async (dispatch: AppDispatch) => {
-    const data: ProblemSet = await axios.get(`/api/problem/${problemSetID}/`);
+    const { data }: { data: ProblemSet } = await axios.get(
+      `/api/problem/${problemSetID}/`
+    );
     dispatch(getProblemSet_(data));
   };
 };
 
-export type ProblemSetAction = GetAllProblemSetsAction | GetProblemSetAction;
+export interface GetAllSolversAction {
+  type: typeof actionTypes.GET_ALL_SOLVER_OF_PROBLEMSET;
+  solvers: Solver[];
+}
+
+export const getAllSolvers_: (solvers: Solver[]) => GetAllSolversAction = (
+  solvers
+) => ({
+  type: actionTypes.GET_ALL_SOLVER_OF_PROBLEMSET,
+  solvers: solvers,
+});
+
+export const getAllSolvers: (
+  problemSetID: number
+) => ThunkAction<void, RootState, null, GetAllSolversAction> = (
+  problemSetID
+) => {
+  return async (dispatch: AppDispatch) => {
+    const { data }: { data: Solver[] } = await axios.get(
+      `/api/solved/${problemSetID}/`
+    );
+    dispatch(getAllSolvers_(data));
+  };
+};
+
+export interface DeleteProblemSetAction {
+  type: typeof actionTypes.DELETE_PROBLEMSET;
+  targetID: number;
+}
+
+export const deleteProblemSet_: (
+  problemSet: ProblemSet
+) => DeleteProblemSetAction = (problemSet) => ({
+  type: actionTypes.DELETE_PROBLEMSET,
+  targetID: problemSet.id,
+});
+
+export const deleteProblemSet: (
+  problemSetID: number
+) => ThunkAction<void, RootState, null, DeleteProblemSetAction> = (
+  problemSetID
+) => {
+  return async (dispatch: AppDispatch) => {
+    const { data }: { data: ProblemSet } = await axios.delete(
+      `/api/problem/${problemSetID}/`
+    );
+    dispatch(deleteProblemSet_(data));
+  };
+};
+
+export type ProblemSetAction =
+  | GetAllProblemSetsAction
+  | GetProblemSetAction
+  | GetAllSolversAction
+  | DeleteProblemSetAction;

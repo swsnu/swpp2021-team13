@@ -57,7 +57,7 @@ class ProblemSetSearch extends Component<Props, ProblemSetSearchState> {
   }
 
   onClickProbHandler = (problem) => {
-    this.props.history.push('/problem/' + problem.id + '/');
+    this.props.history.push('/problem/' + problem.id + '/detail/');
   };
 
   render() {
@@ -178,7 +178,7 @@ class ProblemSetSearch extends Component<Props, ProblemSetSearchState> {
 const mapStateToProps = (state: any) => {
   return {
     user: state.user.selectedUser,
-    problemSets: state.problem.problemSets,
+    problemSets: state.problemset.problemSets,
   };
 };
 

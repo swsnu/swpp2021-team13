@@ -266,8 +266,9 @@ class ProblemSetInfoView(View):
                 return HttpResponse(status=404)
 
             if request.user.id == problem_set.creator.user.id:
+                res = problem_set.info_dict()
                 problem_set.delete()
-                return HttpResponse(status=200)
+                return HttpResponse(res, status=200)
             else:
                 return HttpResponse(status=403)
         else:
@@ -372,8 +373,9 @@ class CommentInfoView(View):
                 return HttpResponse(status=404)
 
             if request.user.id == comment.creator.user.id:
+                res = comment.to_dict()
                 comment.delete()
-                return HttpResponse(status=200)
+                return HttpResponse(res, status=200)
             else:
                 return HttpResponse(status=403)
         else:

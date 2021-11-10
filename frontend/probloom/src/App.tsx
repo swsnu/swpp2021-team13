@@ -9,6 +9,8 @@ import SignUp from './containers/SignUp/SignUp';
 import Profile from './containers/Profile/Profile';
 import ProblemSetSearch from './containers/ProblemSet/ProblemSetSearch/ProblemSetSearch';
 import ProblemSetDetail from './containers/ProblemSet/ProblemSetDetail/ProblemSetDetail';
+import ProblemSetSolve from './containers/ProblemSet/ProblemSetSolve/ProblemSetSolve';
+import ProblemSetExplanationDetail from './containers/ProblemSet/ProblemSetExplanation/ProblemSetExplanationDetail';
 import NotFound from './components/NotFound/NotFound';
 
 function App(props: { history: History }) {
@@ -34,6 +36,12 @@ function App(props: { history: History }) {
             path="/problem/:id/detail/"
             exact
             component={ProblemSetDetail}
+          />
+          <Route path="/problem/:id/solve/" exact component={ProblemSetSolve} />
+          <Route
+            path="/problem/:id/explanation/"
+            exact
+            component={ProblemSetExplanationDetail}
           />
           <Route component={NotFound} />
         </Switch>

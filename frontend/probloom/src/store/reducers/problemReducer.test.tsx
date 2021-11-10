@@ -37,6 +37,7 @@ describe('Problem Reducer', () => {
     expect(state).toEqual({
       problemSets: problemSets,
       selectedProblemSet: null,
+      solvers: [],
     });
   });
 });

@@ -27,6 +27,22 @@ const commentReducer: CommentReducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.GET_COMMENTS_OF_PROBLEMSET:
       return { ...state, comments: action.comments };
+    case actionTypes.CREATE_COMMENT:
+      return { ...state, selectedComment: action.target };
+    case actionTypes.UPDATE_COMMENT:
+      const modifiedComments = state.comments.map((com) => {
+        if (com.id === action.targetID) {
+          return { ...com, content: com.content };
+        } else {
+          return { ...com };
+        }
+      });
+      return { ...state, comments: modifiedComments };
+    case actionTypes.DELETE_COMMENT:
+      const remainComment = state.comments.filter((com) => {
+        return com.id !== action.targetID;
+      });
+      return { ...state, problemSets: remainComment };
     default:
       break;
   }

@@ -66,6 +66,7 @@ const ProblemSetStateTest: ProblemSetState = {
       recommended_num: 2,
     },
   ],
+  solvers: [],
   selectedProblemSet: null,
 };
 
@@ -121,7 +122,7 @@ describe('<ProblemSetSearch />', () => {
     const component = mount(problemSetSearch);
     const wrapper = component.find('#detail').first();
     wrapper.simulate('click');
-    expect(spyHistoryPush).toHaveBeenCalledWith('/problem/2/');
+    expect(spyHistoryPush).toHaveBeenCalledWith('/problem/2/detail/');
   });
 
   it('should search by title appropriately', () => {

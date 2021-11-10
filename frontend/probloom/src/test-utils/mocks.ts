@@ -26,6 +26,7 @@ const defaultUserState = {
 
 const defaultProblemSetState = {
   problemSets: [],
+  solvers: [],
   selectedProblemSet: null,
 };
 
@@ -45,7 +46,7 @@ export const getMockStore = (
 
   const rootReducer = combineReducers({
     user: mockUserReducer,
-    problem: mockProblemReducer,
+    problemset: mockProblemReducer,
     comment: mockCommentReducer,
     router: connectRouter(history),
   });

@@ -33,4 +33,81 @@ export const getCommentsOfProblemSet: (
   };
 };
 
-export type CommentAction = GetCommentsOfProblemSetAction;
+export interface CreateCommentAction {
+  type: typeof actionTypes.CREATE_COMMENT;
+  target: Comment;
+}
+
+export const createComment_: (comment: Comment) => CreateCommentAction = (
+  comment
+) => ({
+  type: actionTypes.CREATE_COMMENT,
+  target: comment,
+});
+
+export const createComment: (
+  comment: any
+) => ThunkAction<void, RootState, null, CreateCommentAction> = (comment) => {
+  return async (dispatch: AppDispatch) => {
+    const { data }: { data: Comment } = await axios.post(
+      `/api/comment/`,
+      comment
+    );
+    dispatch(createComment_(data));
+  };
+};
+
+export interface UpdateCommentAction {
+  type: typeof actionTypes.UPDATE_COMMENT;
+  targetID: number;
+  content: string;
+}
+
+export const updateComment_: (comment: Comment) => UpdateCommentAction = (
+  comment
+) => ({
+  type: actionTypes.UPDATE_COMMENT,
+  targetID: comment.id,
+  content: comment.content,
+});
+
+export const updateComment: (
+  comment: any
+) => ThunkAction<void, RootState, null, UpdateCommentAction> = (comment) => {
+  return async (dispatch: AppDispatch) => {
+    const { data }: { data: Comment } = await axios.put(
+      `/api/comment/${comment.id}/`,
+      { content: comment.content }
+    );
+    dispatch(updateComment_(data));
+  };
+};
+
+export interface DeleteCommentAction {
+  type: typeof actionTypes.DELETE_COMMENT;
+  targetID: number;
+}
+
+export const deleteComment_: (comment: Comment) => DeleteCommentAction = (
+  comment
+) => ({
+  type: actionTypes.DELETE_COMMENT,
+  targetID: comment.id,
+});
+
+export const deleteComment: (
+  commentID: number
+) => ThunkAction<void, RootState, null, DeleteCommentAction> = (commentID) => {
+  return async (dispatch: AppDispatch) => {
+    const { data }: { data: Comment } = await axios.delete(
+      `/api/comment/${commentID}/`
+    );
+    dispatch(deleteComment_(data));
+  };
+};
+
+export type CommentAction =
+  | GetCommentsOfProblemSetAction
+  | CreateCommentAction
+  | UpdateCommentAction
+  | DeleteCommentAction;

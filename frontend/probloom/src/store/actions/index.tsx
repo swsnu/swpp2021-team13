@@ -7,6 +7,16 @@ export {
   updateUserIntroduction,
 } from './userActions';
 
-export { getAllProblemSets, getProblemSet } from './problemActions';
+export {
+  getAllProblemSets,
+  getProblemSet,
+  getAllSolvers,
+  deleteProblemSet,
+} from './problemActions';
 
-export { getCommentsOfProblemSet } from './commentActions';
+export {
+  getCommentsOfProblemSet,
+  createComment,
+  updateComment,
+  deleteComment,
+} from './commentActions';
