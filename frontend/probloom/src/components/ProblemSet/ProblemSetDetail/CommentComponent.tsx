@@ -1,6 +1,6 @@
 import React from 'react';
 
-const CommentCompoent = (props) => {
+const CommentComponent = (props) => {
   return (
     <div className="CommentComponent">
       <h1 className="username">{props.username}</h1>
@@ -22,4 +22,4 @@ const CommentCompoent = (props) => {
   );
 };
 
-export default CommentCompoent;
+export default CommentComponent;

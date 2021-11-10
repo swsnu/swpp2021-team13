@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { returntypeof } from 'react-redux-typescript';
 import { connect } from 'react-redux';
 import ProblemSetView from '../../../components/ProblemSet/ProblemSetDetail/ProblemSetView';
-import CommentCompoent from '../../../components/ProblemSet/ProblemSetDetail/CommentComponent';
+import CommentComponent from '../../../components/ProblemSet/ProblemSetDetail/CommentComponent';
 import { User } from '../../../store/reducers/userReducer';
 import { ProblemSet, Solver } from '../../../store/reducers/problemReducer';
 import { Comment } from '../../../store/reducers/commentReducer';
@@ -180,11 +180,11 @@ class ProblemSetDetail extends Component<Props, State> {
         />
         <div className="Comment">
           <label>Comment</label>
-          {this.props.comments.map((com, index) => {
+          {this.props.comments.map((com) => {
             isCreator = com.userID === this.props.selectedUser.id;
             return (
-              <CommentCompoent
-                key={index}
+              <CommentComponent
+                key={com.id}
                 username={com.username}
                 content={com.content}
                 isCreator={isCreator}
