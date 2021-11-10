@@ -1,8 +1,8 @@
 # from django.shortcuts import render
 from django.http import (
     HttpResponse,
-    HttpResponseNotAllowed,
     HttpResponseBadRequest,
+    HttpResponseNotFound,
     JsonResponse,
 )
 from django.contrib.auth import authenticate, login, logout
@@ -14,8 +14,8 @@ from django.http.request import HttpRequest
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
+from .models import User, UserProfile, UserStatistics, ProblemSet, Solved, Comment
 from django.views.generic.detail import SingleObjectMixin
-from .models import User, UserProfile, UserStatistics, ProblemSet, Comment
 
 # Create your views here.
 class SignUpView(View):
@@ -53,7 +53,6 @@ class SignInView(View):
         except (KeyError, JSONDecodeError) as e:
             return HttpResponseBadRequest()
 
-        user_set = User.objects.all()
         isEmail = id.find("@") > 0
         try:
             if isEmail:
@@ -128,6 +127,91 @@ def userStatistics(request, id=0):
         )
 
 
+class ProblemSetListView(LoginRequiredMixin, View):
+
+    login_url = "/api/signin/"
+    redirect_field_name = None
+
+    def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
+        res = [prob.info_dict() for prob in ProblemSet.objects.all()]
+
+        return JsonResponse(data=res, safe=False)
+
+    def post(self, request: HttpRequest, **kwargs) -> HttpResponse:
+        try:
+            req_data = json.loads(request.body.decode())
+            title = req_data["title"]
+            is_open = req_data["is_open"]
+            tag = req_data["tag"]
+            difficulty = req_data["difficulty"]
+            content = req_data["content"]
+        except (JSONDecodeError, KeyError) as error:
+            raise BadRequest() from error
+
+        creator = UserStatistics.objects.get(user=request.user)
+        prob = ProblemSet(
+            title=title,
+            is_open=is_open,
+            tag=tag,
+            difficulty=difficulty,
+            content=content,
+            creator=creator,
+        )
+        prob.save()
+        return JsonResponse(data=prob.info_dict())
+
+
+class SolvedProblemView(LoginRequiredMixin, View):
+
+    login_url = "/api/signin/"
+    redirect_field_name = None
+
+    def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
+        try:
+            solver = User.objects.get(id=kwargs["p_id"])
+            solver_stat = UserStatistics.objects.get(user=solver)
+        except (User.DoesNotExist, UserStatistics.DoesNotExist):
+            return HttpResponseNotFound()
+
+        probs = Solved.objects.filter(solver=solver_stat)
+        return JsonResponse(data=[prob.to_dict() for prob in probs], safe=False)
+
+
+class SolvedView(LoginRequiredMixin, View):
+
+    login_url = "/api/signin/"
+    redirect_field_name = None
+    
+    def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
+        try:
+            solver = User.objects.get(id=kwargs["u_id"])
+            solver_stat = UserStatistics.objects.get(user=solver)
+            problem = ProblemSet.objects.get(id=kwargs["p_id"])
+            res = Solved.objects.get(solver=solver_stat, problem=problem)
+        except (User.DoesNotExist, UserStatistics.DoesNotExist, ProblemSet.DoesNotExist):
+            return HttpResponseNotFound()
+
+        return JsonResponse(data={"result": res.result})
+
+    def post(self, request: HttpRequest, **kwargs) -> HttpResponse:
+        try:
+            req_data = json.loads(request.body.decode())
+            result = req_data["result"]
+        except (JSONDecodeError, KeyError) as error:
+            raise BadRequest() from error
+
+        try:
+            solver = User.objects.get(id=kwargs["u_id"])
+            solver_stat = UserStatistics.objects.get(user=solver)
+            problem = ProblemSet.objects.get(id=kwargs["p_id"])
+        except (User.DoesNotExist, UserStatistics.DoesNotExist, ProblemSet.DoesNotExist):
+            return HttpResponseNotFound()
+
+        res = Solved(solver=solver_stat, problem=problem, result=result)
+        res.save()
+        return JsonResponse(data=res.to_dict())
+
+
 class ProblemSetInfoView(View):
     def get(self, request: HttpRequest, id, **kwargs):
         if request.user.is_authenticated:
@@ -178,20 +262,6 @@ class ProblemSetInfoView(View):
                 return HttpResponse(status=200)
             else:
                 return HttpResponse(status=403)
-        else:
-            return HttpResponse(status=401)
-
-
-class ProblemSetSolverView(View):
-    def get(self, request: HttpRequest, id, **kwargs):
-        if request.user.is_authenticated:
-            try:
-                problem_set = ProblemSet.objects.get(id=id)
-            except:
-                return HttpResponse(status=404)
-
-            res = problem_set.solver_dict()
-            return JsonResponse(res, status=201, safe=False)
         else:
             return HttpResponse(status=401)
 

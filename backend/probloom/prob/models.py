@@ -1,8 +1,6 @@
-from typing import Any, Dict
-
 from django.db.models import *
 from django.contrib.auth.models import AbstractUser
-import datetime
+from typing import Any, Dict
 
 # Create your models here.
 class User(AbstractUser):
@@ -32,8 +30,8 @@ class UserStatistics(Model):
 
 class ProblemSet(Model):
     title = CharField(max_length=100, default="default title")
-    date = DateTimeField(auto_now_add=True, blank=True)
-    type = BooleanField(default=False)
+    created_time = DateTimeField(auto_now_add=True, blank=True)
+    is_open = BooleanField(default=False)
     tag = CharField(max_length=100, default="default tag")
     difficulty = SmallIntegerField(default=0)
     content = TextField(max_length=1000, default="default content")
@@ -43,27 +41,52 @@ class ProblemSet(Model):
     recommender = ManyToManyField(
         UserStatistics, blank=True, related_name="recommended_problem"
     )
-    solver = ManyToManyField(UserStatistics, blank=True, related_name="solved_problem")
 
     def info_dict(self):
+        solved_num = self.solved_user.all().count()
+        recommended_num = self.recommender.all().count()
         return {
             "id": self.id,
+            "title": self.title,
+            "created_time": self.created_time,
+            "is_open": self.is_open,
+            "tag": self.tag,
+            "difficulty": self.difficulty,
+            "content": str(self.content),
             "userID": self.creator.user.id,
             "username": self.creator.user.username,
-            "date": self.date,
-            "title": self.title,
-            "content": str(self.content),
+            "solved_num": solved_num,
+            "recommended_num": recommended_num
         }
 
     def solver_dict(self):
         sovler_set = self.solver.all()
         res = []
         for solver in sovler_set:
-            res.append({"userID": solver.user.id, "username": solver.user.username})
+            res.append({
+                "userID": solver.solved_user.user.id, 
+                "username": solver.solved_user.user.username
+            })
         return res
 
-    def __str__(self):
-        return self.title
+
+class Solved(Model):
+    solver = ForeignKey(
+        UserStatistics, related_name="solved_problem", on_delete=CASCADE
+    )
+    problem = ForeignKey(
+        ProblemSet, related_name="solved_user", on_delete=CASCADE
+    )
+    result = BooleanField(default=False)
+
+    def to_dict(self):
+        return {
+            "userID": self.solver.user.id,
+            "username": self.solver.user.username,
+            "problemID": self.problem.id,
+            "problemtitle": self.problem.title,
+            "result": self.result,
+        }
 
 
 class Comment(Model):

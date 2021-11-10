@@ -7,13 +7,11 @@ urlpatterns = [
     path("signout/", views.SignOutView.as_view(), name="signout"),
     path("user/<int:u_id>/profile/", views.UserProfileView.as_view()),
     path("user/<int:id>/statistics/", views.userStatistics),
+    path("solved/<int:u_id>/<int:p_id>/", views.SolvedView.as_view()),
+    path("solved/<int:p_id>/", views.SolvedProblemView.as_view()),
+    path("problem/", views.ProblemSetListView.as_view()),
     path(
         "problem/<int:id>/", views.ProblemSetInfoView.as_view(), name="problem_set_info"
-    ),
-    path(
-        "problem/<int:id>/solver/",
-        views.ProblemSetSolverView.as_view(),
-        name="problem_set_solver",
     ),
     path(
         "problem/<int:id>/comment/",
