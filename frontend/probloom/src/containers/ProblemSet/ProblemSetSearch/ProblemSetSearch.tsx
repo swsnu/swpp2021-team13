@@ -110,7 +110,7 @@ class ProblemSetSearch extends Component<Props, ProblemSetSearchState> {
         <button id="create" onClick={() => this.onClickCreateButton()}>
           Create
         </button>
-        <h1>{this.props.user.id}</h1>
+        <h1>user id : {this.props.user.id}</h1>
         <div>
           <input
             id="search_bar"

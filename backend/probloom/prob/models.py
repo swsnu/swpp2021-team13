@@ -60,6 +60,24 @@ class ProblemSet(Model):
         }
 
 
+class Choice(Model):
+    choice1 = TextField(max_length=1000, default="choice1")
+    choice2 = TextField(max_length=1000, default="choice2")
+    choice3 = TextField(max_length=1000, default="choice3")
+    choice4 = TextField(max_length=1000, default="choice4")
+
+
+class Problems(Model):
+    index = IntegerField(blank=True, null=True)
+    problem_type = CharField(max_length=100, default="default type")
+    statement = TextField(max_length=1000, default="default statement")
+    choice = ForeignKey(Choice, related_name="problems_choice", on_delete=CASCADE)
+    solution = CharField(max_length=10, default="default solution")
+    explanation = TextField(max_length=1000, default="default explanation")
+
+    problemSet = ForeignKey(ProblemSet, related_name="problem_set", on_delete=CASCADE)
+
+
 class Solved(Model):
     solver = ForeignKey(
         UserStatistics, related_name="solved_problem", on_delete=CASCADE
