@@ -46,12 +46,14 @@ export const createProblemSet_: (
 
 export const createProblemSet: (
   title: string,
+  content: string,
   scope: string,
   tag: string,
   difficulty: string,
   problems: NewProblemSet[]
 ) => ThunkAction<void, RootState, null, CreateProblemSetAction> = (
   title: string,
+  content: string,
   scope: string,
   tag: string,
   difficulty: string,
@@ -60,6 +62,7 @@ export const createProblemSet: (
   return async (dispatch: AppDispatch) => {
     const { data }: { data: ProblemSet[] } = await axios.post(`/api/problem/`, {
       title: title,
+      content: content,
       scope: scope,
       tag: tag,
       difficulty: difficulty,

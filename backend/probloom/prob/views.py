@@ -14,7 +14,16 @@ from django.http.request import HttpRequest
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
-from .models import User, UserProfile, UserStatistics, ProblemSet, Solved, Comment
+from .models import (
+    Choice,
+    Problems,
+    User,
+    UserProfile,
+    UserStatistics,
+    ProblemSet,
+    Solved,
+    Comment,
+)
 from django.views.generic.detail import SingleObjectMixin
 
 # Create your views here.
@@ -35,6 +44,8 @@ class SignUpView(View):
 
         User.objects.create_user(username=username, email=email, password=password)
         new_user = User.objects.get(username=username)
+        userStatistics = UserStatistics(lastActiveDays=1, user=new_user)
+        userStatistics.save()
         res = {
             "id": new_user.id,
             "username": new_user.username,
@@ -141,10 +152,11 @@ class ProblemSetListView(LoginRequiredMixin, View):
         try:
             req_data = json.loads(request.body.decode())
             title = req_data["title"]
-            is_open = req_data["is_open"]
-            tag = req_data["tag"]
-            difficulty = req_data["difficulty"]
             content = req_data["content"]
+            is_open = req_data["scope"] == "scope-public"
+            tag = req_data["tag"]
+            difficulty = int(req_data["difficulty"])
+            problems = req_data["problems"]
         except (JSONDecodeError, KeyError) as error:
             raise BadRequest() from error
 
@@ -158,6 +170,30 @@ class ProblemSetListView(LoginRequiredMixin, View):
             creator=creator,
         )
         prob.save()
+
+        try:
+            problemSet = ProblemSet.objects.get(id=prob.id)
+        except:
+            return HttpResponse(status=404)
+        for problem in problems:
+            choice = Choice(
+                choice1=problem["choice"][0],
+                choice2=problem["choice"][1],
+                choice3=problem["choice"][2],
+                choice4=problem["choice"][3],
+            )
+            choice.save()
+            problem = Problems(
+                index=problem["index"],
+                problem_type=problem["type"],
+                statement=problem["problem"],
+                choice=choice,
+                solution=problem["solution"],
+                explanation=problem["explanation"],
+                problemSet=problemSet,
+            )
+            problem.save()
+
         return JsonResponse(data=prob.info_dict())
 
 
@@ -188,7 +224,11 @@ class SolvedView(LoginRequiredMixin, View):
             solver_stat = UserStatistics.objects.get(user=solver)
             problem = ProblemSet.objects.get(id=kwargs["p_id"])
             res = Solved.objects.get(solver=solver_stat, problem=problem)
-        except (User.DoesNotExist, UserStatistics.DoesNotExist, ProblemSet.DoesNotExist):
+        except (
+            User.DoesNotExist,
+            UserStatistics.DoesNotExist,
+            ProblemSet.DoesNotExist,
+        ):
             return HttpResponseNotFound()
 
         return JsonResponse(data={"result": res.result})
@@ -204,7 +244,11 @@ class SolvedView(LoginRequiredMixin, View):
             solver = User.objects.get(id=kwargs["u_id"])
             solver_stat = UserStatistics.objects.get(user=solver)
             problem = ProblemSet.objects.get(id=kwargs["p_id"])
-        except (User.DoesNotExist, UserStatistics.DoesNotExist, ProblemSet.DoesNotExist):
+        except (
+            User.DoesNotExist,
+            UserStatistics.DoesNotExist,
+            ProblemSet.DoesNotExist,
+        ):
             return HttpResponseNotFound()
 
         res = Solved(solver=solver_stat, problem=problem, result=result)

@@ -19,6 +19,7 @@ interface StateFromProps {}
 interface DispatchFromProps {
   onCreateProblemSet: (
     title: string,
+    content: string,
     scope: string,
     tag: string,
     difficulty: string,
@@ -37,6 +38,7 @@ class ProblemSetCreate extends Component<Props, State> {
 
     this.state = {
       title: 'title here...',
+      content: 'content here...',
       scope: '',
       tag: '',
       difficulty: '',
@@ -84,6 +86,7 @@ class ProblemSetCreate extends Component<Props, State> {
   submitProblemSetHandler = () => {
     this.props.onCreateProblemSet(
       this.state.title,
+      this.state.content,
       this.state.scope,
       this.state.tag,
       this.state.difficulty,
@@ -489,7 +492,7 @@ class ProblemSetCreate extends Component<Props, State> {
     // console.log('this.state.scope', this.state.scope);
     // console.log('this.state.tag', this.state.tag);
     // console.log('this.state.difficulty', this.state.difficulty);
-    console.log('this.state.problems', this.state.problems);
+    // console.log('this.state.problems', this.state.problems);
     // console.log('this.state.numberOfProblems', this.state.numberOfProblems);
     // ------------ Just for debugging messages -----------------
 
@@ -509,6 +512,19 @@ class ProblemSetCreate extends Component<Props, State> {
               this.setState({
                 ...this.state,
                 title: event.target.value,
+              });
+            }}
+          ></input>
+        </div>
+
+        <div className="Content">
+          <label>Content</label>
+          <input
+            placeholder={`${this.state.content}`}
+            onChange={(event) => {
+              this.setState({
+                ...this.state,
+                content: event.target.value,
               });
             }}
           ></input>
@@ -565,9 +581,9 @@ class ProblemSetCreate extends Component<Props, State> {
             }}
           >
             <option value="none">=== select ===</option>
-            <option value="difficulty-basic">basic</option>
-            <option value="difficulty-intermediate">intermediate</option>
-            <option value="difficulty-advanced">advanced</option>
+            <option value="1">basic</option>
+            <option value="2">intermediate</option>
+            <option value="3">advanced</option>
           </select>
         </div>
 
@@ -597,13 +613,21 @@ const mapDispatchToProps = (dispatch: any) => {
   return {
     onCreateProblemSet: (
       title: string,
+      content: string,
       scope: string,
       tag: string,
       difficulty: string,
       problems: NewProblemSet[]
     ) => {
       dispatch(
-        actionCreators.createProblemSet(title, scope, tag, difficulty, problems)
+        actionCreators.createProblemSet(
+          title,
+          content,
+          scope,
+          tag,
+          difficulty,
+          problems
+        )
       );
     },
   };

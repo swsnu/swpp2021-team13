@@ -13,6 +13,7 @@ export interface NewProblemSet {
 
 export interface ProblemSetCreateState {
   title: string;
+  content: string;
   scope: string;
   tag: string;
   difficulty: string;
