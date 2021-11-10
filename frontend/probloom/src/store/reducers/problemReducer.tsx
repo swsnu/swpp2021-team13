@@ -24,6 +24,24 @@ export interface Solver {
   result: boolean;
 }
 
+export interface NewProblemSet {
+  index: number;
+  type: string;
+  problem: string;
+  choice: string[];
+  solution: string;
+  explanation: string;
+}
+
+export interface ProblemSetCreateState {
+  title: string;
+  scope: string;
+  tag: string;
+  difficulty: string;
+  problems: NewProblemSet[];
+  numberOfProblems: number;
+}
+
 export interface ProblemSetState {
   problemSets: ProblemSet[];
   solvers: Solver[];
@@ -46,6 +64,8 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
       return { ...state, selectedProblemSet: action.target };
     case actionTypes.GET_ALL_SOLVER_OF_PROBLEMSET:
       return { ...state, solvers: action.solvers };
+    case actionTypes.CREATE_PROBLEM_SET:
+      return { ...state, problemSets: action.problemSets };
     case actionTypes.DELETE_PROBLEMSET:
       const remainProblemSet = state.problemSets.filter((problemset) => {
         return problemset.id !== action.targetID;

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { ThunkAction } from 'redux-thunk';
 
-import { ProblemSet, Solver } from '../reducers/problemReducer';
+import { ProblemSet, Solver, NewProblemSet } from '../reducers/problemReducer';
 import { AppDispatch, RootState } from '../store';
 import * as actionTypes from './actionTypes';
 
@@ -82,6 +82,43 @@ export const getAllSolvers: (
   };
 };
 
+export interface CreateProblemSetAction {
+  type: typeof actionTypes.CREATE_PROBLEM_SET;
+  problemSets: ProblemSet[];
+}
+
+export const createProblemSet_: (
+  problemSets: ProblemSet[]
+) => CreateProblemSetAction = (problemSets: ProblemSet[]) => ({
+  type: actionTypes.CREATE_PROBLEM_SET,
+  problemSets: problemSets,
+});
+
+export const createProblemSet: (
+  title: string,
+  scope: string,
+  tag: string,
+  difficulty: string,
+  problems: NewProblemSet[]
+) => ThunkAction<void, RootState, null, CreateProblemSetAction> = (
+  title: string,
+  scope: string,
+  tag: string,
+  difficulty: string,
+  problems: NewProblemSet[]
+) => {
+  return async (dispatch: AppDispatch) => {
+    const { data }: { data: ProblemSet[] } = await axios.post(`/api/problem/`, {
+      title: title,
+      scope: scope,
+      tag: tag,
+      difficulty: difficulty,
+      problems: problems,
+    });
+    dispatch(createProblemSet_(data));
+  };
+};
+
 export interface DeleteProblemSetAction {
   type: typeof actionTypes.DELETE_PROBLEMSET;
   targetID: number;
@@ -111,4 +148,5 @@ export type ProblemSetAction =
   | GetAllProblemSetsAction
   | GetProblemSetAction
   | GetAllSolversAction
+  | CreateProblemSetAction
   | DeleteProblemSetAction;
