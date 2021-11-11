@@ -22,7 +22,7 @@ const ProfileDropdown = ({ user, onSignOut }: ProfileDropdownProps) => {
           <Dropdown.Item>
             <NavLink to={`/user/${user.id}/summary`}>View Profile</NavLink>
           </Dropdown.Item>
-          <Dropdown.Item onClick={() => onSignOut(user)}>
+          <Dropdown.Item onClick={async () => onSignOut(user)}>
             Sign Out
           </Dropdown.Item>
         </Dropdown.Menu>

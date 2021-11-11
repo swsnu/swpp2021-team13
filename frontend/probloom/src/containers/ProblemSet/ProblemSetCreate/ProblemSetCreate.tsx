@@ -51,9 +51,9 @@ class ProblemSetCreate extends Component<Props, State> {
     this.state = {
       title: '',
       content: '',
-      scope: '',
+      scope: 'scope-private',
       tag: '',
-      difficulty: '',
+      difficulty: '1',
       problems: [],
       numberOfProblems: 0,
     };

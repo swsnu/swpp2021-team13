@@ -149,7 +149,7 @@ export const getUserProfile: (
 ) => ThunkAction<void, RootState, null, GetUserProfileAction> = (userId) => {
   return async (dispatch: AppDispatch) => {
     const { data } = await axios.get<GetUserProfileResponse>(
-      `/api/user/${userId}/profile`
+      `/api/user/${userId}/profile/`
     );
     const profile: UserProfile = { userId, ...data };
     dispatch(getUserProfile_(profile));
