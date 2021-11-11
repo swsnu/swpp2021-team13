@@ -1,23 +1,34 @@
 import { Component } from 'react';
-import { NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { returntypeof } from 'react-redux-typescript';
+import { RouteComponentProps } from 'react-router';
+import { NavLink } from 'react-router-dom';
 
-import './ProblemSetCreate.css';
+import './ProblemSetEdit.css';
 import * as actionCreators from '../../../store/actions/index';
 import {
+  ProblemSet,
   NewProblemSet,
   ProblemSetCreateState,
 } from '../../../store/reducers/problemReducer';
 
-interface ProblemSetCreateProps {
+interface MatchParams {
+  id: string;
+}
+
+interface MatchProps extends RouteComponentProps<MatchParams> {}
+
+interface ProblemSetEditProps {
   history: any;
 }
 
-interface StateFromProps {}
+interface StateFromProps {
+  selectedProblemSet: ProblemSet;
+}
 
 interface DispatchFromProps {
-  onCreateProblemSet: (
+  onGetProblemSet: (problemSetID: number) => any;
+  onEditProblemSet: (
     title: string,
     content: string,
     scope: string,
@@ -27,64 +38,48 @@ interface DispatchFromProps {
   ) => void;
 }
 
-type Props = ProblemSetCreateProps &
+type Props = ProblemSetEditProps &
+  MatchProps &
   typeof statePropTypes &
   typeof actionPropTypes;
 type State = ProblemSetCreateState;
 
-class ProblemSetCreate extends Component<Props, State> {
+class ProblemSetEdit extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
+    let title = '';
+    let content = '';
+    let scope = '';
+    let tag = '';
+    let difficulty = '';
+    let problems = [];
+    let numberOfProblems = 0;
+    if (this.props.selectedProblemSet) {
+      title = this.props.selectedProblemSet.title;
+      content = this.props.selectedProblemSet.content;
+      scope = this.props.selectedProblemSet.is_open ? 'true' : 'false';
+      tag = this.props.selectedProblemSet.tag;
+      difficulty = this.props.selectedProblemSet.difficulty.toString();
+      problems = this.props.selectedProblems;
+    }
     this.state = {
-      title: 'title here...',
-      content: 'content here...',
-      scope: '',
-      tag: '',
-      difficulty: '',
-      problems: [],
-      numberOfProblems: 0,
+      title: title,
+      content: content,
+      scope: scope,
+      tag: tag,
+      difficulty: difficulty,
+      problems: problems,
+      numberOfProblems: numberOfProblems,
     };
   }
 
-  addProblemHandler = (index: number) => {
-    const newProblem = {
-      index: index,
-      problem_type: '',
-      problem_statement: 'problem here...',
-      choice: ['', '', '', ''],
-      solution: '',
-      explanation: 'explanation here...',
-    };
+  componentDidMount() {
+    this.props.onGetProblemSet(parseInt(this.props.match.params.id));
+  }
 
-    this.setState({
-      ...this.state,
-      problems: [...this.state.problems, newProblem],
-      numberOfProblems: this.state.numberOfProblems + 1,
-    });
-  };
-
-  // confirmProblemHandler = () => {
-  // };
-  removeProblemHandler = (index: number) => {
-    const deletedProblems = this.state.problems.filter((problem) => {
-      return problem.index !== index;
-    });
-    deletedProblems.forEach((element) => {
-      if (element.index > index) {
-        element.index -= 1;
-      }
-    });
-
-    this.setState({
-      ...this.state,
-      problems: deletedProblems,
-      numberOfProblems: this.state.numberOfProblems - 1,
-    });
-  };
-
-  submitProblemSetHandler = () => {
-    this.props.onCreateProblemSet(
+  submitProblemSetEditHandler = () => {
+    this.props.onEditProblemSet(
       this.state.title,
       this.state.content,
       this.state.scope,
@@ -95,6 +90,15 @@ class ProblemSetCreate extends Component<Props, State> {
   };
 
   render() {
+    // ------------ Just for debugging messages -----------------
+    // console.log('this.state.title', this.state.title);
+    // console.log('this.state.scope', this.state.scope);
+    // console.log('this.state.tag', this.state.tag);
+    // console.log('this.state.difficulty', this.state.difficulty);
+    // console.log('this.state.problems', this.state.problems);
+    // console.log('this.props.selectedProblemSet', this.props.selectedProblemSet);
+    // console.log('this.state.numberOfProblems', this.state.numberOfProblems);
+    // ------------ Just for debugging messages -----------------
     const currentProblemSet = this.state.problems.map((problemSet, index) => {
       return (
         <div className="NewProblemSet" id={index.toString()}>
@@ -126,7 +130,12 @@ class ProblemSetCreate extends Component<Props, State> {
               }}
             >
               <option value="none">=== select ===</option>
-              <option value="type-multiplechoice">multiple choice</option>
+              <option
+                value="type-multiplechoice"
+                selected={problemSet.problem_type === 'type-multiplechoice'}
+              >
+                multiple choice
+              </option>
             </select>
           </div>
 
@@ -134,7 +143,7 @@ class ProblemSetCreate extends Component<Props, State> {
             <label>Problem statement</label>
             <textarea
               rows={4}
-              placeholder={`${problemSet.problem_statement}`}
+              value={`${problemSet.problem_statement}`}
               onChange={(event) => {
                 const newProblem: NewProblemSet[] = [];
                 const editProblem: NewProblemSet = {
@@ -165,7 +174,7 @@ class ProblemSetCreate extends Component<Props, State> {
           <div className="ProblemChoice1">
             <label>choice 1</label>
             <input
-              placeholder="choice 1 here..."
+              value={`${problemSet.choice[0]}`}
               onChange={(event) => {
                 const editChoice1 = event.target.value;
                 const newChoice1: string[] = [];
@@ -204,7 +213,7 @@ class ProblemSetCreate extends Component<Props, State> {
           <div className="ProblemChoice2">
             <label>choice 2</label>
             <input
-              placeholder="choice 2 here..."
+              value={`${problemSet.choice[1]}`}
               onChange={(event) => {
                 const editChoice1 = event.target.value;
                 const newChoice1: string[] = [];
@@ -243,7 +252,7 @@ class ProblemSetCreate extends Component<Props, State> {
           <div className="ProblemChoice3">
             <label>choice 3</label>
             <input
-              placeholder="choice 3 here..."
+              value={`${problemSet.choice[2]}`}
               onChange={(event) => {
                 const editChoice1 = event.target.value;
                 const newChoice1: string[] = [];
@@ -282,7 +291,7 @@ class ProblemSetCreate extends Component<Props, State> {
           <div className="ProblemChoice4">
             <label>choice 4</label>
             <input
-              placeholder="choice 4 here..."
+              value={`${problemSet.choice[3]}`}
               onChange={(event) => {
                 const editChoice1 = event.target.value;
                 const newChoice1: string[] = [];
@@ -447,7 +456,7 @@ class ProblemSetCreate extends Component<Props, State> {
             <label>Solution explanation</label>
             <textarea
               rows={4}
-              placeholder={`${problemSet.explanation}`}
+              value={`${problemSet.explanation}`}
               onChange={(event) => {
                 const newProblem: NewProblemSet[] = [];
                 const editProblem: NewProblemSet = {
@@ -473,38 +482,25 @@ class ProblemSetCreate extends Component<Props, State> {
               }}
             />
           </div>
-
-          {/* <button onClick={() => this.confirmProblemHandler()}>
-            Confirm problem
-          </button> */}
-          <button onClick={() => this.removeProblemHandler(problemSet.index)}>
-            Remove problem
-          </button>
         </div>
       );
     });
 
-    // ------------ Just for debugging messages -----------------
-    // console.log('this.state.title', this.state.title);
-    // console.log('this.state.scope', this.state.scope);
-    // console.log('this.state.tag', this.state.tag);
-    // console.log('this.state.difficulty', this.state.difficulty);
-    // console.log('this.state.problems', this.state.problems);
-    // console.log('this.state.numberOfProblems', this.state.numberOfProblems);
-    // ------------ Just for debugging messages -----------------
-
     return (
-      <div className="ProblemSetCreate">
-        <h1>ProblemSetCreate Page</h1>
+      <div className="ProblemSetEdit">
+        <h1>ProblemSetEdit Page</h1>
 
-        <NavLink id="problemsetcreate-back" to={`/problem/search/`}>
+        <NavLink
+          id="problemsetedit-back"
+          to={`/problem/${this.props.match.params.id}/detail/`}
+        >
           Back to problem set search
         </NavLink>
 
         <div className="Title">
           <label>Title</label>
           <input
-            placeholder={`${this.state.title}`}
+            value={`${this.state.title}`}
             onChange={(event) => {
               this.setState({
                 ...this.state,
@@ -517,7 +513,7 @@ class ProblemSetCreate extends Component<Props, State> {
         <div className="Content">
           <label>Content</label>
           <input
-            placeholder={`${this.state.content}`}
+            value={`${this.state.content}`}
             onChange={(event) => {
               this.setState({
                 ...this.state,
@@ -538,8 +534,15 @@ class ProblemSetCreate extends Component<Props, State> {
             }}
           >
             <option value="none">=== select ===</option>
-            <option value="scope-private">private</option>
-            <option value="scope-public">public</option>
+            <option
+              value="scope-private"
+              selected={this.state.scope === 'false'}
+            >
+              private
+            </option>
+            <option value="scope-public" selected={this.state.scope === 'true'}>
+              public
+            </option>
           </select>
         </div>
 
@@ -554,16 +557,66 @@ class ProblemSetCreate extends Component<Props, State> {
             }}
           >
             <option value="none">=== select ===</option>
-            <option value="tag-philosophy">philosophy</option>
-            <option value="tag-psychology">psychology</option>
-            <option value="tag-statistics">statistics</option>
-            <option value="tag-economics">economics</option>
-            <option value="tag-mathematics">mathematics</option>
-            <option value="tag-physics">physics</option>
-            <option value="tag-chemistry">chemistry</option>
-            <option value="tag-biology">biology</option>
-            <option value="tag-engineering">engineering</option>
-            <option value="tag-history">history</option>
+            <option
+              value="tag-philosophy"
+              selected={this.state.tag === 'tag-philosophy'}
+            >
+              philosophy
+            </option>
+            <option
+              value="tag-psychology"
+              selected={this.state.tag === 'tag-psychology'}
+            >
+              psychology
+            </option>
+            <option
+              value="tag-statistics"
+              selected={this.state.tag === 'tag-statistics'}
+            >
+              statistics
+            </option>
+            <option
+              value="tag-economics"
+              selected={this.state.tag === 'tag-economics'}
+            >
+              economics
+            </option>
+            <option
+              value="tag-mathematics"
+              selected={this.state.tag === 'tag-mathematics'}
+            >
+              mathematics
+            </option>
+            <option
+              value="tag-physics"
+              selected={this.state.tag === 'tag-physics'}
+            >
+              physics
+            </option>
+            <option
+              value="tag-chemistry"
+              selected={this.state.tag === 'tag-chemistry'}
+            >
+              chemistry
+            </option>
+            <option
+              value="tag-biology"
+              selected={this.state.tag === 'tag-biology'}
+            >
+              biology
+            </option>
+            <option
+              value="tag-engineering"
+              selected={this.state.tag === 'tag-engineering'}
+            >
+              engineering
+            </option>
+            <option
+              value="tag-history"
+              selected={this.state.tag === 'tag-history'}
+            >
+              history
+            </option>
           </select>
         </div>
 
@@ -578,24 +631,24 @@ class ProblemSetCreate extends Component<Props, State> {
             }}
           >
             <option value="none">=== select ===</option>
-            <option value="1">basic</option>
-            <option value="2">intermediate</option>
-            <option value="3">advanced</option>
+            <option value="1" selected={this.state.difficulty === '1'}>
+              basic
+            </option>
+            <option value="2" selected={this.state.difficulty === '2'}>
+              intermediate
+            </option>
+            <option value="3" selected={this.state.difficulty === '3'}>
+              advanced
+            </option>
           </select>
         </div>
 
         {currentProblemSet}
 
-        <div className="AddProblemButton">
-          <button
-            onClick={() => this.addProblemHandler(this.state.numberOfProblems)}
-          >
-            Add problem
-          </button>
-        </div>
-
         <div className="SubmitProblemSetButton">
-          <button onClick={() => this.submitProblemSetHandler()}>Submit</button>
+          <button onClick={() => this.submitProblemSetEditHandler()}>
+            Submit change
+          </button>
         </div>
       </div>
     );
@@ -603,12 +656,18 @@ class ProblemSetCreate extends Component<Props, State> {
 }
 
 const mapStateToProps = (state: any) => {
-  return {};
+  return {
+    selectedProblemSet: state.problemset.selectedProblemSet,
+    selectedProblems: state.problemset.selectedProblems,
+  };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    onCreateProblemSet: (
+    onGetProblemSet: (problemSetID: number) =>
+      dispatch(actionCreators.getProblemSet(problemSetID)),
+
+    onEditProblemSet: (
       title: string,
       content: string,
       scope: string,
@@ -636,4 +695,4 @@ const actionPropTypes = returntypeof(mapDispatchToProps);
 export default connect<StateFromProps, DispatchFromProps>(
   mapStateToProps,
   mapDispatchToProps
-)(ProblemSetCreate);
+)(ProblemSetEdit);

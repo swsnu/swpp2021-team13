@@ -176,23 +176,30 @@ class ProblemSetListView(LoginRequiredMixin, View):
         except:
             return HttpResponse(status=404)
         for problem in problems:
+            newProblem = Problems(
+                index=problem["index"],
+                problem_type=problem["problem_type"],
+                problem_statement=problem["problem_statement"],
+                solution=problem["solution"],
+                explanation=problem["explanation"],
+                problemSet=problemSet,
+            )
+            # print("@@@@@@@@@@@newProblem", newProblem)
+            newProblem.save()
+
+            try:
+                newProblems = Problems.objects.get(id=newProblem.id)
+            except:
+                return HttpResponse(status=404)
+
             choice = Choice(
                 choice1=problem["choice"][0],
                 choice2=problem["choice"][1],
                 choice3=problem["choice"][2],
                 choice4=problem["choice"][3],
+                problems=newProblems,
             )
             choice.save()
-            problem = Problems(
-                index=problem["index"],
-                problem_type=problem["type"],
-                statement=problem["problem"],
-                choice=choice,
-                solution=problem["solution"],
-                explanation=problem["explanation"],
-                problemSet=problemSet,
-            )
-            problem.save()
 
         return JsonResponse(data=prob.info_dict())
 
@@ -264,8 +271,32 @@ class ProblemSetInfoView(View):
             except:
                 return HttpResponse(status=404)
 
-            res = problem_set.info_dict()
-            return JsonResponse(res, status=201, safe=False)
+            res_pset = problem_set.info_dict()
+            problems = problem_set.problems.all()
+            problems_list = []
+            for problem in problems:
+                choices = problem.problem_choice
+                # print("@@@@@@@@@@@@@choices", choices.choice1)
+                choice = [
+                    choices.choice1,
+                    choices.choice2,
+                    choices.choice3,
+                    choices.choice4,
+                ]
+                problems_list.append(
+                    {
+                        "id": problem.id,
+                        "index": problem.index,
+                        "problem_type": problem.problem_type,
+                        "problem_statement": problem.problem_statement,
+                        "choice": choice,
+                        "solution": problem.solution,
+                        "explanation": problem.explanation,
+                    }
+                )
+            # print("@@@@@@@@@@@@@problems_list", problems_list)
+            res_dict = {"res_pset": res_pset, "problems_list": problems_list}
+            return JsonResponse(res_dict, status=201, safe=False)
         else:
             return HttpResponse(status=401)
 
