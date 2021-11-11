@@ -10,6 +10,7 @@ import Profile from './containers/Profile/Profile';
 import ProblemSetSearch from './containers/ProblemSet/ProblemSetSearch/ProblemSetSearch';
 import ProblemSetCreate from './containers/ProblemSet/ProblemSetCreate/ProblemSetCreate';
 import ProblemSetDetail from './containers/ProblemSet/ProblemSetDetail/ProblemSetDetail';
+import ProblemSetEdit from './containers/ProblemSet/ProblemSetEdit/ProblemSetEdit';
 import ProblemSetSolve from './containers/ProblemSet/ProblemSetSolve/ProblemSetSolve';
 import ProblemSetExplanationDetail from './containers/ProblemSet/ProblemSetExplanation/ProblemSetExplanationDetail';
 import NotFound from './components/NotFound/NotFound';
@@ -40,6 +41,7 @@ function App(props: { history: History }) {
             component={ProblemSetDetail}
           />
           <Route path="/problem/:id/solve/" exact component={ProblemSetSolve} />
+          <Route path="/problem/:id/edit/" exact component={ProblemSetEdit} />
           <Route
             path="/problem/:id/explanation/"
             exact

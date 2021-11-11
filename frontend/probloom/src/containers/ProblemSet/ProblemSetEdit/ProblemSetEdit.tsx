@@ -29,6 +29,7 @@ interface StateFromProps {
 interface DispatchFromProps {
   onGetProblemSet: (problemSetID: number) => any;
   onEditProblemSet: (
+    id: number,
     title: string,
     content: string,
     scope: string,
@@ -80,6 +81,7 @@ class ProblemSetEdit extends Component<Props, State> {
 
   submitProblemSetEditHandler = () => {
     this.props.onEditProblemSet(
+      this.props.selectedProblemSet.id,
       this.state.title,
       this.state.content,
       this.state.scope,
@@ -668,6 +670,7 @@ const mapDispatchToProps = (dispatch: any) => {
       dispatch(actionCreators.getProblemSet(problemSetID)),
 
     onEditProblemSet: (
+      id: number,
       title: string,
       content: string,
       scope: string,
@@ -676,7 +679,8 @@ const mapDispatchToProps = (dispatch: any) => {
       problems: NewProblemSet[]
     ) => {
       dispatch(
-        actionCreators.createProblemSet(
+        actionCreators.editProblemSet(
+          id,
           title,
           content,
           scope,

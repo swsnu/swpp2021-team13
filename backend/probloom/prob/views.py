@@ -312,14 +312,60 @@ class ProblemSetInfoView(View):
                     req_data = json.loads(request.body.decode())
                     title = req_data["title"]
                     content = req_data["content"]
+                    scope = req_data["scope"] == "scope-public"
+                    tag = req_data["tag"]
+                    difficulty = int(req_data["difficulty"])
+                    edit_problems = req_data["problems"]
                 except (KeyError, JSONDecodeError) as e:
                     return HttpResponseBadRequest()
 
                 problem_set.title = title
                 problem_set.content = content
+                problem_set.is_open = scope
+                problem_set.tag = tag
+                problem_set.difficulty = difficulty
                 problem_set.save()
-                res = problem_set.info_dict()
-                return JsonResponse(res, status=200)
+                res_pset = problem_set.info_dict()
+
+                problems = problem_set.problems.all()
+                # print("#########edit_problems", edit_problems)
+                # print("#########problems", problems)
+                problems_list = []
+                for problem, edit_problem in zip(problems, edit_problems):
+                    choices = problem.problem_choice
+                    # print('@@@@@@@@@@edit_problems["choice"]', edit_problem["choice"])
+                    choices.choice1 = edit_problem["choice"][0]
+                    choices.choice2 = edit_problem["choice"][1]
+                    choices.choice3 = edit_problem["choice"][2]
+                    choices.choice4 = edit_problem["choice"][3]
+                    choices.save()
+                    choice = [
+                        choices.choice1,
+                        choices.choice2,
+                        choices.choice3,
+                        choices.choice4,
+                    ]
+
+                    problem.problem_type = edit_problem["problem_type"]
+                    problem.problem_statement = edit_problem["problem_type"]
+                    problem.solution = edit_problem["solution"]
+                    problem.explanation = edit_problem["explanation"]
+                    problem.save()
+                    problems_list.append(
+                        {
+                            "id": problem.id,
+                            "index": problem.index,
+                            "problem_type": problem.problem_type,
+                            "problem_statement": problem.problem_statement,
+                            "choice": choice,
+                            "solution": problem.solution,
+                            "explanation": problem.explanation,
+                        }
+                    )
+
+                print("--------------- problems_list", problems_list)
+                res_dict = {"res_pset": res_pset, "problems_list": problems_list}
+                return JsonResponse(res_dict, status=200)
             else:
                 return HttpResponse(status=403)
         else:

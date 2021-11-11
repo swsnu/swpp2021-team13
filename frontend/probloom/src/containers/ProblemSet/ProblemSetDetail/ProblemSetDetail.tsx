@@ -142,6 +142,8 @@ class ProblemSetDetail extends Component<Props, State> {
   };
 
   render() {
+    console.log('@@@@@@@@@@@selectedProblemSet', this.props.selectedProblemSet);
+
     if (this.props.selectedUser === null) {
       this.props.history.push('/signin');
     }

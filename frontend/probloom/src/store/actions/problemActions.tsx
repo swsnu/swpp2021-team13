@@ -35,14 +35,16 @@ export const getAllProblemSets: () => ThunkAction<
 
 export interface GetProblemSetAction {
   type: typeof actionTypes.GET_PROBLEMSET;
-  target: ProblemSet;
+  pset: ProblemSet;
+  problems_list: NewProblemSet[];
 }
 
-export const getProblemSet_: (problemSet: ProblemSet) => GetProblemSetAction = (
+export const getProblemSet_: (problemSet) => GetProblemSetAction = (
   problemSet
 ) => ({
   type: actionTypes.GET_PROBLEMSET,
-  target: problemSet,
+  pset: problemSet.res_pset,
+  problems_list: problemSet.problems_list,
 });
 
 export const getProblemSet: (
@@ -51,9 +53,7 @@ export const getProblemSet: (
   problemSetID
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data }: { data: ProblemSet } = await axios.get(
-      `/api/problem/${problemSetID}/`
-    );
+    const { data } = await axios.get(`/api/problem/${problemSetID}/`);
     dispatch(getProblemSet_(data));
   };
 };
@@ -124,6 +124,53 @@ export const createProblemSet: (
   };
 };
 
+export interface EditProblemSetAction {
+  type: typeof actionTypes.EDIT_PROBLEM_SET;
+  pset: ProblemSet;
+  problems_list: NewProblemSet[];
+}
+
+export const editProblemSet_: (editData) => EditProblemSetAction = (
+  editData
+) => ({
+  type: actionTypes.EDIT_PROBLEM_SET,
+  pset: editData.res_pset,
+  problems_list: editData.problems_list,
+});
+
+export const editProblemSet: (
+  id: number,
+  title: string,
+  content: string,
+  scope: string,
+  tag: string,
+  difficulty: string,
+  problems: NewProblemSet[]
+) => ThunkAction<void, RootState, null, CreateProblemSetAction> = (
+  id: number,
+  title: string,
+  content: string,
+  scope: string,
+  tag: string,
+  difficulty: string,
+  problems: NewProblemSet[]
+) => {
+  return async (dispatch: AppDispatch) => {
+    const { data } = await axios.put(`/api/problem/${id}/`, {
+      id: id,
+      title: title,
+      content: content,
+      scope: scope,
+      tag: tag,
+      difficulty: difficulty,
+      problems: problems,
+    });
+    dispatch(editProblemSet_(data));
+    // dispatch(push(`/problem/${data.id}/detail/`));
+    dispatch(push(`/problem/search/`));
+  };
+};
+
 export interface DeleteProblemSetAction {
   type: typeof actionTypes.DELETE_PROBLEMSET;
   targetID: number;
@@ -154,4 +201,5 @@ export type ProblemSetAction =
   | GetProblemSetAction
   | GetAllSolversAction
   | CreateProblemSetAction
+  | EditProblemSetAction
   | DeleteProblemSetAction;
