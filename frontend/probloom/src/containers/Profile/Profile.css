@@ -27,7 +27,7 @@ body {
   transition: box-shadow 0.4s ease;
   margin-left: auto; /* Strictly for positioning */
 }
-
+/* 
 .menu-trigger:hover {
   box-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
 }
@@ -78,4 +78,4 @@ body {
   color: #333333;
   padding: 15px 20px;
   display: block;
-}
+} */

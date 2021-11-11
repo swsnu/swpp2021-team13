@@ -3,6 +3,7 @@ import { Route, Redirect, Switch } from 'react-router-dom';
 import { ConnectedRouter } from 'connected-react-router';
 import { History } from 'history';
 
+import 'semantic-ui-css/semantic.min.css';
 import './App.css';
 import Welcome from './containers/Welcome/Welcome';
 import SignUp from './containers/SignUp/SignUp';
@@ -14,11 +15,14 @@ import ProblemSetEdit from './containers/ProblemSet/ProblemSetEdit/ProblemSetEdi
 import ProblemSetSolve from './containers/ProblemSet/ProblemSetSolve/ProblemSetSolve';
 import ProblemSetExplanationDetail from './containers/ProblemSet/ProblemSetExplanation/ProblemSetExplanationDetail';
 import NotFound from './components/NotFound/NotFound';
+import AppHeader from './containers/AppHeader/AppHeader';
+import Footer from './components/Layout/Footer';
 
 function App(props: { history: History }) {
   return (
-    <div className="App">
+    <div className="App" style={{ paddingTop: '4rem' }}>
       <ConnectedRouter history={props.history}>
+        <AppHeader />
         <Switch>
           <Route
             path="/signin/"
@@ -49,6 +53,7 @@ function App(props: { history: History }) {
           />
           <Route component={NotFound} />
         </Switch>
+        <Footer />
       </ConnectedRouter>
     </div>
   );

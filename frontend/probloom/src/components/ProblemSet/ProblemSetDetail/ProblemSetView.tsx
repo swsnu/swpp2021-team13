@@ -3,21 +3,27 @@ import React from 'react';
 const ProblemSetView = (props) => {
   return (
     <div className="ProblemSetView">
-      <button className="signOutButton" onClick={props.onClickSignOutButton}>
+      <button
+        className="signOutButton"
+        onClick={() => props.onClickSignOutButton()}
+      >
         Sign Out
       </button>
-      <button className="backButton" onClick={props.onClickBackButton}>
+      <button className="backButton" onClick={() => props.onClickBackButton()}>
         Back
       </button>
       {props.isCreator && (
-        <button className="editButton" onClick={props.onClickEditProblemButton}>
+        <button
+          className="editButton"
+          onClick={() => props.onClickEditProblemButton}
+        >
           Edit
         </button>
       )}
       {props.isCreator && (
         <button
           className="deleteButton"
-          onClick={props.onClickDeleteProblemButton}
+          onClick={() => props.onClickDeleteProblemButton()}
         >
           Delete
         </button>
@@ -27,14 +33,14 @@ const ProblemSetView = (props) => {
         <p className="content">{props.content}</p>
         <button
           className="solveButton"
-          onClick={props.onClickSolveProblemButton}
+          onClick={() => props.onClickSolveProblemButton()}
         >
           Solve Problem
         </button>
         {(props.isCreator || props.isSolver) && (
           <button
             className="explanationButton"
-            onClick={props.onClickExplanationButton}
+            onClick={() => props.onClickExplanationButton()}
           >
             Explanations
           </button>

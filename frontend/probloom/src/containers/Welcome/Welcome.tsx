@@ -1,11 +1,20 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import axios from 'axios';
+import { Component } from 'react';
+import { connect, ConnectedProps } from 'react-redux';
+import {
+  Button,
+  Divider,
+  Form,
+  Grid,
+  Header,
+  Input,
+  Segment,
+} from 'semantic-ui-react';
 import * as actionCreators from '../../store/actions/index';
-import { returntypeof } from 'react-redux-typescript';
-import './Welcome.css';
-import { User } from '../../store/reducers/userReducer';
+import { SignInRequest } from '../../store/actions/userActions';
+import { AppDispatch, RootState } from '../../store/store';
 
-interface WelcomeProps {
+interface WelcomeProps extends PropsFromRedux {
   logo: string;
   history: any;
 }
@@ -15,25 +24,11 @@ interface WelcomeState {
   pw: string;
 }
 
-interface StateFromProps {
-  selectedUser: User;
-}
+class Welcome extends Component<WelcomeProps, WelcomeState> {
+  state = { id: '', pw: '' };
 
-interface DispatchFromProps {
-  onSignIn: (user: any) => void;
-}
-
-type Props = WelcomeProps & typeof statePropTypes & typeof actionPropTypes;
-type State = WelcomeState;
-
-class Welcome extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      id: '',
-      pw: '',
-    };
+  async componentDidMount() {
+    await axios.get('/api/token/');
   }
 
   onClickSignInButton = async () => {
@@ -55,8 +50,8 @@ class Welcome extends Component<Props, State> {
     const isValid = (isProperEmail || isProperUsername) && isProperPW;
 
     if (isValid) {
-      const user = { id: data.id, password: data.pw };
-      await this.props.onSignIn(user);
+      const request = { id: data.id, password: data.pw };
+      await this.props.onSignIn(request);
 
       if (this.props.selectedUser) {
         this.props.history.push('/problem/search/');
@@ -76,61 +71,86 @@ class Welcome extends Component<Props, State> {
 
   render() {
     return (
-      <div className="Welcome">
-        <h1 className="logo">{this.props.logo}</h1>
+      <Grid
+        textAlign="center"
+        style={{ height: '80vh' }}
+        verticalAlign="middle"
+      >
+        <Grid.Column className="Welcome" style={{ maxWidth: '28rem' }}>
+          <Header as="h1">{this.props.logo}</Header>
+          <Header as="h2">Sign In</Header>
+          <Form size="large">
+            <Segment>
+              <Form.Field>
+                <label>Username / Email</label>
+                <Input
+                  fluid
+                  icon="user"
+                  iconPosition="left"
+                  placeholder="Username / Email"
+                  value={this.state.id}
+                  onChange={(event) =>
+                    this.setState({ id: event.target.value })
+                  }
+                />
+              </Form.Field>
 
-        <div className="SignInBox">
-          <label className="idLabel">Username / Email</label>
-          <input
-            type="text"
-            value={this.state.id}
-            className="idlInput"
-            onChange={(event) => this.setState({ id: event.target.value })}
-          />
+              <Form.Field>
+                <label>Password</label>
+                <Input
+                  type="password"
+                  fluid
+                  icon="lock"
+                  iconPosition="left"
+                  placeholder="Password"
+                  value={this.state.pw}
+                  onChange={(event) =>
+                    this.setState({ pw: event.target.value })
+                  }
+                />
+              </Form.Field>
 
-          <label className="pwLabel">Password</label>
-          <input
-            type="password"
-            value={this.state.pw}
-            className="pwInput"
-            onChange={(event) => this.setState({ pw: event.target.value })}
-          />
+              <Button
+                primary
+                type="submit"
+                fluid
+                className="signInButton"
+                onClick={this.onClickSignInButton}
+              >
+                Sign In
+              </Button>
 
-          <button
-            className="signInButton"
-            onClick={() => this.onClickSignInButton()}
-          >
-            Sign In
-          </button>
-        </div>
+              <Divider />
 
-        <button
-          className="signUpButton"
-          onClick={() => this.onClickSignUpButton()}
-        >
-          Sign Up
-        </button>
-      </div>
+              <Button
+                fluid
+                className="signUpButton"
+                onClick={this.onClickSignUpButton}
+              >
+                Sign Up
+              </Button>
+            </Segment>
+          </Form>
+        </Grid.Column>
+      </Grid>
     );
   }
 }
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = (state: RootState) => {
   return {
     selectedUser: state.user.selectedUser,
   };
 };
 
-const mapDispatchToProps = (dispatch: any) => {
+const mapDispatchToProps = (dispatch: AppDispatch) => {
   return {
-    onSignIn: (user: any) => dispatch(actionCreators.signIn(user)),
+    onSignIn: (request: SignInRequest) =>
+      dispatch(actionCreators.signIn(request)),
   };
 };
 
-const statePropTypes = returntypeof(mapStateToProps);
-const actionPropTypes = returntypeof(mapDispatchToProps);
+const connector = connect(mapStateToProps, mapDispatchToProps);
+type PropsFromRedux = ConnectedProps<typeof connector>;
 
-export default connect<StateFromProps, DispatchFromProps>(
-  mapStateToProps,
-  mapDispatchToProps
-)(Welcome);
+export default connector(Welcome);

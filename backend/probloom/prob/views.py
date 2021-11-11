@@ -44,6 +44,8 @@ class SignUpView(View):
 
         User.objects.create_user(username=username, email=email, password=password)
         new_user = User.objects.get(username=username)
+        user_profile = UserProfile(user=new_user)
+        user_profile.save()
         userStatistics = UserStatistics(lastActiveDays=1, user=new_user)
         userStatistics.save()
         res = {

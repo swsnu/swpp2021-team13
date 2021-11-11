@@ -1,11 +1,13 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import * as actionCreators from '../../store/actions/index';
-import { returntypeof } from 'react-redux-typescript';
-import './SignUp.css';
-import { User } from '../../store/reducers/userReducer';
+import { Component } from 'react';
+import { connect, ConnectedProps } from 'react-redux';
+import { Button, Form, Grid, Header, Input, Segment } from 'semantic-ui-react';
 
-interface SignUpProps {
+import './SignUp.css';
+import * as actionCreators from '../../store/actions/index';
+import { AppDispatch, RootState } from '../../store/store';
+import { SignUpRequest } from '../../store/actions/userActions';
+
+interface SignUpProps extends PropsFromRedux {
   history: any;
 }
 
@@ -16,28 +18,13 @@ interface SignUpState {
   pwConfirm: string;
 }
 
-interface StateFromProps {
-  selectedUser: User;
-}
-
-interface DispatchFromProps {
-  onSignUp: (any) => void;
-}
-
-type Props = SignUpProps & typeof statePropTypes & typeof actionPropTypes;
-type State = SignUpState;
-
-class SignUp extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      username: '',
-      email: '',
-      pw: '',
-      pwConfirm: '',
-    };
-  }
+class SignUp extends Component<SignUpProps, SignUpState> {
+  state = {
+    username: '',
+    email: '',
+    pw: '',
+    pwConfirm: '',
+  };
 
   onClickSignUpButton = async () => {
     const data = {
@@ -93,79 +80,105 @@ class SignUp extends Component<Props, State> {
 
   render() {
     return (
-      <div className="SignUp">
-        <div className="SignUpBox">
-          <label className="usernameLabel">Username</label>
-          <input
-            type="text"
-            value={this.state.username}
-            className="usernameInput"
-            onChange={(event) =>
-              this.setState({ username: event.target.value })
-            }
-          />
+      <Grid
+        textAlign="center"
+        style={{ height: '80vh' }}
+        verticalAlign="middle"
+      >
+        <Grid.Column className="SignUp" style={{ maxWidth: '28rem' }}>
+          <Header as="h2">Sign Up</Header>
+          <Form size="large">
+            <Segment>
+              <Form.Field>
+                <label>Username</label>
+                <Input
+                  fluid
+                  placeholder="Username"
+                  value={this.state.username}
+                  onChange={(event) =>
+                    this.setState({ username: event.target.value })
+                  }
+                />
+              </Form.Field>
 
-          <label className="emailLabel">Email</label>
-          <input
-            type="text"
-            value={this.state.email}
-            className="emailInput"
-            onChange={(event) => this.setState({ email: event.target.value })}
-          />
+              <Form.Field>
+                <label>Email</label>
+                <Input
+                  type="email"
+                  fluid
+                  placeholder="Email"
+                  value={this.state.email}
+                  onChange={(event) =>
+                    this.setState({ email: event.target.value })
+                  }
+                />
+              </Form.Field>
 
-          <label className="pwLabel">Password</label>
-          <input
-            type="password"
-            value={this.state.pw}
-            className="pwInput"
-            onChange={(event) => this.setState({ pw: event.target.value })}
-          />
+              <Form.Field>
+                <label>Password</label>
+                <Input
+                  type="password"
+                  fluid
+                  placeholder="Password"
+                  value={this.state.pw}
+                  onChange={(event) =>
+                    this.setState({ pw: event.target.value })
+                  }
+                />
+              </Form.Field>
 
-          <label className="pwComfirmLabel">Confirm Password</label>
-          <input
-            type="password"
-            value={this.state.pwConfirm}
-            className="pwConfirmInput"
-            onChange={(event) =>
-              this.setState({ pwConfirm: event.target.value })
-            }
-          />
+              <Form.Field>
+                <label>Confirm Password</label>
+                <Input
+                  type="password"
+                  fluid
+                  placeholder="Confirm Password"
+                  value={this.state.pwConfirm}
+                  onChange={(event) =>
+                    this.setState({ pwConfirm: event.target.value })
+                  }
+                />
+              </Form.Field>
 
-          <button
-            className="signUpButton"
-            onClick={() => this.onClickSignUpButton()}
-          >
-            Sign Up
-          </button>
-        </div>
+              <Button
+                primary
+                type="submit"
+                fluid
+                className="signUpButton"
+                onClick={this.onClickSignUpButton}
+              >
+                Sign Up
+              </Button>
 
-        <button
-          className="signInButton"
-          onClick={() => this.onClickSignInButton()}
-        >
-          Sign In
-        </button>
-      </div>
+              <Button
+                fluid
+                className="signInButton"
+                onClick={this.onClickSignInButton}
+              >
+                Back
+              </Button>
+            </Segment>
+          </Form>
+        </Grid.Column>
+      </Grid>
     );
   }
 }
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = (state: RootState) => {
   return {
     selectedUser: state.user.selectedUser,
   };
 };
 
-const mapDispatchToProps = (dispatch: any) => {
+const mapDispatchToProps = (dispatch: AppDispatch) => {
   return {
-    onSignUp: (user: any) => dispatch(actionCreators.signUp(user)),
+    onSignUp: (request: SignUpRequest) =>
+      dispatch(actionCreators.signUp(request)),
   };
 };
 
-const statePropTypes = returntypeof(mapStateToProps);
-const actionPropTypes = returntypeof(mapDispatchToProps);
+const connector = connect(mapStateToProps, mapDispatchToProps);
+type PropsFromRedux = ConnectedProps<typeof connector>;
 
-export default connect<StateFromProps, DispatchFromProps>(
-  mapStateToProps,
-  mapDispatchToProps
-)(SignUp);
+export default connector(SignUp);

@@ -13,6 +13,11 @@ export interface SignInAction {
   target: User | null;
 }
 
+export interface SignInRequest {
+  id: string;
+  password: string;
+}
+
 export const signInSuccess = (user) => {
   return {
     type: actionTypes.SIGN_IN,
@@ -27,10 +32,10 @@ export const signInFail = () => {
   };
 };
 
-export const signIn = (user: any) => {
+export const signIn = (request: SignInRequest) => {
   return (dispatch) => {
     return axios
-      .post('/api/signin/', user)
+      .post('/api/signin/', request)
       .then((res) => dispatch(signInSuccess(res.data)))
       .catch((error) => dispatch(signInFail()));
   };
@@ -69,6 +74,12 @@ export interface SignUpAction {
   target: User | null;
 }
 
+export interface SignUpRequest {
+  username: string;
+  email: string;
+  password: string;
+}
+
 export const signUpSuccess = (user: any) => {
   return {
     type: actionTypes.SIGN_UP,
@@ -83,10 +94,10 @@ export const signUpFail = () => {
   };
 };
 
-export const signUp = (user: any) => {
+export const signUp = (request: SignUpRequest) => {
   return (dispatch) => {
     return axios
-      .post('/api/signup/', user)
+      .post('/api/signup/', request)
       .then((res) => dispatch(signUpSuccess(res.data)))
       .catch((error) => dispatch(signUpFail()));
   };
@@ -108,7 +119,7 @@ export const getUserStatistics: (
   id: number
 ) => ThunkAction<void, RootState, null, GetUserStatisticsAction> = (id) => {
   return async (dispatch: AppDispatch) => {
-    const data: UserStatistics = await axios.get(`/api/user/${id}/statistics`);
+    const data: UserStatistics = await axios.get(`/api/user/${id}/statistics/`);
     dispatch(getUserStatistics_(data));
   };
 };
@@ -161,7 +172,7 @@ export const updateUserIntroduction: (
   pendingIntroduction
 ) => {
   return async (dispatch: AppDispatch) => {
-    await axios.put(`/api/user/${userId}/profile`, {
+    await axios.put(`/api/user/${userId}/profile/`, {
       introduction: pendingIntroduction,
     });
     const newIntroduction = pendingIntroduction;

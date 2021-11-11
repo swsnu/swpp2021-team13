@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
-import { returntypeof } from 'react-redux-typescript';
-import { connect } from 'react-redux';
+import { connect, ConnectedProps } from 'react-redux';
 import ProblemSetView from '../../../components/ProblemSet/ProblemSetDetail/ProblemSetView';
 import CommentComponent from '../../../components/ProblemSet/ProblemSetDetail/CommentComponent';
-import { User } from '../../../store/reducers/userReducer';
-import { ProblemSet, Solver } from '../../../store/reducers/problemReducer';
+import { Solver } from '../../../store/reducers/problemReducer';
 import { Comment } from '../../../store/reducers/commentReducer';
-import { AppDispatch } from '../../../store/store';
+import { AppDispatch, RootState } from '../../../store/store';
 import { RouteComponentProps } from 'react-router';
 import NotFound from '../../../components/NotFound/NotFound';
 import {
@@ -27,7 +25,7 @@ interface MatchParams {
 
 interface MatchProps extends RouteComponentProps<MatchParams> {}
 
-interface ProblemSetDetailProps {
+interface ProblemSetDetailProps extends PropsFromRedux {
   history: any;
 }
 
@@ -37,33 +35,11 @@ interface ProblemSetDetailState {
   editComment: Comment | null;
 }
 
-interface StateFromProps {
-  selectedUser: User;
-  selectedProblemSet: ProblemSet;
-  solvers: Solver[];
-  comments: Comment[];
-  selectedComment: Comment | null;
-}
-
-interface DispatchFromProps {
-  onSignOut: (user: any) => any;
-  onGetCommentsOfProblemSet: (problemSetID: number) => any;
-  onGetProblemSet: (problemSetID: number) => any;
-  onGetAllSolvers: (problemSetID: number) => any;
-  onDeleteProblemSet: (problemSetID: number) => any;
-  onCreateComment: (comment: Comment) => any;
-  onUpdateComment: (comment: any) => any;
-  onDeleteComment: (commentID: number) => any;
-}
-
-type Props = ProblemSetDetailProps &
-  MatchProps &
-  typeof statePropTypes &
-  typeof actionPropTypes;
-type State = ProblemSetDetailState;
-
-class ProblemSetDetail extends Component<Props, State> {
-  constructor(props: Props) {
+class ProblemSetDetail extends Component<
+  ProblemSetDetailProps & MatchProps,
+  ProblemSetDetailState
+> {
+  constructor(props: ProblemSetDetailProps & MatchProps) {
     super(props);
 
     this.state = {
@@ -130,8 +106,8 @@ class ProblemSetDetail extends Component<Props, State> {
       this.setState({ commentContent: '', isEdit: false, editComment: null });
     } else {
       const comment = {
-        userID: this.props.selectedUser.id,
-        username: this.props.selectedUser.username,
+        userID: this.props.selectedUser?.id,
+        username: this.props.selectedUser?.username,
         problemSetID: parseInt(this.props.match.params.id),
         content: this.state.commentContent,
       };
@@ -156,12 +132,12 @@ class ProblemSetDetail extends Component<Props, State> {
     let isCreator = false;
     let isSolver = false;
     if (this.props.selectedProblemSet) {
-      isCreator =
-        this.props.selectedProblemSet.userID === this.props.selectedUser.id;
+      const selectedUserID = this.props.selectedUser?.id;
+      isCreator = this.props.selectedProblemSet.userID === selectedUserID;
       const solver = this.props.solvers.find(
-        (element: Solver) => element.userID === this.props.selectedUser.id
+        (element: Solver) => element.userID === selectedUserID
       );
-      isSolver = solver === undefined;
+      isSolver = solver !== undefined;
     } else {
       return <NotFound />;
     }
@@ -183,7 +159,7 @@ class ProblemSetDetail extends Component<Props, State> {
         <div className="Comment">
           <label>Comment</label>
           {this.props.comments.map((com) => {
-            isCreator = com.userID === this.props.selectedUser.id;
+            isCreator = com.userID === this.props.selectedUser?.id;
             return (
               <CommentComponent
                 key={com.id}
@@ -229,7 +205,7 @@ class ProblemSetDetail extends Component<Props, State> {
   }
 }
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = (state: RootState) => {
   return {
     selectedUser: state.user.selectedUser,
     selectedProblemSet: state.problemset.selectedProblemSet,
@@ -256,10 +232,7 @@ const mapDispatchToProps = (dispatch: AppDispatch) => {
   };
 };
 
-const statePropTypes = returntypeof(mapStateToProps);
-const actionPropTypes = returntypeof(mapDispatchToProps);
+const connector = connect(mapStateToProps, mapDispatchToProps);
+type PropsFromRedux = ConnectedProps<typeof connector>;
 
-export default connect<StateFromProps, DispatchFromProps>(
-  mapStateToProps,
-  mapDispatchToProps
-)(ProblemSetDetail);
+export default connector(ProblemSetDetail);

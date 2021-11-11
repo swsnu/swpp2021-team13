@@ -76,10 +76,17 @@ export const getAllSolvers: (
   problemSetID
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data }: { data: Solver[] } = await axios.get(
-      `/api/solved/${problemSetID}/`
-    );
-    dispatch(getAllSolvers_(data));
+    try {
+      const { data } = await axios.get(`/api/solved/${problemSetID}/`);
+      dispatch(getAllSolvers_(data));
+    } catch (err) {
+      const { status } = (err as any).response;
+      if (status === 404) {
+        dispatch(getAllSolvers_([]));
+      } else {
+        throw err;
+      }
+    }
   };
 };
 
