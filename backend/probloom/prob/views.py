@@ -131,11 +131,31 @@ class UserProfileView(LoginRequiredMixin, SingleObjectMixin, View):
         return HttpResponse()
 
 
-def userStatistics(request, id=0):
+def userStatistics(request, id):
     if request.method == "GET":
-        userStatistics = UserStatistics.objects.get(id=id)
+        current_user = User.objects.get(id=id)
+        userStatistics = current_user.statistics
+        createdProblems = userStatistics.created_problem.all()
+
+        createdProblems_list = []
+        for createdProblem in createdProblems:
+            createdProblems_list.append(
+                {
+                    "title": createdProblem.title,
+                    "content": createdProblem.content,
+                    "created_time": createdProblem.created_time,
+                    "scope": createdProblem.is_open,
+                    "tag": createdProblem.tag,
+                    "difficulty": createdProblem.difficulty,
+                }
+            )
+
         return JsonResponse(
-            {"id": userStatistics.id, "lastActiveDays": userStatistics.lastActiveDays},
+            {
+                "id": userStatistics.id,
+                "lastActiveDays": userStatistics.lastActiveDays,
+                "createdProblems": createdProblems_list,
+            },
             safe=False,
         )
 

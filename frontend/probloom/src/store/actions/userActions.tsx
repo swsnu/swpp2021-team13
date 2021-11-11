@@ -119,7 +119,11 @@ export const getUserStatistics: (
   id: number
 ) => ThunkAction<void, RootState, null, GetUserStatisticsAction> = (id) => {
   return async (dispatch: AppDispatch) => {
-    const data: UserStatistics = await axios.get(`/api/user/${id}/statistics/`);
+    const { data }: { data: UserStatistics } = await axios.get(
+      `/api/user/${id}/statistics/`
+    );
+    // console.log('*********** ACTION data', data);
+
     dispatch(getUserStatistics_(data));
   };
 };

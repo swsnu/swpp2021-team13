@@ -7,9 +7,7 @@ const Footer = (props: RouteComponentProps) => {
       <List horizontal divided link>
         <List.Item>Made by Team 13, SWPP 2021</List.Item>
         <List.Item>
-          <NavLink to="https://www.github.com/swsnu/swpp2021-team13">
-            View Source
-          </NavLink>
+          <a href="https://www.github.com/swsnu/swpp2021-team13">View Source</a>
         </List.Item>
       </List>
     </Segment>

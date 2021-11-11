@@ -25,14 +25,14 @@ const getPanes = (userId: number) => [
 ];
 
 class Profile extends Component<RouteComponentProps<ProfilePathParams>> {
-  handleTabChange: (arg0: any, arg1: TabProps) => void = () => {};
+  handleTabChange = (_: any, { activeIndex = 0 }: TabProps) => {
+    const active = validActiveValues[activeIndex];
+    this.props.history.push(active);
+  };
 
-  componentDidMount() {
-    this.handleTabChange = (_, { activeIndex = 0 }: TabProps) => {
-      const active = validActiveValues[activeIndex];
-      this.props.history.push(active);
-    };
-  }
+  onClickBackButton = () => {
+    this.props.history.push('/problem/search/');
+  };
 
   render() {
     const userId = parseInt(this.props.match.params.id, 10);
@@ -64,6 +64,9 @@ class Profile extends Component<RouteComponentProps<ProfilePathParams>> {
           activeIndex={activeIndex}
           onTabChange={this.handleTabChange}
         />
+        <button onClick={() => this.onClickBackButton()}>
+          Back to problem search
+        </button>
       </Container>
     );
   }
