@@ -7,6 +7,7 @@ import { AppDispatch } from '../../../store/store';
 import { User } from '../../../store/reducers/userReducer';
 import { ProblemSet } from '../../../store/reducers/problemReducer';
 import './ProblemSetSearch.css';
+import Layout from '../../../components/Layout/Layout';
 
 export interface ProblemSetSearchProps {
   history: any;
@@ -106,71 +107,73 @@ class ProblemSetSearch extends Component<Props, ProblemSetSearchState> {
       });
 
     return (
-      <div className="ProblemSetSearch">
-        <button id="create" onClick={() => this.onClickCreateButton()}>
-          Create
-        </button>
-        <h1>user id : {this.props.user.id}</h1>
-        <div>
-          <input
-            id="search_bar"
-            type="text"
-            value={this.state.searchBar}
-            onChange={(event) => {
-              this.setState({ searchBar: event.target.value });
-            }}
-          />
-          <button id="search" onClick={() => this.onClickSearchButton()}>
-            Search
+      <Layout username={this.props.user.username} footer={true}>
+        <div className="ProblemSetSearch">
+          <button id="create" onClick={() => this.onClickCreateButton()}>
+            Create
           </button>
-          <select
-            id="term"
-            value={this.state.term}
-            onChange={(event) => {
-              this.setState({ term: event.target.value });
-            }}
-          >
-            <option value="title+content">title+content</option>
-            <option value="title">title</option>
-            <option value="content">content</option>
-          </select>
-          <select
-            id="creator"
-            value={this.state.creator}
-            onChange={(event) => {
-              this.setState({ creator: event.target.value });
-            }}
-          >
-            <option value="open">open</option>
-            <option value="own">own</option>
-          </select>
-          <select
-            id="tag"
-            value={this.state.tag}
-            onChange={(event) => {
-              this.setState({ tag: event.target.value });
-            }}
-          >
-            <option value="all">all</option>
-            <option value="math">math</option>
-            <option value="english">english</option>
-            <option value="history">history</option>
-            <option value="science">science</option>
-          </select>
-          <select
-            id="sort"
-            value={this.state.sort}
-            onChange={(event) => {
-              this.setState({ sort: event.target.value });
-            }}
-          >
-            <option value="date">date</option>
-            <option value="solved">solved</option>
-            <option value="recommended">recommended</option>
-          </select>
+          <h1>user id : {this.props.user.id}</h1>
+          <div>
+            <input
+              id="search_bar"
+              type="text"
+              value={this.state.searchBar}
+              onChange={(event) => {
+                this.setState({ searchBar: event.target.value });
+              }}
+            />
+            <button id="search" onClick={() => this.onClickSearchButton()}>
+              Search
+            </button>
+            <select
+              id="term"
+              value={this.state.term}
+              onChange={(event) => {
+                this.setState({ term: event.target.value });
+              }}
+            >
+              <option value="title+content">title+content</option>
+              <option value="title">title</option>
+              <option value="content">content</option>
+            </select>
+            <select
+              id="creator"
+              value={this.state.creator}
+              onChange={(event) => {
+                this.setState({ creator: event.target.value });
+              }}
+            >
+              <option value="open">open</option>
+              <option value="own">own</option>
+            </select>
+            <select
+              id="tag"
+              value={this.state.tag}
+              onChange={(event) => {
+                this.setState({ tag: event.target.value });
+              }}
+            >
+              <option value="all">all</option>
+              <option value="math">math</option>
+              <option value="english">english</option>
+              <option value="history">history</option>
+              <option value="science">science</option>
+            </select>
+            <select
+              id="sort"
+              value={this.state.sort}
+              onChange={(event) => {
+                this.setState({ sort: event.target.value });
+              }}
+            >
+              <option value="date">date</option>
+              <option value="solved">solved</option>
+              <option value="recommended">recommended</option>
+            </select>
+          </div>
+          {problems}
         </div>
-        {problems}
-      </div>
+      </Layout>
     );
   }
 }

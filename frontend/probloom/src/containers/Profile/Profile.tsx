@@ -50,6 +50,7 @@ const Profile = (props: RouteComponentProps<ProfilePathParams>) => {
         <h2>John Doe</h2>
         <h3>john.doe@example.com</h3>
         {tabContent}
+        <NavLink to={`/problem/search/`}>Back to problem list</NavLink>
       </Layout>
     </div>
   );
