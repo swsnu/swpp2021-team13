@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Component } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
+import { Redirect } from 'react-router';
 import {
   Button,
   Divider,
@@ -70,6 +71,9 @@ class Welcome extends Component<WelcomeProps, WelcomeState> {
   };
 
   render() {
+    if (this.props.selectedUser !== null) {
+      return <Redirect to="/problem/search/" />;
+    }
     return (
       <Grid
         textAlign="center"

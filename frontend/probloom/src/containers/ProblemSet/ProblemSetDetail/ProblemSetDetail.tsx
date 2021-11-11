@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
+import { RouteComponentProps } from 'react-router';
+import { Button, Comment, Container, Form, Header } from 'semantic-ui-react';
 import ProblemSetView from '../../../components/ProblemSet/ProblemSetDetail/ProblemSetView';
 import CommentComponent from '../../../components/ProblemSet/ProblemSetDetail/CommentComponent';
 import { Solver } from '../../../store/reducers/problemReducer';
-import { Comment } from '../../../store/reducers/commentReducer';
+import { Comment as CommentData } from '../../../store/reducers/commentReducer';
 import { AppDispatch, RootState } from '../../../store/store';
-import { RouteComponentProps } from 'react-router';
 import NotFound from '../../../components/NotFound/NotFound';
 import {
   signOut,
@@ -32,7 +33,7 @@ interface ProblemSetDetailProps extends PropsFromRedux {
 interface ProblemSetDetailState {
   commentContent: string;
   isEdit: boolean;
-  editComment: Comment | null;
+  editComment: CommentData | null;
 }
 
 class ProblemSetDetail extends Component<
@@ -54,10 +55,6 @@ class ProblemSetDetail extends Component<
     this.props.onGetCommentsOfProblemSet(parseInt(this.props.match.params.id));
     this.props.onGetAllSolvers(parseInt(this.props.match.params.id));
   }
-
-  onClickSignOutButton = () => {
-    this.props.onSignOut(this.props.selectedUser);
-  };
 
   onClickBackButton = () => {
     this.props.history.push('/problem/search/');
@@ -86,11 +83,11 @@ class ProblemSetDetail extends Component<
     );
   };
 
-  onClickEditCommentButton = (comment: Comment) => {
-    this.setState({ isEdit: true, editComment: comment });
+  onClickEditCommentButton = (comment: CommentData) => {
+    this.setState({ isEdit: !this.state.isEdit, editComment: comment });
   };
 
-  onClickDeleteCommentButton = (comment: Comment) => {
+  onClickDeleteCommentButton = (comment: CommentData) => {
     this.props.onDeleteComment(comment.id);
     this.props.onGetCommentsOfProblemSet(parseInt(this.props.match.params.id));
     this.setState({ commentContent: '', isEdit: false, editComment: null });
@@ -118,7 +115,7 @@ class ProblemSetDetail extends Component<
   };
 
   render() {
-    console.log('@@@@@@@@@@@selectedProblemSet', this.props.selectedProblemSet);
+    // console.log('@@@@@@@@@@@selectedProblemSet', this.props.selectedProblemSet);
 
     if (this.props.selectedUser === null) {
       this.props.history.push('/signin');
@@ -144,62 +141,73 @@ class ProblemSetDetail extends Component<
 
     return (
       <div className="ProblemSetDetail">
-        <ProblemSetView
-          isCreator={isCreator}
-          isSolver={isSolver}
-          title={this.props.selectedProblemSet.title}
-          content={this.props.selectedProblemSet.content}
-          onClickSignOutButton={() => this.onClickSignOutButton()}
-          onClickBackButton={() => this.onClickBackButton()}
-          onClickEditProblemButton={() => this.onClickEditProblemButton()}
-          onClickDeleteProblemButton={() => this.onClickDeleteProblemButton()}
-          onClickSolveProblemButton={() => this.onClickSolveProblemButton()}
-          onClickExplanationButton={() => this.onClickExplanationButton()}
-        />
-        <div className="Comment">
-          <label>Comment</label>
-          {this.props.comments.map((com) => {
-            isCreator = com.userID === this.props.selectedUser?.id;
-            return (
-              <CommentComponent
-                key={com.id}
-                username={com.username}
-                content={com.content}
-                isCreator={isCreator}
-                onClickEditCommentButton={() =>
-                  this.onClickEditCommentButton(com)
-                }
-                onClickDeleteCommentButton={() =>
-                  this.onClickDeleteCommentButton(com)
+        <Container text>
+          <ProblemSetView
+            creator={this.props.selectedUser?.username ?? '[deleted]'}
+            isCreator={isCreator}
+            isSolver={isSolver}
+            title={this.props.selectedProblemSet.title}
+            content={this.props.selectedProblemSet.content}
+            onClickBackButton={() => this.onClickBackButton()}
+            onClickEditProblemButton={() => this.onClickEditProblemButton()}
+            onClickDeleteProblemButton={() => this.onClickDeleteProblemButton()}
+            onClickSolveProblemButton={() => this.onClickSolveProblemButton()}
+            onClickExplanationButton={() => this.onClickExplanationButton()}
+          />
+          <Comment.Group className="Comment">
+            <Header as="h3" dividing>
+              Comments
+            </Header>
+
+            {this.props.comments.map((com) => {
+              isCreator = com.userID === this.props.selectedUser?.id;
+              return (
+                <CommentComponent
+                  key={com.id}
+                  username={com.username}
+                  content={com.content}
+                  isCreator={isCreator}
+                  onClickEditCommentButton={() =>
+                    this.onClickEditCommentButton(com)
+                  }
+                  onClickDeleteCommentButton={() =>
+                    this.onClickDeleteCommentButton(com)
+                  }
+                />
+              );
+            })}
+
+            <Form reply size="small">
+              <Form.TextArea
+                value={this.state.commentContent}
+                className="commentInput"
+                onChange={(event) =>
+                  this.setState({ commentContent: event.target.value })
                 }
               />
-            );
-          })}
-          <input
-            type="text"
-            value={this.state.commentContent}
-            className="commentInput"
-            onChange={(event) =>
-              this.setState({ commentContent: event.target.value })
-            }
-          />
-          {!this.state.isEdit && (
-            <button
-              className="commentComfirmButton"
-              onClick={() => this.onClickCommentButton()}
-            >
-              comment
-            </button>
-          )}
-          {this.state.isEdit && (
-            <button
-              className="commentEditComfirmButton"
-              onClick={() => this.onClickCommentButton()}
-            >
-              edit
-            </button>
-          )}
-        </div>
+              {!this.state.isEdit && (
+                <Button
+                  primary
+                  size="small"
+                  className="commentComfirmButton"
+                  onClick={() => this.onClickCommentButton()}
+                >
+                  Comment
+                </Button>
+              )}
+              {this.state.isEdit && (
+                <Button
+                  primary
+                  size="small"
+                  className="commentEditComfirmButton"
+                  onClick={() => this.onClickCommentButton()}
+                >
+                  Edit Comment
+                </Button>
+              )}
+            </Form>
+          </Comment.Group>
+        </Container>
       </div>
     );
   }

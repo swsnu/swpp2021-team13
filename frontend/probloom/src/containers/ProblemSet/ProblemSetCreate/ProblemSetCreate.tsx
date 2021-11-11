@@ -1,5 +1,4 @@
 import { Component } from 'react';
-import { NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { returntypeof } from 'react-redux-typescript';
 
@@ -9,6 +8,8 @@ import {
   NewProblemSet,
   ProblemSetCreateState,
 } from '../../../store/reducers/problemReducer';
+import { Button, Container, Form, Header, Input } from 'semantic-ui-react';
+import { tagOptions } from '../ProblemSetSearch/ProblemSetSearch';
 
 interface ProblemSetCreateProps {
   history: any;
@@ -32,13 +33,24 @@ type Props = ProblemSetCreateProps &
   typeof actionPropTypes;
 type State = ProblemSetCreateState;
 
+const scopeOptions = [
+  { text: 'Private', value: 'scope-private' },
+  { text: 'Public', value: 'scope-public' },
+];
+
+const difficultyOptions = [
+  { key: 1, text: 'Basic', value: '1' },
+  { key: 2, text: 'Intermediate', value: '2' },
+  { key: 3, text: 'Advanced', value: '3' },
+];
+
 class ProblemSetCreate extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
     this.state = {
-      title: 'title here...',
-      content: 'content here...',
+      title: '',
+      content: '',
       scope: '',
       tag: '',
       difficulty: '',
@@ -494,110 +506,95 @@ class ProblemSetCreate extends Component<Props, State> {
     // ------------ Just for debugging messages -----------------
 
     return (
-      <div className="ProblemSetCreate">
-        <h1>ProblemSetCreate Page</h1>
-
-        <NavLink id="problemsetcreate-back" to={`/problem/search/`}>
-          Back to problem set search
-        </NavLink>
-
-        <div className="Title">
-          <label>Title</label>
-          <input
-            placeholder={`${this.state.title}`}
-            onChange={(event) => {
-              this.setState({
-                ...this.state,
-                title: event.target.value,
-              });
-            }}
-          ></input>
-        </div>
-
-        <div className="Content">
-          <label>Content</label>
-          <input
-            placeholder={`${this.state.content}`}
-            onChange={(event) => {
-              this.setState({
-                ...this.state,
-                content: event.target.value,
-              });
-            }}
-          ></input>
-        </div>
-
-        <div className="Scope">
-          <label>Scope</label>
-          <select
-            onChange={(event) => {
-              this.setState({
-                ...this.state,
-                scope: event.target.value,
-              });
-            }}
+      <Container text className="ProblemSetCreate">
+        <Header as="h1">
+          New Problem
+          <Button
+            floated="right"
+            id="problemsetcreate-back"
+            onClick={() => this.props.history.goBack()}
           >
-            <option value="none">=== select ===</option>
-            <option value="scope-private">private</option>
-            <option value="scope-public">public</option>
-          </select>
-        </div>
+            Back
+          </Button>
+        </Header>
 
-        <div className="Tag">
-          <label>Tag</label>
-          <select
+        <Form>
+          <Form.Field className="Title">
+            <label>Title</label>
+            <Input
+              placeholder="Title"
+              value={this.state.title}
+              onChange={(event) => {
+                this.setState({ title: event.target.value });
+              }}
+            />
+          </Form.Field>
+
+          <Form.TextArea
+            className="Content"
+            label="Content"
+            placeholder="Content"
+            value={this.state.content}
             onChange={(event) => {
-              this.setState({
-                ...this.state,
-                tag: event.target.value,
-              });
+              this.setState({ content: event.target.value });
             }}
-          >
-            <option value="none">=== select ===</option>
-            <option value="tag-philosophy">philosophy</option>
-            <option value="tag-psychology">psychology</option>
-            <option value="tag-statistics">statistics</option>
-            <option value="tag-economics">economics</option>
-            <option value="tag-mathematics">mathematics</option>
-            <option value="tag-physics">physics</option>
-            <option value="tag-chemistry">chemistry</option>
-            <option value="tag-biology">biology</option>
-            <option value="tag-engineering">engineering</option>
-            <option value="tag-history">history</option>
-          </select>
-        </div>
+          />
 
-        <div className="Difficulty">
-          <label>Difficulty</label>
-          <select
-            onChange={(event) => {
-              this.setState({
-                ...this.state,
-                difficulty: event.target.value,
-              });
-            }}
-          >
-            <option value="none">=== select ===</option>
-            <option value="1">basic</option>
-            <option value="2">intermediate</option>
-            <option value="3">advanced</option>
-          </select>
-        </div>
+          <Form.Group>
+            <Form.Dropdown
+              className="Scope"
+              item
+              options={scopeOptions}
+              label="Scope"
+              defaultValue="scope-private"
+              onChange={(_, { value }) => {
+                this.setState({ scope: value as string });
+              }}
+            />
 
-        {currentProblemSet}
+            <Form.Dropdown
+              className="Tag"
+              item
+              options={tagOptions.slice(1)}
+              label="Tag"
+              defaultValue="tag-philosophy"
+              onChange={(_, { value }) => {
+                this.setState({ tag: value as string });
+              }}
+            />
 
-        <div className="AddProblemButton">
-          <button
+            <Form.Dropdown
+              className="Difficulty"
+              item
+              options={difficultyOptions}
+              label="Difficulty"
+              defaultValue="1"
+              onChange={(_, { value }) => {
+                this.setState({ difficulty: value as string });
+              }}
+            />
+          </Form.Group>
+
+          {currentProblemSet}
+
+          <Button
+            secondary
+            className="AddProblemButton"
             onClick={() => this.addProblemHandler(this.state.numberOfProblems)}
           >
             Add problem
-          </button>
-        </div>
+          </Button>
 
-        <div className="SubmitProblemSetButton">
-          <button onClick={() => this.submitProblemSetHandler()}>Submit</button>
-        </div>
-      </div>
+          <Button
+            primary
+            className="SubmitProblemSetButton"
+            floated="right"
+            onClick={() => this.submitProblemSetHandler()}
+          >
+            Submit
+          </Button>
+        </Form>
+      </Container>
     );
   }
 }

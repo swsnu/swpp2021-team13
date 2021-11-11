@@ -30,34 +30,34 @@ export interface ProblemSetSearchState {
 }
 
 const searchRangeOptions = [
-  { text: 'Title + Content', value: 'title+content' },
-  { text: 'Title', value: 'title' },
-  { text: 'Content', value: 'content' },
+  { key: 'title+content', text: 'Title + Content', value: 'title+content' },
+  { key: 'title', text: 'Title', value: 'title' },
+  { key: 'content', text: 'Content', value: 'content' },
 ];
 
 const creatorOptions = [
-  { text: 'Open Problems', value: 'open' },
-  { text: 'Your Problems', value: 'own' },
+  { key: 'open', text: 'Open Problems', value: 'open' },
+  { key: 'own', text: 'Your Problems', value: 'own' },
 ];
 
-const tagOptions = [
-  { text: 'all', value: 'all' },
-  { text: 'philosophy', value: 'tag-philosophy' },
-  { text: 'psychology', value: 'tag-psychology' },
-  { text: 'statistics', value: 'tag-statistics' },
-  { text: 'economics', value: 'tag-economics' },
-  { text: 'mathematics', value: 'tag-mathematics' },
-  { text: 'physics', value: 'tag-physics' },
-  { text: 'chemistry', value: 'tag-chemistry' },
-  { text: 'biology', value: 'tag-biology' },
-  { text: 'engineering', value: 'tag-engineering' },
-  { text: 'history', value: 'tag-history' },
+export const tagOptions = [
+  { key: 'all', text: 'all', value: 'all' },
+  { key: 'tag-philosophy', text: 'philosophy', value: 'tag-philosophy' },
+  { key: 'tag-psychology', text: 'psychology', value: 'tag-psychology' },
+  { key: 'tag-statistics', text: 'statistics', value: 'tag-statistics' },
+  { key: 'tag-economics', text: 'economics', value: 'tag-economics' },
+  { key: 'tag-mathematics', text: 'mathematics', value: 'tag-mathematics' },
+  { key: 'tag-physics', text: 'physics', value: 'tag-physics' },
+  { key: 'tag-chemistry', text: 'chemistry', value: 'tag-chemistry' },
+  { key: 'tag-biology', text: 'biology', value: 'tag-biology' },
+  { key: 'tag-engineering', text: 'engineering', value: 'tag-engineering' },
+  { key: 'tag-history', text: 'history', value: 'tag-history' },
 ];
 
 const sortOptions = [
-  { text: 'Date', value: 'date' },
-  { text: 'Solved', value: 'solved' },
-  { text: 'Recommended', value: 'recommended' },
+  { key: 'date', text: 'Date', value: 'date' },
+  { key: 'solved', text: 'Solved', value: 'solved' },
+  { key: 'recommended', text: 'Recommended', value: 'recommended' },
 ];
 
 class ProblemSetSearch extends Component<
