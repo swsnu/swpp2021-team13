@@ -166,8 +166,8 @@ export const editProblemSet: (
       problems: problems,
     });
     dispatch(editProblemSet_(data));
-    // dispatch(push(`/problem/${data.id}/detail/`));
-    dispatch(push(`/problem/search/`));
+    dispatch(push(`/problem/${data.id}/detail/`));
+    // dispatch(push(`/problem/search/`));
   };
 };
 

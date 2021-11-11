@@ -74,9 +74,9 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
     case actionTypes.CREATE_PROBLEM_SET:
       return { ...state, problemSet: action.problemSet };
     case actionTypes.EDIT_PROBLEM_SET:
-      const otherProblemSets = state.problemSets.filter((problemSet) => {
-        return problemSet.id !== action.pset.id;
-      });
+      // const otherProblemSets = state.problemSets.filter((problemSet) => {
+      //   return problemSet.id !== action.pset.id;
+      // });
       const editProblemSets = {
         id: action.pset.id,
         title: action.pset.title,
@@ -104,8 +104,7 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
 
       return {
         ...state,
-        problemSets: [...otherProblemSets, editProblemSets],
-        // selectedProblems: editProblems,
+        selectedProblemSet: editProblemSets,
       };
 
     case actionTypes.DELETE_PROBLEMSET:
