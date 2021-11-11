@@ -6,6 +6,8 @@ import ProfileSummary from './ProfileSummary';
 import ProfileStatistics from './ProfileStatistics';
 import { Container, Tab, TabProps } from 'semantic-ui-react';
 import { Component } from 'react';
+import { RootState } from '../../store/store';
+import { connect, ConnectedProps } from 'react-redux';
 
 export interface ProfilePathParams {
   id: string;
@@ -24,7 +26,9 @@ const getPanes = (userId: number) => [
   },
 ];
 
-class Profile extends Component<RouteComponentProps<ProfilePathParams>> {
+class Profile extends Component<
+  PropsFromRedux & RouteComponentProps<ProfilePathParams>
+> {
   handleTabChange = (_: any, { activeIndex = 0 }: TabProps) => {
     const active = validActiveValues[activeIndex];
     this.props.history.push(active);
@@ -56,9 +60,8 @@ class Profile extends Component<RouteComponentProps<ProfilePathParams>> {
 
     return (
       <Container text>
-        {/* TODO : props as a username */}
-        <h2>John Doe</h2>
-        <h3>john.doe@example.com</h3>
+        <h2>{this.props.selectedUser?.username}</h2>
+        <h3>{this.props.selectedUser?.email}</h3>
         <Tab
           panes={panes}
           activeIndex={activeIndex}
@@ -72,4 +75,13 @@ class Profile extends Component<RouteComponentProps<ProfilePathParams>> {
   }
 }
 
-export default withRouter(Profile);
+const mapStateToProps = (state: RootState) => {
+  return {
+    selectedUser: state.user.selectedUser,
+  };
+};
+
+const connector = connect(mapStateToProps);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(withRouter(Profile));
