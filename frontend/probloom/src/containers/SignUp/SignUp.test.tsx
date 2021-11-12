@@ -85,7 +85,7 @@ describe('<SignUp />', () => {
 
   it('should render Sign up', () => {
     const component = mount(signup);
-    const wrapper = component.find('.SignUp');
+    const wrapper = component.find('div.SignUp');
     expect(wrapper.length).toBe(1);
   });
 
@@ -115,7 +115,7 @@ describe('<SignUp />', () => {
 
   it('should click sign in button', () => {
     const component = mount(signup);
-    const wrapper = component.find('.signInButton');
+    const wrapper = component.find('button.signInButton');
     wrapper.simulate('click');
     expect(window.location.href).toEqual('http://localhost/signin');
     history.push('/');
@@ -138,7 +138,7 @@ describe('<SignUp />', () => {
     const passwordConfirm = 'abc';
     wrapper.at(3).simulate('change', { target: { value: passwordConfirm } });
 
-    const wrapper2 = component.find('.signUpButton');
+    const wrapper2 = component.find('button.signUpButton');
     wrapper2.simulate('click');
 
     expect(spyAlert).toBeCalledTimes(1);
@@ -167,7 +167,7 @@ describe('<SignUp />', () => {
     const passwordConfirm = 'abcabcabc';
     wrapper.at(3).simulate('change', { target: { value: passwordConfirm } });
 
-    const wrapper2 = component.find('.signUpButton');
+    const wrapper2 = component.find('button.signUpButton');
     wrapper2.simulate('click');
 
     //expect(spyAlert).toBeCalledTimes(1);
@@ -192,7 +192,7 @@ describe('<SignUp />', () => {
     const passwordConfirm = 'abcabcab';
     wrapper.at(3).simulate('change', { target: { value: passwordConfirm } });
 
-    const wrapper2 = component.find('.signUpButton');
+    const wrapper2 = component.find('button.signUpButton');
     wrapper2.simulate('click');
 
     expect(spyAlert).toBeCalledTimes(1);
@@ -221,7 +221,7 @@ describe('<SignUp />', () => {
     const passwordConfirm = 'abcabcabc';
     wrapper.at(3).simulate('change', { target: { value: passwordConfirm } });
 
-    const wrapper2 = component.find('.signUpButton');
+    const wrapper2 = component.find('button.signUpButton');
     wrapper2.simulate('click');
 
     //expect(spyAlert).toBeCalledTimes(1);
@@ -249,7 +249,7 @@ describe('<SignUp />', () => {
     const passwordConfirm = 'abcabcabc';
     wrapper.at(3).simulate('change', { target: { value: passwordConfirm } });
 
-    const wrapper2 = component.find('.signUpButton');
+    const wrapper2 = component.find('button.signUpButton');
     wrapper2.simulate('click');
 
     expect(spyPost).toBeCalledTimes(1);

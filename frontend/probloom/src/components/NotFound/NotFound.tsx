@@ -1,4 +1,5 @@
 import { RouteComponentProps, withRouter } from 'react-router-dom';
+import { Button, Container, Header } from 'semantic-ui-react';
 
 export interface NotFoundProps {
   message?: string;
@@ -10,13 +11,15 @@ const NotFound = (props: NotFoundProps & RouteComponentProps) => {
     props.history.goBack();
   };
   return (
-    <div>
-      <h1>Not Found</h1>
+    <Container textAlign="center">
+      <Header as="h1">Not Found</Header>
       <p>{message}</p>
       <p>
-        <button onClick={goBackHandler}>Go back</button>
+        <Button secondary onClick={goBackHandler}>
+          Go back
+        </Button>
       </p>
-    </div>
+    </Container>
   );
 };
 

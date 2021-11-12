@@ -14,7 +14,16 @@ from django.http.request import HttpRequest
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
-from .models import User, UserProfile, UserStatistics, ProblemSet, Solved, Comment
+from .models import (
+    Choice,
+    Problems,
+    User,
+    UserProfile,
+    UserStatistics,
+    ProblemSet,
+    Solved,
+    Comment,
+)
 from django.views.generic.detail import SingleObjectMixin
 
 # Create your views here.
@@ -35,6 +44,10 @@ class SignUpView(View):
 
         User.objects.create_user(username=username, email=email, password=password)
         new_user = User.objects.get(username=username)
+        user_profile = UserProfile(user=new_user)
+        user_profile.save()
+        userStatistics = UserStatistics(lastActiveDays=1, user=new_user)
+        userStatistics.save()
         res = {
             "id": new_user.id,
             "username": new_user.username,
@@ -118,11 +131,31 @@ class UserProfileView(LoginRequiredMixin, SingleObjectMixin, View):
         return HttpResponse()
 
 
-def userStatistics(request, id=0):
+def userStatistics(request, id):
     if request.method == "GET":
-        userStatistics = UserStatistics.objects.get(id=id)
+        current_user = User.objects.get(id=id)
+        userStatistics = current_user.statistics
+        createdProblems = userStatistics.created_problem.all()
+
+        createdProblems_list = []
+        for createdProblem in createdProblems:
+            createdProblems_list.append(
+                {
+                    "title": createdProblem.title,
+                    "content": createdProblem.content,
+                    "created_time": createdProblem.created_time,
+                    "scope": createdProblem.is_open,
+                    "tag": createdProblem.tag,
+                    "difficulty": createdProblem.difficulty,
+                }
+            )
+
         return JsonResponse(
-            {"id": userStatistics.id, "lastActiveDays": userStatistics.lastActiveDays},
+            {
+                "id": userStatistics.id,
+                "lastActiveDays": userStatistics.lastActiveDays,
+                "createdProblems": createdProblems_list,
+            },
             safe=False,
         )
 
@@ -141,10 +174,11 @@ class ProblemSetListView(LoginRequiredMixin, View):
         try:
             req_data = json.loads(request.body.decode())
             title = req_data["title"]
-            is_open = req_data["is_open"]
-            tag = req_data["tag"]
-            difficulty = req_data["difficulty"]
             content = req_data["content"]
+            is_open = req_data["scope"] == "scope-public"
+            tag = req_data["tag"]
+            difficulty = int(req_data["difficulty"])
+            problems = req_data["problems"]
         except (JSONDecodeError, KeyError) as error:
             raise BadRequest() from error
 
@@ -158,6 +192,37 @@ class ProblemSetListView(LoginRequiredMixin, View):
             creator=creator,
         )
         prob.save()
+
+        try:
+            problemSet = ProblemSet.objects.get(id=prob.id)
+        except:
+            return HttpResponse(status=404)
+        for problem in problems:
+            newProblem = Problems(
+                index=problem["index"],
+                problem_type=problem["problem_type"],
+                problem_statement=problem["problem_statement"],
+                solution=problem["solution"],
+                explanation=problem["explanation"],
+                problemSet=problemSet,
+            )
+            # print("@@@@@@@@@@@newProblem", newProblem)
+            newProblem.save()
+
+            try:
+                newProblems = Problems.objects.get(id=newProblem.id)
+            except:
+                return HttpResponse(status=404)
+
+            choice = Choice(
+                choice1=problem["choice"][0],
+                choice2=problem["choice"][1],
+                choice3=problem["choice"][2],
+                choice4=problem["choice"][3],
+                problems=newProblems,
+            )
+            choice.save()
+
         return JsonResponse(data=prob.info_dict())
 
 
@@ -228,8 +293,32 @@ class ProblemSetInfoView(View):
             except:
                 return HttpResponse(status=404)
 
-            res = problem_set.info_dict()
-            return JsonResponse(res, status=201, safe=False)
+            res_pset = problem_set.info_dict()
+            problems = problem_set.problems.all()
+            problems_list = []
+            for problem in problems:
+                choices = problem.problem_choice
+                # print("@@@@@@@@@@@@@choices", choices.choice1)
+                choice = [
+                    choices.choice1,
+                    choices.choice2,
+                    choices.choice3,
+                    choices.choice4,
+                ]
+                problems_list.append(
+                    {
+                        "id": problem.id,
+                        "index": problem.index,
+                        "problem_type": problem.problem_type,
+                        "problem_statement": problem.problem_statement,
+                        "choice": choice,
+                        "solution": problem.solution,
+                        "explanation": problem.explanation,
+                    }
+                )
+            # print("@@@@@@@@@@@@@problems_list", problems_list)
+            res_dict = {"res_pset": res_pset, "problems_list": problems_list}
+            return JsonResponse(res_dict, status=201, safe=False)
         else:
             return HttpResponse(status=401)
 
@@ -245,14 +334,60 @@ class ProblemSetInfoView(View):
                     req_data = json.loads(request.body.decode())
                     title = req_data["title"]
                     content = req_data["content"]
+                    scope = req_data["scope"] == "scope-public"
+                    tag = req_data["tag"]
+                    difficulty = int(req_data["difficulty"])
+                    edit_problems = req_data["problems"]
                 except (KeyError, JSONDecodeError) as e:
                     return HttpResponseBadRequest()
 
                 problem_set.title = title
                 problem_set.content = content
+                problem_set.is_open = scope
+                problem_set.tag = tag
+                problem_set.difficulty = difficulty
                 problem_set.save()
-                res = problem_set.info_dict()
-                return JsonResponse(res, status=200)
+                res_pset = problem_set.info_dict()
+
+                problems = problem_set.problems.all()
+                # print("#########edit_problems", edit_problems)
+                # print("#########problems", problems)
+                problems_list = []
+                for problem, edit_problem in zip(problems, edit_problems):
+                    choices = problem.problem_choice
+                    # print('@@@@@@@@@@edit_problems["choice"]', edit_problem["choice"])
+                    choices.choice1 = edit_problem["choice"][0]
+                    choices.choice2 = edit_problem["choice"][1]
+                    choices.choice3 = edit_problem["choice"][2]
+                    choices.choice4 = edit_problem["choice"][3]
+                    choices.save()
+                    choice = [
+                        choices.choice1,
+                        choices.choice2,
+                        choices.choice3,
+                        choices.choice4,
+                    ]
+
+                    problem.problem_type = edit_problem["problem_type"]
+                    problem.problem_statement = edit_problem["problem_type"]
+                    problem.solution = edit_problem["solution"]
+                    problem.explanation = edit_problem["explanation"]
+                    problem.save()
+                    problems_list.append(
+                        {
+                            "id": problem.id,
+                            "index": problem.index,
+                            "problem_type": problem.problem_type,
+                            "problem_statement": problem.problem_statement,
+                            "choice": choice,
+                            "solution": problem.solution,
+                            "explanation": problem.explanation,
+                        }
+                    )
+
+                print("--------------- problems_list", problems_list)
+                res_dict = {"res_pset": res_pset, "problems_list": problems_list}
+                return JsonResponse(res_dict, status=200)
             else:
                 return HttpResponse(status=403)
         else:

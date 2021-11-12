@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import { returntypeof } from 'react-redux-typescript';
-import { connect } from 'react-redux';
+import { connect, ConnectedProps } from 'react-redux';
+import { RouteComponentProps } from 'react-router';
+import { Button, Comment, Container, Form, Header } from 'semantic-ui-react';
 import ProblemSetView from '../../../components/ProblemSet/ProblemSetDetail/ProblemSetView';
 import CommentComponent from '../../../components/ProblemSet/ProblemSetDetail/CommentComponent';
-import { User } from '../../../store/reducers/userReducer';
-import { ProblemSet, Solver } from '../../../store/reducers/problemReducer';
-import { Comment } from '../../../store/reducers/commentReducer';
-import { AppDispatch } from '../../../store/store';
-import { RouteComponentProps } from 'react-router';
+import { Solver } from '../../../store/reducers/problemReducer';
+import { Comment as CommentData } from '../../../store/reducers/commentReducer';
+import { AppDispatch, RootState } from '../../../store/store';
 import NotFound from '../../../components/NotFound/NotFound';
 import {
   signOut,
@@ -27,43 +26,21 @@ interface MatchParams {
 
 interface MatchProps extends RouteComponentProps<MatchParams> {}
 
-interface ProblemSetDetailProps {
+interface ProblemSetDetailProps extends PropsFromRedux {
   history: any;
 }
 
 interface ProblemSetDetailState {
   commentContent: string;
   isEdit: boolean;
-  editComment: Comment | null;
+  editComment: CommentData | null;
 }
 
-interface StateFromProps {
-  selectedUser: User;
-  selectedProblemSet: ProblemSet;
-  solvers: Solver[];
-  comments: Comment[];
-  selectedComment: Comment | null;
-}
-
-interface DispatchFromProps {
-  onSignOut: (user: any) => any;
-  onGetCommentsOfProblemSet: (problemSetID: number) => any;
-  onGetProblemSet: (problemSetID: number) => any;
-  onGetAllSolvers: (problemSetID: number) => any;
-  onDeleteProblemSet: (problemSetID: number) => any;
-  onCreateComment: (comment: Comment) => any;
-  onUpdateComment: (comment: any) => any;
-  onDeleteComment: (commentID: number) => any;
-}
-
-type Props = ProblemSetDetailProps &
-  MatchProps &
-  typeof statePropTypes &
-  typeof actionPropTypes;
-type State = ProblemSetDetailState;
-
-class ProblemSetDetail extends Component<Props, State> {
-  constructor(props: Props) {
+class ProblemSetDetail extends Component<
+  ProblemSetDetailProps & MatchProps,
+  ProblemSetDetailState
+> {
+  constructor(props: ProblemSetDetailProps & MatchProps) {
     super(props);
 
     this.state = {
@@ -78,10 +55,6 @@ class ProblemSetDetail extends Component<Props, State> {
     this.props.onGetCommentsOfProblemSet(parseInt(this.props.match.params.id));
     this.props.onGetAllSolvers(parseInt(this.props.match.params.id));
   }
-
-  onClickSignOutButton = () => {
-    this.props.onSignOut(this.props.selectedUser);
-  };
 
   onClickBackButton = () => {
     this.props.history.push('/problem/search/');
@@ -110,11 +83,11 @@ class ProblemSetDetail extends Component<Props, State> {
     );
   };
 
-  onClickEditCommentButton = (comment: Comment) => {
-    this.setState({ isEdit: true, editComment: comment });
+  onClickEditCommentButton = (comment: CommentData) => {
+    this.setState({ isEdit: !this.state.isEdit, editComment: comment });
   };
 
-  onClickDeleteCommentButton = (comment: Comment) => {
+  onClickDeleteCommentButton = (comment: CommentData) => {
     this.props.onDeleteComment(comment.id);
     this.props.onGetCommentsOfProblemSet(parseInt(this.props.match.params.id));
     this.setState({ commentContent: '', isEdit: false, editComment: null });
@@ -130,8 +103,8 @@ class ProblemSetDetail extends Component<Props, State> {
       this.setState({ commentContent: '', isEdit: false, editComment: null });
     } else {
       const comment = {
-        userID: this.props.selectedUser.id,
-        username: this.props.selectedUser.username,
+        userID: this.props.selectedUser?.id,
+        username: this.props.selectedUser?.username,
         problemSetID: parseInt(this.props.match.params.id),
         content: this.state.commentContent,
       };
@@ -142,6 +115,8 @@ class ProblemSetDetail extends Component<Props, State> {
   };
 
   render() {
+    // console.log('@@@@@@@@@@@selectedProblemSet', this.props.selectedProblemSet);
+
     if (this.props.selectedUser === null) {
       this.props.history.push('/signin');
     }
@@ -154,80 +129,91 @@ class ProblemSetDetail extends Component<Props, State> {
     let isCreator = false;
     let isSolver = false;
     if (this.props.selectedProblemSet) {
-      isCreator =
-        this.props.selectedProblemSet.userID === this.props.selectedUser.id;
+      const selectedUserID = this.props.selectedUser?.id;
+      isCreator = this.props.selectedProblemSet.userID === selectedUserID;
       const solver = this.props.solvers.find(
-        (element: Solver) => element.userID === this.props.selectedUser.id
+        (element: Solver) => element.userID === selectedUserID
       );
-      isSolver = solver === undefined;
+      isSolver = solver !== undefined;
     } else {
       return <NotFound />;
     }
 
     return (
       <div className="ProblemSetDetail">
-        <ProblemSetView
-          isCreator={isCreator}
-          isSolver={isSolver}
-          title={this.props.selectedProblemSet.title}
-          content={this.props.selectedProblemSet.content}
-          onClickSignOutButton={() => this.onClickSignOutButton()}
-          onClickBackButton={() => this.onClickBackButton()}
-          onClickEditProblemButton={() => this.onClickEditProblemButton()}
-          onClickDeleteProblemButton={() => this.onClickDeleteProblemButton()}
-          onClickSolveProblemButton={() => this.onClickSolveProblemButton()}
-          onClickExplanationButton={() => this.onClickExplanationButton()}
-        />
-        <div className="Comment">
-          <label>Comment</label>
-          {this.props.comments.map((com) => {
-            isCreator = com.userID === this.props.selectedUser.id;
-            return (
-              <CommentComponent
-                key={com.id}
-                username={com.username}
-                content={com.content}
-                isCreator={isCreator}
-                onClickEditCommentButton={() =>
-                  this.onClickEditCommentButton(com)
-                }
-                onClickDeleteCommentButton={() =>
-                  this.onClickDeleteCommentButton(com)
+        <Container text>
+          <ProblemSetView
+            creator={this.props.selectedUser?.username ?? '[deleted]'}
+            isCreator={isCreator}
+            isSolver={isSolver}
+            title={this.props.selectedProblemSet.title}
+            content={this.props.selectedProblemSet.content}
+            onClickBackButton={() => this.onClickBackButton()}
+            onClickEditProblemButton={() => this.onClickEditProblemButton()}
+            onClickDeleteProblemButton={() => this.onClickDeleteProblemButton()}
+            onClickSolveProblemButton={() => this.onClickSolveProblemButton()}
+            onClickExplanationButton={() => this.onClickExplanationButton()}
+          />
+          <Comment.Group className="Comment">
+            <Header as="h3" dividing>
+              Comments
+            </Header>
+
+            {this.props.comments.map((com) => {
+              isCreator = com.userID === this.props.selectedUser?.id;
+              return (
+                <CommentComponent
+                  key={com.id}
+                  username={com.username}
+                  content={com.content}
+                  isCreator={isCreator}
+                  onClickEditCommentButton={() =>
+                    this.onClickEditCommentButton(com)
+                  }
+                  onClickDeleteCommentButton={() =>
+                    this.onClickDeleteCommentButton(com)
+                  }
+                />
+              );
+            })}
+
+            <Form reply size="small">
+              <Form.TextArea
+                value={this.state.commentContent}
+                className="commentInput"
+                onChange={(event) =>
+                  this.setState({ commentContent: event.target.value })
                 }
               />
-            );
-          })}
-          <input
-            type="text"
-            value={this.state.commentContent}
-            className="commentInput"
-            onChange={(event) =>
-              this.setState({ commentContent: event.target.value })
-            }
-          />
-          {!this.state.isEdit && (
-            <button
-              className="commentComfirmButton"
-              onClick={() => this.onClickCommentButton()}
-            >
-              comment
-            </button>
-          )}
-          {this.state.isEdit && (
-            <button
-              className="commentEditComfirmButton"
-              onClick={() => this.onClickCommentButton()}
-            >
-              edit
-            </button>
-          )}
-        </div>
+              {!this.state.isEdit && (
+                <Button
+                  primary
+                  size="small"
+                  className="commentComfirmButton"
+                  onClick={() => this.onClickCommentButton()}
+                >
+                  Comment
+                </Button>
+              )}
+              {this.state.isEdit && (
+                <Button
+                  primary
+                  size="small"
+                  className="commentEditComfirmButton"
+                  onClick={() => this.onClickCommentButton()}
+                >
+                  Edit Comment
+                </Button>
+              )}
+            </Form>
+          </Comment.Group>
+        </Container>
       </div>
     );
   }
 }
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = (state: RootState) => {
   return {
     selectedUser: state.user.selectedUser,
     selectedProblemSet: state.problemset.selectedProblemSet,
@@ -254,10 +240,7 @@ const mapDispatchToProps = (dispatch: AppDispatch) => {
   };
 };
 
-const statePropTypes = returntypeof(mapStateToProps);
-const actionPropTypes = returntypeof(mapDispatchToProps);
+const connector = connect(mapStateToProps, mapDispatchToProps);
+type PropsFromRedux = ConnectedProps<typeof connector>;
 
-export default connect<StateFromProps, DispatchFromProps>(
-  mapStateToProps,
-  mapDispatchToProps
-)(ProblemSetDetail);
+export default connector(ProblemSetDetail);

@@ -86,14 +86,14 @@ describe('<Welcome />', () => {
 
   it('should render Welcome', () => {
     const component = mount(welcome);
-    const wrapper = component.find('.Welcome');
+    const wrapper = component.find('div.Welcome');
     expect(wrapper.length).toBe(1);
   });
 
   it('should click sign in button', () => {
     const spyAlert = jest.spyOn(window, 'alert').mockImplementation(() => {});
     const component = mount(welcome);
-    const wrapper = component.find('.signInButton');
+    const wrapper = component.find('button.signInButton');
     wrapper.simulate('click');
     expect(spyAlert).toBeCalledTimes(1);
   });
@@ -106,7 +106,7 @@ describe('<Welcome />', () => {
     wrapper.at(0).simulate('change', { target: { value: id } });
     const pw = 'iluvswpp';
     wrapper.at(1).simulate('change', { target: { value: pw } });
-    const wrapper2 = component.find('.signInButton');
+    const wrapper2 = component.find('button.signInButton');
     wrapper2.simulate('click');
 
     expect(spyPost).toBeCalledTimes(1);
@@ -122,7 +122,7 @@ describe('<Welcome />', () => {
     wrapper.at(0).simulate('change', { target: { value: id } });
     const pw = 'iluvsw';
     wrapper.at(1).simulate('change', { target: { value: pw } });
-    const wrapper2 = component.find('.signInButton');
+    const wrapper2 = component.find('button.signInButton');
     wrapper2.simulate('click');
 
     expect(spyAlert).toBeCalledTimes(1);
@@ -133,7 +133,7 @@ describe('<Welcome />', () => {
 
   it('should click sign up button', () => {
     const component = mount(welcome);
-    const wrapper = component.find('.signUpButton');
+    const wrapper = component.find('button.signUpButton');
     wrapper.simulate('click');
     expect(window.location.href).toEqual('http://localhost/signup');
     history.push('/');
@@ -151,7 +151,7 @@ describe('<Welcome />', () => {
     const pw = 'iluvswpp';
     wrapper.at(1).simulate('change', { target: { value: pw } });
 
-    const wrapper2 = component.find('.signInButton');
+    const wrapper2 = component.find('button.signInButton');
     wrapper2.simulate('click');
 
     expect(spyPost).toBeCalledTimes(1);

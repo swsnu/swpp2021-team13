@@ -9,10 +9,19 @@ export interface User {
   logged_in: boolean;
 }
 
+export interface UserStatisticsProblemSet {
+  title: string;
+  content: string;
+  created_time: string;
+  scope: boolean;
+  tag: string;
+  difficulty: number;
+}
+
 export interface UserStatistics {
   userId: number;
   lastActiveDays: number;
-  // createdProblems: number[];
+  createdProblems: UserStatisticsProblemSet[];
   // solvedProblems: number[];
   // recommendedProblems: number[];
   // createdExplanations: number[];

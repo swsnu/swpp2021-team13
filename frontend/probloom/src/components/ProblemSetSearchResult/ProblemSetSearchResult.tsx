@@ -1,28 +1,27 @@
+import { Button, Table } from 'semantic-ui-react';
+
 export interface ProblemSetSearchResultProps {
-    title: string;
-    date: string;
-    creator: string;
-    solved: number;
-    recommended: number;
-    clickProb: () => void;
+  title: string;
+  date: string;
+  creator: string;
+  solved: number;
+  recommended: number;
+  clickProb: () => void;
 }
 
 const ProblemSetSearchResult = (props: ProblemSetSearchResultProps) => {
-    return (
-        <div className="ProblemSetSearchResult">
-            <div className="info">
-                <button id='detail' 
-                    onClick={props.clickProb}>{props.title}</button>
-                <div className="sub">
-                    <p>{props.date}</p>
-                    <p>{props.creator}</p>
-                </div>
-            </div>
-            <div className="stat">
-                <p>{props.solved}</p>
-                <p>{props.recommended}</p>
-            </div>
-        </div>
-    )
-}
+  return (
+    <Table.Row className="ProblemSetSearchResult">
+      <Table.Cell>
+        <Button basic color="black" id="detail" onClick={props.clickProb}>
+          {props.title}
+        </Button>
+      </Table.Cell>
+      <Table.Cell>{new Date(props.date).toDateString()}</Table.Cell>
+      <Table.Cell>{props.creator}</Table.Cell>
+      <Table.Cell>{props.solved}</Table.Cell>
+      <Table.Cell>{props.recommended}</Table.Cell>
+    </Table.Row>
+  );
+};
 export default ProblemSetSearchResult;

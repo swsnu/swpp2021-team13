@@ -9,16 +9,16 @@ urlpatterns = [
     path("user/<int:id>/statistics/", views.userStatistics),
     path("solved/<int:u_id>/<int:p_id>/", views.SolvedView.as_view()),
     path("solved/<int:p_id>/", views.SolvedProblemView.as_view()),
-    path("problem/", views.ProblemSetListView.as_view()),
-    path(
-        "problem/<int:id>/", views.ProblemSetInfoView.as_view(), name="problem_set_info"
-    ),
     path(
         "problem/<int:id>/comment/",
         views.ProblemSetCommentView.as_view(),
         name="problem_set_comment",
     ),
-    path("comment/", views.CommentListView.as_view(), name="comment_list"),
+    path(
+        "problem/<int:id>/", views.ProblemSetInfoView.as_view(), name="problem_set_info"
+    ),
+    path("problem/", views.ProblemSetListView.as_view()),
     path("comment/<int:id>/", views.CommentInfoView.as_view(), name="comment_info"),
+    path("comment/", views.CommentListView.as_view(), name="comment_list"),
     path("token/", views.TokenView.as_view(), name="token"),
 ]

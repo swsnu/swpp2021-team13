@@ -51,7 +51,7 @@ class ProfileDropdown extends React.Component<
           onClick={() => this.showDropdownMenu()}
           onBlur={(e) => this.closeDropdownMenu(e)}
         >
-          <span>☰ username: {this.props.username} </span>
+          <span>☰ username: {this.props.username}</span>
           <img
             src="https://item.kakaocdn.net/do/1b9aa4b7165a7d3822d2c2c81d0c37259f5287469802eca457586a25a096fd31"
             alt="User avatar"
@@ -64,11 +64,12 @@ class ProfileDropdown extends React.Component<
         {this.state.displayMenu && (
           <ul>
             <li>
-              <NavLink to="/user/1/summary">View profile</NavLink>
+              <NavLink to="/user/1/summary/">View profile</NavLink>
             </li>
-            <li>
+            {/* TODO : sign out */}
+            {/* <li>
               <NavLink to="/user/1/summary">Sign out</NavLink>
-            </li>
+            </li> */}
           </ul>
         )}
       </div>

@@ -1,29 +1,25 @@
 import { Component } from 'react';
-import { connect } from 'react-redux';
-import { returntypeof } from 'react-redux-typescript';
+import { connect, ConnectedProps } from 'react-redux';
 import { getAllProblemSets } from '../../../store/actions';
 import ProblemSetSearchResult from '../../../components/ProblemSetSearchResult/ProblemSetSearchResult';
-import { AppDispatch } from '../../../store/store';
-import { User } from '../../../store/reducers/userReducer';
-import { ProblemSet } from '../../../store/reducers/problemReducer';
+import { AppDispatch, RootState } from '../../../store/store';
 import './ProblemSetSearch.css';
+import { Redirect, RouteComponentProps, withRouter } from 'react-router-dom';
+import {
+  Button,
+  Container,
+  Form,
+  Header,
+  Icon,
+  Input,
+  Segment,
+  Table,
+} from 'semantic-ui-react';
 
 export interface ProblemSetSearchProps {
   history: any;
 }
 
-export interface StateFromProps {
-  user: User;
-  problemSets: ProblemSet[];
-}
-
-export interface DispatchFromProps {
-  onGetAllProblems: () => void;
-}
-
-type Props = ProblemSetSearchProps &
-  typeof statePropTypes &
-  typeof actionPropTypes;
 export interface ProblemSetSearchState {
   searchBar: string;
   search: string;
@@ -33,7 +29,41 @@ export interface ProblemSetSearchState {
   sort: string;
 }
 
-class ProblemSetSearch extends Component<Props, ProblemSetSearchState> {
+const searchRangeOptions = [
+  { key: 'title+content', text: 'Title + Content', value: 'title+content' },
+  { key: 'title', text: 'Title', value: 'title' },
+  { key: 'content', text: 'Content', value: 'content' },
+];
+
+const creatorOptions = [
+  { key: 'open', text: 'Open Problems', value: 'open' },
+  { key: 'own', text: 'Your Problems', value: 'own' },
+];
+
+export const tagOptions = [
+  { key: 'all', text: 'all', value: 'all' },
+  { key: 'tag-philosophy', text: 'philosophy', value: 'tag-philosophy' },
+  { key: 'tag-psychology', text: 'psychology', value: 'tag-psychology' },
+  { key: 'tag-statistics', text: 'statistics', value: 'tag-statistics' },
+  { key: 'tag-economics', text: 'economics', value: 'tag-economics' },
+  { key: 'tag-mathematics', text: 'mathematics', value: 'tag-mathematics' },
+  { key: 'tag-physics', text: 'physics', value: 'tag-physics' },
+  { key: 'tag-chemistry', text: 'chemistry', value: 'tag-chemistry' },
+  { key: 'tag-biology', text: 'biology', value: 'tag-biology' },
+  { key: 'tag-engineering', text: 'engineering', value: 'tag-engineering' },
+  { key: 'tag-history', text: 'history', value: 'tag-history' },
+];
+
+const sortOptions = [
+  { key: 'date', text: 'Date', value: 'date' },
+  { key: 'solved', text: 'Solved', value: 'solved' },
+  { key: 'recommended', text: 'Recommended', value: 'recommended' },
+];
+
+class ProblemSetSearch extends Component<
+  PropsFromRedux & RouteComponentProps,
+  ProblemSetSearchState
+> {
   state = {
     searchBar: '',
     search: '',
@@ -61,7 +91,11 @@ class ProblemSetSearch extends Component<Props, ProblemSetSearchState> {
   };
 
   render() {
-    const problems = this.props.problemSets
+    if (this.props.user === null) {
+      return <Redirect to="/signin" />;
+    }
+
+    let problems = this.props.problemSets
       .filter((prob) => {
         let check = new RegExp(this.state.search);
         switch (this.state.term) {
@@ -74,10 +108,10 @@ class ProblemSetSearch extends Component<Props, ProblemSetSearchState> {
             return check.test(prob.title) || check.test(prob.content);
         }
       })
-      .filter((prob) => prob.userID === this.props.user.id || prob.is_open)
+      .filter((prob) => prob.userID === this.props.user?.id || prob.is_open)
       .filter(
         (prob) =>
-          prob.userID === this.props.user.id || this.state.creator !== 'own'
+          prob.userID === this.props.user?.id || this.state.creator !== 'own'
       )
       .filter((prob) => this.state.tag === 'all' || prob.tag === this.state.tag)
       .sort((a, b) => {
@@ -96,86 +130,132 @@ class ProblemSetSearch extends Component<Props, ProblemSetSearchState> {
           <ProblemSetSearchResult
             key={prob.id}
             title={prob.title}
-            date={prob.date}
-            creator={prob.creator}
-            solved={prob.solved}
-            recommended={prob.recommended}
+            date={prob.created_time}
+            creator={prob.username}
+            solved={prob.solved_num}
+            recommended={prob.recommended_num}
             clickProb={() => this.onClickProbHandler(prob)}
           />
         );
       });
 
+    let problemsWrapper: JSX.Element;
+    if (problems.length === 0) {
+      problemsWrapper = (
+        <Segment placeholder>
+          <Header icon>
+            <Icon name="search" />
+            No Results
+          </Header>
+        </Segment>
+      );
+    } else {
+      problemsWrapper = (
+        <Table basic="very" padded>
+          <Table.Header>
+            <Table.Row>
+              <Table.HeaderCell>Title</Table.HeaderCell>
+              <Table.HeaderCell>Created</Table.HeaderCell>
+              <Table.HeaderCell>Author</Table.HeaderCell>
+              <Table.HeaderCell>Solved People</Table.HeaderCell>
+              <Table.HeaderCell>Recommendations</Table.HeaderCell>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>{problems}</Table.Body>
+        </Table>
+      );
+    }
+
     return (
       <div className="ProblemSetSearch">
-        <button id="create" onClick={() => this.onClickCreateButton()}>
-          Create
-        </button>
-        <h1>{this.props.user.id}</h1>
-        <div>
-          <input
-            id="search_bar"
-            type="text"
-            value={this.state.searchBar}
-            onChange={(event) => {
-              this.setState({ searchBar: event.target.value });
-            }}
-          />
-          <button id="search" onClick={() => this.onClickSearchButton()}>
-            Search
-          </button>
-          <select
-            id="term"
-            value={this.state.term}
-            onChange={(event) => {
-              this.setState({ term: event.target.value });
-            }}
-          >
-            <option value="title+content">title+content</option>
-            <option value="title">title</option>
-            <option value="content">content</option>
-          </select>
-          <select
-            id="creator"
-            value={this.state.creator}
-            onChange={(event) => {
-              this.setState({ creator: event.target.value });
-            }}
-          >
-            <option value="open">open</option>
-            <option value="own">own</option>
-          </select>
-          <select
-            id="tag"
-            value={this.state.tag}
-            onChange={(event) => {
-              this.setState({ tag: event.target.value });
-            }}
-          >
-            <option value="all">all</option>
-            <option value="math">math</option>
-            <option value="english">english</option>
-            <option value="history">history</option>
-            <option value="science">science</option>
-          </select>
-          <select
-            id="sort"
-            value={this.state.sort}
-            onChange={(event) => {
-              this.setState({ sort: event.target.value });
-            }}
-          >
-            <option value="date">date</option>
-            <option value="solved">solved</option>
-            <option value="recommended">recommended</option>
-          </select>
-        </div>
-        {problems}
+        <Container>
+          <Header as="h1">
+            Problems
+            <Button
+              primary
+              floated="right"
+              id="create"
+              onClick={() => this.onClickCreateButton()}
+            >
+              Create
+            </Button>
+          </Header>
+          <Form style={{ margin: '2rem 1rem 0' }}>
+            <Form.Group>
+              <Form.Field width={12}>
+                <Input
+                  label={
+                    <Button
+                      secondary
+                      type="submit"
+                      id="search"
+                      onClick={() => this.onClickSearchButton()}
+                    >
+                      Search
+                    </Button>
+                  }
+                  labelPosition="right"
+                  placeholder="Search Problems..."
+                  value={this.state.searchBar}
+                  onChange={(event) =>
+                    this.setState({ searchBar: event.target.value })
+                  }
+                />
+              </Form.Field>
+
+              <Form.Dropdown
+                width={4}
+                item
+                options={searchRangeOptions}
+                label="Range"
+                defaultValue="title+content"
+                onChange={(_, { value }) => {
+                  this.setState({ term: value as string });
+                }}
+              />
+
+              <Form.Dropdown
+                width={4}
+                item
+                options={creatorOptions}
+                label="Creator"
+                defaultValue="open"
+                onChange={(_, { value }) => {
+                  this.setState({ creator: value as string });
+                }}
+              />
+
+              <Form.Dropdown
+                width={4}
+                item
+                options={tagOptions}
+                label="Tag"
+                defaultValue="all"
+                onChange={(_, { value }) =>
+                  this.setState({ tag: value as string })
+                }
+              />
+
+              <Form.Dropdown
+                width={4}
+                item
+                options={sortOptions}
+                label="Sort By"
+                defaultValue="date"
+                onChange={(_, { value }) =>
+                  this.setState({ sort: value as string })
+                }
+              />
+            </Form.Group>
+          </Form>
+          {problemsWrapper}
+        </Container>
       </div>
     );
   }
 }
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = (state: RootState) => {
   return {
     user: state.user.selectedUser,
     problemSets: state.problemset.problemSets,
@@ -186,10 +266,7 @@ const mapDispatchToProps = (dispatch: AppDispatch) => ({
   onGetAllProblems: () => dispatch(getAllProblemSets()),
 });
 
-const statePropTypes = returntypeof(mapStateToProps);
-const actionPropTypes = returntypeof(mapDispatchToProps);
+const connector = connect(mapStateToProps, mapDispatchToProps);
+type PropsFromRedux = ConnectedProps<typeof connector>;
 
-export default connect<StateFromProps, DispatchFromProps>(
-  mapStateToProps,
-  mapDispatchToProps
-)(ProblemSetSearch);
+export default connector(withRouter(ProblemSetSearch));

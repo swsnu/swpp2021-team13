@@ -1,24 +1,29 @@
-import React from 'react';
+import { Comment } from 'semantic-ui-react';
 
 const CommentComponent = (props) => {
   return (
-    <div className="CommentComponent">
-      <h1 className="username">{props.username}</h1>
-      <p className="content">{props.content}</p>
-      {props.isCreator && (
-        <button className="editButton" onClick={props.onClickEditCommentButton}>
-          Edit
-        </button>
-      )}
-      {props.isCreator && (
-        <button
-          className="deleteButton"
-          onClick={props.onClickDeleteCommentButton}
-        >
-          Delete
-        </button>
-      )}
-    </div>
+    <Comment className="CommentComponent">
+      <Comment.Author>{props.username}</Comment.Author>
+      <Comment.Text>{props.content}</Comment.Text>
+      <Comment.Actions>
+        {props.isCreator && (
+          <Comment.Action
+            className="editButton"
+            onClick={props.onClickEditCommentButton}
+          >
+            Edit
+          </Comment.Action>
+        )}
+        {props.isCreator && (
+          <Comment.Action
+            className="deleteButton"
+            onClick={props.onClickDeleteCommentButton}
+          >
+            Delete
+          </Comment.Action>
+        )}
+      </Comment.Actions>
+    </Comment>
   );
 };
 
