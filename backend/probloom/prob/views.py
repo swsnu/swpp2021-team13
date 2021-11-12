@@ -52,7 +52,7 @@ class SignUpView(View):
             "id": new_user.id,
             "username": new_user.username,
             "email": new_user.email,
-            "logged_in": False,
+            "logged_in": True,
         }
         return JsonResponse(res, status=201, safe=False)
 
@@ -193,10 +193,8 @@ class ProblemSetListView(LoginRequiredMixin, View):
         )
         prob.save()
 
-        try:
-            problemSet = ProblemSet.objects.get(id=prob.id)
-        except:
-            return HttpResponse(status=404)
+        problemSet = ProblemSet.objects.get(id=prob.id)
+        
         for problem in problems:
             newProblem = Problems(
                 index=problem["index"],
@@ -209,10 +207,7 @@ class ProblemSetListView(LoginRequiredMixin, View):
             # print("@@@@@@@@@@@newProblem", newProblem)
             newProblem.save()
 
-            try:
-                newProblems = Problems.objects.get(id=newProblem.id)
-            except:
-                return HttpResponse(status=404)
+            newProblems = Problems.objects.get(id=newProblem.id)
 
             choice = Choice(
                 choice1=problem["choice"][0],
@@ -369,7 +364,7 @@ class ProblemSetInfoView(View):
                     ]
 
                     problem.problem_type = edit_problem["problem_type"]
-                    problem.problem_statement = edit_problem["problem_type"]
+                    problem.problem_statement = edit_problem["problem_statement"]
                     problem.solution = edit_problem["solution"]
                     problem.explanation = edit_problem["explanation"]
                     problem.save()
@@ -385,7 +380,6 @@ class ProblemSetInfoView(View):
                         }
                     )
 
-                print("--------------- problems_list", problems_list)
                 res_dict = {"res_pset": res_pset, "problems_list": problems_list}
                 return JsonResponse(res_dict, status=200)
             else:

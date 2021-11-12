@@ -120,11 +120,6 @@ class ProblemSetDetail extends Component<
     if (this.props.selectedUser === null) {
       this.props.history.push('/signin');
     }
-    if (this.props.selectedUser) {
-      if (this.props.selectedUser.logged_in === false) {
-        this.props.history.push('/signin');
-      }
-    }
 
     let isCreator = false;
     let isSolver = false;

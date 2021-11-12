@@ -24,9 +24,6 @@ class UserStatistics(Model):
     lastActiveDays = IntegerField(default=0)
     user = OneToOneField(User, on_delete=CASCADE, related_name="statistics", null=True)
 
-    def __str__(self):
-        return str(self.lastActiveDays)
-
 
 class ProblemSet(Model):
     title = CharField(max_length=100, default="default title")
