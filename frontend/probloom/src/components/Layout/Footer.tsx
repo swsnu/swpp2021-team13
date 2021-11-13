@@ -1,7 +1,6 @@
-import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { Container, List, Segment } from 'semantic-ui-react';
 
-const Footer = (props: RouteComponentProps) => {
+const Footer = () => {
   return (
     <Segment vertical>
       <Container textAlign="center">
@@ -18,4 +17,4 @@ const Footer = (props: RouteComponentProps) => {
   );
 };
 
-export default withRouter(Footer);
+export default Footer;
