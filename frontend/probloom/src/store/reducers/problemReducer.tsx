@@ -72,7 +72,10 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
     case actionTypes.GET_ALL_SOLVER_OF_PROBLEMSET:
       return { ...state, solvers: action.solvers };
     case actionTypes.CREATE_PROBLEM_SET:
-      return { ...state, problemSet: action.problemSet };
+      return {
+        ...state,
+        problemSets: [...state.problemSets, action.problemSet],
+      };
     case actionTypes.EDIT_PROBLEM_SET:
       // const otherProblemSets = state.problemSets.filter((problemSet) => {
       //   return problemSet.id !== action.pset.id;
