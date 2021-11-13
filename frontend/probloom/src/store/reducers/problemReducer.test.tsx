@@ -53,6 +53,73 @@ describe('Problem Reducer', () => {
     });
   });
 
+  it('should GET_PROBLEMSET', () => {
+    const stubProblemSet = {
+      id: 1,
+      title: 'title1',
+      created_time: 'create_time1',
+      is_open: false,
+      tag: 'math',
+      difficulty: 1,
+      content: 'content1',
+      userID: 1,
+      username: 'creator1',
+      solved_num: 1,
+      recommended_num: 1,
+    };
+    const stubNewProblemSet = {
+      index: 4,
+      problem_type: 'stub-type',
+      problem_statement: 'stub-statement',
+      choice: ['stub-choice1', 'stub-choice2', 'stub-choice3', 'stub-choice4'],
+      solution: 'stub-solution',
+      explanation: 'stub-explanation',
+    };
+    const stubInitialState = {
+      problemSets: [],
+      solvers: [],
+      selectedProblemSet: stubProblemSet,
+      selectedProblems: [stubNewProblemSet],
+    };
+    const currentState = problemReducer(stubInitialState, {
+      type: actionTypes.GET_PROBLEMSET,
+      pset: stubProblemSet,
+      problems_list: [stubNewProblemSet],
+    });
+    expect(currentState).toEqual({
+      problemSets: [],
+      solvers: [],
+      selectedProblemSet: stubProblemSet,
+      selectedProblems: [stubNewProblemSet],
+    });
+  });
+
+  it('should GET_ALL_SOLVER_OF_PROBLEMSET', () => {
+    const stubSolver = {
+      userID: 1,
+      username: 'creator1',
+      problemID: 1,
+      problemtitle: 'problem1',
+      result: true,
+    };
+    const stubInitialState = {
+      problemSets: [],
+      solvers: [stubSolver],
+      selectedProblemSet: null,
+      selectedProblems: [],
+    };
+    const currentState = problemReducer(stubInitialState, {
+      type: actionTypes.GET_ALL_SOLVER_OF_PROBLEMSET,
+      solvers: [stubSolver],
+    });
+    expect(currentState).toEqual({
+      problemSets: [],
+      solvers: [stubSolver],
+      selectedProblemSet: null,
+      selectedProblems: [],
+    });
+  });
+
   it('should CREATE_PROBLEM_SET', () => {
     const stubProblemSet = {
       id: 1,

@@ -52,6 +52,72 @@ describe('Get Problem List', () => {
     expect(spy).toHaveBeenCalledWith('/api/problem/');
     expect(store.getState().problemset.problemSets).toEqual(stubProblems);
   });
+
+  it('Test getProblemSet', async () => {
+    const stubProblemSet = {
+      id: 1,
+      title: 'title1',
+      created_time: 'create_time1',
+      is_open: false,
+      tag: 'math',
+      difficulty: 1,
+      content: 'content1',
+      userID: 1,
+      username: 'creator1',
+      solved_num: 1,
+      recommended_num: 1,
+    };
+    const stubNewProblemSet = {
+      index: 4,
+      problem_type: 'stub-type',
+      problem_statement: 'stub-statement',
+      choice: ['stub-choice1', 'stub-choice2', 'stub-choice3', 'stub-choice4'],
+      solution: 'stub-solution',
+      explanation: 'stub-explanation',
+    };
+
+    spy = jest.spyOn(axios, 'get').mockImplementation(async () => {
+      return {
+        status: 200,
+        pset: stubProblemSet,
+        problems_list: [stubNewProblemSet],
+      };
+    });
+
+    try {
+      await dispatch(actionCreators.getProblemSet(1));
+    } catch (err) {}
+
+    const newState = store.getState();
+    expect(newState.problemset.problemSets[0]).toEqual(stubProblemSet);
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('Test getAllSolvers', async () => {
+    const stubSolver = {
+      userID: 1,
+      username: 'creator1',
+      problemID: 1,
+      problemtitle: 'problem1',
+      result: true,
+    };
+
+    spy = jest.spyOn(axios, 'get').mockImplementation(async () => {
+      return {
+        status: 200,
+        solvers: [stubSolver],
+      };
+    });
+
+    try {
+      await dispatch(actionCreators.getAllSolvers(1));
+    } catch (err) {}
+
+    const newState = store.getState();
+    expect(newState.problemset.solvers[0]).toEqual(stubSolver);
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledWith('/api/solved/1/');
+  });
 });
 
 describe('Create & Edit ProblemSet', () => {
@@ -225,5 +291,44 @@ describe('Create & Edit ProblemSet', () => {
       tag: 'stub-tag',
       title: 'stub-title',
     });
+  });
+});
+
+describe('Delete ProblemSet', () => {
+  let spy: jest.SpyInstance;
+
+  afterEach(() => {
+    jest.clearAllMocks();
+    spy.mockClear();
+  });
+
+  it('Test deleteProblemSet', async () => {
+    const stubProblemSet = {
+      id: 1,
+      title: 'title1',
+      created_time: 'create_time1',
+      is_open: false,
+      tag: 'math',
+      difficulty: 1,
+      content: 'content1',
+      userID: 1,
+      username: 'creator1',
+      solved_num: 1,
+      recommended_num: 1,
+    };
+
+    spy = jest.spyOn(axios, 'delete').mockImplementation(async () => {
+      return {
+        status: 200,
+        data: 0,
+      };
+    });
+
+    try {
+      dispatch(actionCreators.deleteProblemSet(0));
+    } catch (err) {}
+    const newState = store.getState();
+    expect(newState.problemset.problemSets[0]).toEqual(stubProblemSet);
+    expect(spy).toHaveBeenCalledTimes(1);
   });
 });
