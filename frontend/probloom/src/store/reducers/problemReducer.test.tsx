@@ -38,6 +38,7 @@ describe('Problem Reducer', () => {
       problemSets: problemSets,
       selectedProblemSet: null,
       solvers: [],
+      selectedProblems: [],
     });
   });
 });

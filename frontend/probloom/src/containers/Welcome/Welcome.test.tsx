@@ -74,7 +74,7 @@ describe('<Welcome />', () => {
         </ConnectedRouter>
       </Provider>
     );
-    spyPost = jest.spyOn(axios, 'post').mockImplementation(async (_) => ({
+    spyPost = jest.spyOn(axios, 'post').mockImplementation(async () => ({
       status: 200,
       data: UserstateTest.users[0],
     }));
@@ -98,13 +98,13 @@ describe('<Welcome />', () => {
     expect(spyAlert).toBeCalledTimes(1);
   });
 
-  it('should sign in fail1', () => {
+  it('should checking incorrect user', () => {
     const component = mount(welcome);
     const wrapper = component.find('input');
 
     const id = 'swpp@snu.ac.kr';
     wrapper.at(0).simulate('change', { target: { value: id } });
-    const pw = 'iluvswpp';
+    const pw = 'iluvswpppp';
     wrapper.at(1).simulate('change', { target: { value: pw } });
     const wrapper2 = component.find('button.signInButton');
     wrapper2.simulate('click');
@@ -113,7 +113,7 @@ describe('<Welcome />', () => {
     history.push('/');
   });
 
-  it('should sign in fail2', () => {
+  it('should checking pw is fail', () => {
     const spyAlert = jest.spyOn(window, 'alert').mockImplementation(() => {});
     const component = mount(welcome);
     const wrapper = component.find('input');
@@ -139,23 +139,9 @@ describe('<Welcome />', () => {
     history.push('/');
   });
 
-  it('should sign in success', () => {
-    //const spyHistoryPush = jest
-    //  .spyOn(history, 'push')
-    //  .mockImplementation((path) => {});
+  it('should redirect problem search page when user is already logged in', () => {
     const component = mount(welcome2);
-    const wrapper = component.find('input');
-
-    const id = 'swpp@snu.ac.kr';
-    wrapper.at(0).simulate('change', { target: { value: id } });
-    const pw = 'iluvswpp';
-    wrapper.at(1).simulate('change', { target: { value: pw } });
-
-    const wrapper2 = component.find('button.signInButton');
-    wrapper2.simulate('click');
-
-    expect(spyPost).toBeCalledTimes(1);
-    //expect(spyHistoryPush).toBeCalledTimes(0);
+    expect(window.location.href).toEqual('http://localhost/problem/search/');
     history.push('/');
   });
 });

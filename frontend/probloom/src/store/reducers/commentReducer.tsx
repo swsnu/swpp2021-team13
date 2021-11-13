@@ -42,7 +42,7 @@ const commentReducer: CommentReducer = (state = initialState, action) => {
       const remainComment = state.comments.filter((com) => {
         return com.id !== action.targetID;
       });
-      return { ...state, problemSets: remainComment };
+      return { ...state, comments: remainComment };
     default:
       break;
   }

@@ -1,7 +1,14 @@
 import React, { Component } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
-import { Button, Comment, Container, Form, Header } from 'semantic-ui-react';
+import {
+  Button,
+  Comment,
+  Container,
+  Form,
+  Header,
+  Input,
+} from 'semantic-ui-react';
 import ProblemSetView from '../../../components/ProblemSet/ProblemSetDetail/ProblemSetView';
 import CommentComponent from '../../../components/ProblemSet/ProblemSetDetail/CommentComponent';
 import { Solver } from '../../../store/reducers/problemReducer';
@@ -9,7 +16,6 @@ import { Comment as CommentData } from '../../../store/reducers/commentReducer';
 import { AppDispatch, RootState } from '../../../store/store';
 import NotFound from '../../../components/NotFound/NotFound';
 import {
-  signOut,
   getCommentsOfProblemSet,
   getProblemSet,
   getAllSolvers,
@@ -18,7 +24,6 @@ import {
   updateComment,
   deleteComment,
 } from '../../../store/actions';
-import './ProblemSetDetail.css';
 
 interface MatchParams {
   id: string;
@@ -115,15 +120,8 @@ class ProblemSetDetail extends Component<
   };
 
   render() {
-    // console.log('@@@@@@@@@@@selectedProblemSet', this.props.selectedProblemSet);
-
     if (this.props.selectedUser === null) {
       this.props.history.push('/signin');
-    }
-    if (this.props.selectedUser) {
-      if (this.props.selectedUser.logged_in === false) {
-        this.props.history.push('/signin');
-      }
     }
 
     let isCreator = false;
@@ -178,7 +176,7 @@ class ProblemSetDetail extends Component<
             })}
 
             <Form reply size="small">
-              <Form.TextArea
+              <Input
                 value={this.state.commentContent}
                 className="commentInput"
                 onChange={(event) =>
@@ -189,7 +187,7 @@ class ProblemSetDetail extends Component<
                 <Button
                   primary
                   size="small"
-                  className="commentComfirmButton"
+                  className="commentConfirmButton"
                   onClick={() => this.onClickCommentButton()}
                 >
                   Comment
@@ -199,7 +197,7 @@ class ProblemSetDetail extends Component<
                 <Button
                   primary
                   size="small"
-                  className="commentEditComfirmButton"
+                  className="commentEditConfirmButton"
                   onClick={() => this.onClickCommentButton()}
                 >
                   Edit Comment
@@ -225,7 +223,6 @@ const mapStateToProps = (state: RootState) => {
 
 const mapDispatchToProps = (dispatch: AppDispatch) => {
   return {
-    onSignOut: (user: any) => dispatch(signOut(user)),
     onGetCommentsOfProblemSet: (problemSetID: number) =>
       dispatch(getCommentsOfProblemSet(problemSetID)),
     onGetProblemSet: (problemSetID: number) =>

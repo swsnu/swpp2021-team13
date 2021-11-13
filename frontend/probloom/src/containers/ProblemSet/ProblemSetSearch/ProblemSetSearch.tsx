@@ -91,8 +91,8 @@ class ProblemSetSearch extends Component<
   };
 
   render() {
-    if (this.props.user === null) {
-      return <Redirect to="/signin" />;
+    if (!this.props.user) {
+      return <Redirect to="/" />;
     }
 
     let problems = this.props.problemSets

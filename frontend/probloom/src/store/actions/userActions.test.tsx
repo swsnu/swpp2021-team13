@@ -171,7 +171,7 @@ describe('Out of all action creators', () => {
       data: { introduction },
     }));
     await dispatch(getUserProfile(42));
-    expect(spy).toHaveBeenCalledWith('/api/user/42/profile');
+    expect(spy).toHaveBeenCalledWith('/api/user/42/profile/');
     expect(store.getState().user.selectedUserProfile).toEqual(stubUserProfile);
   });
 
@@ -185,7 +185,7 @@ describe('Out of all action creators', () => {
       status: 200,
     }));
     await dispatch(updateUserIntroduction(42, newIntroduction));
-    expect(spy).toHaveBeenCalledWith('/api/user/42/profile', {
+    expect(spy).toHaveBeenCalledWith('/api/user/42/profile/', {
       introduction: newIntroduction,
     });
     expect(store.getState().user.selectedUserProfile).toEqual({
