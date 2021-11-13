@@ -31,6 +31,7 @@ yarn
 ```bash
 cd swpp2021-team13/backend/probloom
 coverage run --branch --source='.' manage.py test
+coverage report -m
 ```
 
 ### Front-End
