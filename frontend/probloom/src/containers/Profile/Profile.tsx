@@ -29,8 +29,8 @@ const getPanes = (userId: number) => [
 class Profile extends Component<
   PropsFromRedux & RouteComponentProps<ProfilePathParams>
 > {
-  handleTabChange = (_: any, { activeIndex = 0 }: TabProps) => {
-    const active = validActiveValues[activeIndex];
+  handleTabChange = (_: any, { activeIndex }: TabProps) => {
+    const active = validActiveValues[activeIndex as number];
     this.props.history.push(active);
   };
 

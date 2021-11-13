@@ -32,9 +32,6 @@ class ProfileSummary extends Component<
   onClickConfirmIntroductionButton() {
     const pendingIntroduction = this.state.pendingIntroduction;
     const oldIntroduction = this.props.selectedUserProfile?.introduction;
-    if (pendingIntroduction === '') {
-      return;
-    }
     if (pendingIntroduction !== oldIntroduction) {
       this.props.onUpdateUserIntroduction(
         this.props.userId,
