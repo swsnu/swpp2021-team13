@@ -1,11 +1,11 @@
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
 
 import Footer from './Footer';
 
 describe('<Footer />', () => {
-  it('Clicked component should render without errors', () => {
-    const component = shallow(<Footer />);
-    const wrapper = component.find('.container-footer');
-    expect(wrapper.length).toBe(1);
+  it('includes us, Team 13', () => {
+    const app = <Footer />;
+    render(app);
+    expect(screen.getAllByText(/Team 13/)[0]).toBeInTheDocument();
   });
 });
