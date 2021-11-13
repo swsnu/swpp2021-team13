@@ -39,7 +39,7 @@ const ProblemSetView = (props) => {
             {props.isCreator && (
               <Button
                 className="editButton"
-                onClick={() => props.onClickEditProblemButton}
+                onClick={() => props.onClickEditProblemButton()}
               >
                 Edit
               </Button>

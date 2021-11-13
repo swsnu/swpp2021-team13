@@ -1,7 +1,14 @@
 import React, { Component } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
-import { Button, Comment, Container, Form, Header } from 'semantic-ui-react';
+import {
+  Button,
+  Comment,
+  Container,
+  Form,
+  Header,
+  Input,
+} from 'semantic-ui-react';
 import ProblemSetView from '../../../components/ProblemSet/ProblemSetDetail/ProblemSetView';
 import CommentComponent from '../../../components/ProblemSet/ProblemSetDetail/CommentComponent';
 import { Solver } from '../../../store/reducers/problemReducer';
@@ -169,7 +176,7 @@ class ProblemSetDetail extends Component<
             })}
 
             <Form reply size="small">
-              <Form.TextArea
+              <Input
                 value={this.state.commentContent}
                 className="commentInput"
                 onChange={(event) =>

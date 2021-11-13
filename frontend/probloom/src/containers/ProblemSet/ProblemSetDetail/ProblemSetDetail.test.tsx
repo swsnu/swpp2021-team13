@@ -192,7 +192,7 @@ describe('<ProblemSetDetail />', () => {
   it('click edit problem button', () => {
     const component = mount(problemSetDetail);
     const wrapper = component.find('button.editButton');
-    wrapper.simulate('click');
+    wrapper.at(0).simulate('click');
     history.push('/');
   });
 
@@ -241,7 +241,7 @@ describe('<ProblemSetDetail />', () => {
   it('click create comment button', () => {
     const component = mount(problemSetDetail);
 
-    const wrapper_input = component.find('FormTextArea.commentInput');
+    const wrapper_input = component.find('input');
     const content = 'iluvswpp';
     wrapper_input.simulate('change', { target: { value: content } });
 
@@ -262,7 +262,7 @@ describe('<ProblemSetDetail />', () => {
     const wrapper_edit = wrapper_action.find('CommentAction.editButton');
     wrapper_edit.simulate('click');
 
-    const wrapper_input = component.find('FormTextArea.commentInput');
+    const wrapper_input = component.find('input');
     const content = 'iluvswpp';
     wrapper_input.simulate('change', { target: { value: content } });
 

@@ -9,7 +9,7 @@ const CommentComponent = (props) => {
         {props.isCreator && (
           <Comment.Action
             className="editButton"
-            onClick={props.onClickEditCommentButton}
+            onClick={() => props.onClickEditCommentButton()}
           >
             Edit
           </Comment.Action>
@@ -17,7 +17,7 @@ const CommentComponent = (props) => {
         {props.isCreator && (
           <Comment.Action
             className="deleteButton"
-            onClick={props.onClickDeleteCommentButton}
+            onClick={() => props.onClickDeleteCommentButton()}
           >
             Delete
           </Comment.Action>
