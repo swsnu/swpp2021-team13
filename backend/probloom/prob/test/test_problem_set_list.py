@@ -63,7 +63,16 @@ class ProblemSetTestCase(TestCase):
             "tag": "test_tag_3",
             "difficulty": 1,
             "content": "test_content_3",
-            "problems": [{"index":1, "problem_type":"choice", "problem_statement":"1", "solution":"1", "explanation":"1", "choice": ["1", "1", "1", "1"]}],
+            "problems": [
+                {
+                    "index": 1,
+                    "problem_type": "choice",
+                    "problem_statement": "1",
+                    "solution": "1",
+                    "explanation": "1",
+                    "choice": ["1", "1", "1", "1"],
+                }
+            ],
         }
         res = client.post("/api/problem/", req, content_type="application/json")
         self.assertEqual(res.status_code, 200)

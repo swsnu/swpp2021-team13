@@ -54,9 +54,7 @@ class Welcome extends Component<WelcomeProps, WelcomeState> {
       const request = { id: data.id, password: data.pw };
       await this.props.onSignIn(request);
 
-      if (this.props.selectedUser) {
-        this.props.history.push('/problem/search/');
-      } else {
+      if (this.props.selectedUser === null) {
         alert('Incorrect username/email or password');
         this.setState({ id: '', pw: '' });
       }

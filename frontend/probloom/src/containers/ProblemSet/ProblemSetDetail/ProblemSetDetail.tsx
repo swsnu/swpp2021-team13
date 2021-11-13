@@ -9,7 +9,6 @@ import { Comment as CommentData } from '../../../store/reducers/commentReducer';
 import { AppDispatch, RootState } from '../../../store/store';
 import NotFound from '../../../components/NotFound/NotFound';
 import {
-  signOut,
   getCommentsOfProblemSet,
   getProblemSet,
   getAllSolvers,
@@ -18,7 +17,6 @@ import {
   updateComment,
   deleteComment,
 } from '../../../store/actions';
-import './ProblemSetDetail.css';
 
 interface MatchParams {
   id: string;
@@ -115,8 +113,6 @@ class ProblemSetDetail extends Component<
   };
 
   render() {
-    // console.log('@@@@@@@@@@@selectedProblemSet', this.props.selectedProblemSet);
-
     if (this.props.selectedUser === null) {
       this.props.history.push('/signin');
     }
@@ -184,7 +180,7 @@ class ProblemSetDetail extends Component<
                 <Button
                   primary
                   size="small"
-                  className="commentComfirmButton"
+                  className="commentConfirmButton"
                   onClick={() => this.onClickCommentButton()}
                 >
                   Comment
@@ -194,7 +190,7 @@ class ProblemSetDetail extends Component<
                 <Button
                   primary
                   size="small"
-                  className="commentEditComfirmButton"
+                  className="commentEditConfirmButton"
                   onClick={() => this.onClickCommentButton()}
                 >
                   Edit Comment
@@ -220,7 +216,6 @@ const mapStateToProps = (state: RootState) => {
 
 const mapDispatchToProps = (dispatch: AppDispatch) => {
   return {
-    onSignOut: (user: any) => dispatch(signOut(user)),
     onGetCommentsOfProblemSet: (problemSetID: number) =>
       dispatch(getCommentsOfProblemSet(problemSetID)),
     onGetProblemSet: (problemSetID: number) =>

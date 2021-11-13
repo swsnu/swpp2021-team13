@@ -4,7 +4,9 @@ from prob.models import User, UserStatistics, ProblemSet
 
 class UserStatisticsTestCase(TestCase):
     def setUp(self):
-        user = User.objects.create_user(username="USER", email="USER@asd.com", password="123")
+        user = User.objects.create_user(
+            username="USER", email="USER@asd.com", password="123"
+        )
         user_stat = UserStatistics.objects.create(lastActiveDays=1, user=user)
         ProblemSet.objects.create(
             title="TITLE",

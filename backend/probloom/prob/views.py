@@ -194,7 +194,7 @@ class ProblemSetListView(LoginRequiredMixin, View):
         prob.save()
 
         problemSet = ProblemSet.objects.get(id=prob.id)
-        
+
         for problem in problems:
             newProblem = Problems(
                 index=problem["index"],

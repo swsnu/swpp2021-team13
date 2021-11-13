@@ -43,10 +43,25 @@ class ProblemSetTestCase(TestCase):
         self.assertEqual(response.status_code, 401)
         response = client1.delete("/api/problem/1/")
         self.assertEqual(response.status_code, 401)
-        
+
         choice = ["1", "2", "3", "4"]
-        edit_problems = [{"problem_type": "choice", "problem_statement": "state", "solution": "sol", "explanation": "exp", "choice": choice}]
-        request = {"title": "123", "content": "123", "scope": "scope-public", "tag": "math", "difficulty": "1", "problems": edit_problems}
+        edit_problems = [
+            {
+                "problem_type": "choice",
+                "problem_statement": "state",
+                "solution": "sol",
+                "explanation": "exp",
+                "choice": choice,
+            }
+        ]
+        request = {
+            "title": "123",
+            "content": "123",
+            "scope": "scope-public",
+            "tag": "math",
+            "difficulty": "1",
+            "problems": edit_problems,
+        }
         response = client1.put(
             "/api/problem/1/", request, content_type="application/json"
         )
