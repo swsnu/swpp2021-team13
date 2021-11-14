@@ -76,7 +76,7 @@ describe('Get Problem List', () => {
       explanation: 'stub-explanation',
     };
 
-    spy = jest.spyOn(axios, 'get').mockImplementation(async () => {
+    spy = jest.spyOn(axios, 'get').mockImplementation(async (_) => {
       return {
         status: 200,
         pset: stubProblemSet,
@@ -102,21 +102,21 @@ describe('Get Problem List', () => {
       result: true,
     };
 
-    spy = jest.spyOn(axios, 'get').mockImplementation(async () => {
-      return {
-        status: 200,
-        solvers: [stubSolver],
-      };
-    });
+    spy = jest.spyOn(axios, 'get').mockImplementation(async (_) => ({
+      status: 200,
+      data: [stubSolver],
+    }));
 
     try {
-      await dispatch(actionCreators.getAllSolvers(1));
+      await dispatch(actionCreators.getAllSolvers(0));
     } catch (err) {}
 
     const newState = store.getState();
+    // console.log('newState.problemset', newState.problemset);
+
     expect(newState.problemset.solvers[0]).toEqual(stubSolver);
     expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenCalledWith('/api/solved/1/');
+    expect(spy).toHaveBeenCalledWith('/api/solved/0/');
   });
 });
 
