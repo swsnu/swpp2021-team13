@@ -2,7 +2,6 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 import { returntypeof } from 'react-redux-typescript';
 
-import './ProblemSetCreate.css';
 import * as actionCreators from '../../../store/actions/index';
 import {
   NewProblemSet,
@@ -43,6 +42,8 @@ const difficultyOptions = [
   { key: 2, text: 'Intermediate', value: '2' },
   { key: 3, text: 'Advanced', value: '3' },
 ];
+
+const typeOptions = [{ text: 'multiple choice', value: 'type-multiplechoice' }];
 
 class ProblemSetCreate extends Component<Props, State> {
   constructor(props: Props) {
@@ -109,42 +110,41 @@ class ProblemSetCreate extends Component<Props, State> {
   render() {
     const currentProblemSet = this.state.problems.map((problemSet, index) => {
       return (
-        <div className="NewProblemSet" id={index.toString()}>
-          <div className="Type">
-            <label>Type</label>
-            <select
-              onChange={(event) => {
-                const newProblem: NewProblemSet[] = [];
-                const editProblem: NewProblemSet = {
-                  index: problemSet.index,
-                  problem_type: event.target.value,
-                  problem_statement: problemSet.problem_statement,
-                  choice: problemSet.choice,
-                  solution: problemSet.solution,
-                  explanation: problemSet.explanation,
-                };
-                this.state.problems.forEach((problem) => {
-                  if (problem.index === index) {
-                    newProblem.push(editProblem);
-                  } else {
-                    newProblem.push(problem);
-                  }
-                });
+        <div className="NewProblemSet" key={index.toString()}>
+          <Form.Dropdown
+            className="Type"
+            item
+            options={typeOptions}
+            label="Type"
+            onChange={(_, { value }) => {
+              const newProblem: NewProblemSet[] = [];
+              const editProblem: NewProblemSet = {
+                index: problemSet.index,
+                problem_type: value as string,
+                problem_statement: problemSet.problem_statement,
+                choice: problemSet.choice,
+                solution: problemSet.solution,
+                explanation: problemSet.explanation,
+              };
+              this.state.problems.forEach((problem) => {
+                if (problem.index === index) {
+                  newProblem.push(editProblem);
+                } else {
+                  newProblem.push(problem);
+                }
+              });
 
-                this.setState({
-                  ...this.state,
-                  problems: newProblem,
-                });
-              }}
-            >
-              <option value="none">=== select ===</option>
-              <option value="type-multiplechoice">multiple choice</option>
-            </select>
-          </div>
+              this.setState({
+                ...this.state,
+                problems: newProblem,
+              });
+            }}
+          />
 
           <div className="ProblemStatement">
             <label>Problem statement</label>
             <textarea
+              id="problemset-problem-statement-input"
               rows={4}
               placeholder={`${problemSet.problem_statement}`}
               onChange={(event) => {
@@ -172,11 +172,11 @@ class ProblemSetCreate extends Component<Props, State> {
               }}
             />
           </div>
-
           <label>Answer choice</label>
           <div className="ProblemChoice1">
             <label>choice 1</label>
             <input
+              id="problemset-choice1-input"
               placeholder="choice 1 here..."
               onChange={(event) => {
                 const editChoice1 = event.target.value;
@@ -216,6 +216,7 @@ class ProblemSetCreate extends Component<Props, State> {
           <div className="ProblemChoice2">
             <label>choice 2</label>
             <input
+              id="problemset-choice2-input"
               placeholder="choice 2 here..."
               onChange={(event) => {
                 const editChoice1 = event.target.value;
@@ -255,6 +256,7 @@ class ProblemSetCreate extends Component<Props, State> {
           <div className="ProblemChoice3">
             <label>choice 3</label>
             <input
+              id="problemset-choice3-input"
               placeholder="choice 3 here..."
               onChange={(event) => {
                 const editChoice1 = event.target.value;
@@ -294,6 +296,7 @@ class ProblemSetCreate extends Component<Props, State> {
           <div className="ProblemChoice4">
             <label>choice 4</label>
             <input
+              id="problemset-choice4-input"
               placeholder="choice 4 here..."
               onChange={(event) => {
                 const editChoice1 = event.target.value;
@@ -330,10 +333,10 @@ class ProblemSetCreate extends Component<Props, State> {
               }}
             ></input>
           </div>
-
           <div className="Solution">
             <label>Solution</label>
             <input
+              id="problemset-solution1-input"
               type="radio"
               name={`choice${problemSet.index}${index}`}
               value="1"
@@ -364,6 +367,7 @@ class ProblemSetCreate extends Component<Props, State> {
             />
             1
             <input
+              id="problemset-solution2-input"
               type="radio"
               name={`choice${problemSet.index}${index}`}
               value="2"
@@ -394,6 +398,7 @@ class ProblemSetCreate extends Component<Props, State> {
             />
             2
             <input
+              id="problemset-solution3-input"
               type="radio"
               name={`choice${problemSet.index}${index}`}
               value="3"
@@ -424,6 +429,7 @@ class ProblemSetCreate extends Component<Props, State> {
             />
             3
             <input
+              id="problemset-solution4-input"
               type="radio"
               name={`choice${problemSet.index}${index}`}
               value="4"
@@ -454,10 +460,10 @@ class ProblemSetCreate extends Component<Props, State> {
             />
             4
           </div>
-
           <div className="SolutionExplanation">
             <label>Solution explanation</label>
             <textarea
+              id="problemset-solution-explanation-input"
               rows={4}
               placeholder={`${problemSet.explanation}`}
               onChange={(event) => {
@@ -485,11 +491,13 @@ class ProblemSetCreate extends Component<Props, State> {
               }}
             />
           </div>
-
           {/* <button onClick={() => this.confirmProblemHandler()}>
             Confirm problem
           </button> */}
-          <button onClick={() => this.removeProblemHandler(problemSet.index)}>
+          <button
+            id="problemsetcreate-remove"
+            onClick={() => this.removeProblemHandler(problemSet.index)}
+          >
             Remove problem
           </button>
         </div>
@@ -506,95 +514,100 @@ class ProblemSetCreate extends Component<Props, State> {
     // ------------ Just for debugging messages -----------------
 
     return (
-      <Container text className="ProblemSetCreate">
-        <Header as="h1">
-          New Problem
-          <Button
-            floated="right"
-            id="problemsetcreate-back"
-            onClick={() => this.props.history.goBack()}
-          >
-            Back
-          </Button>
-        </Header>
+      <div className="ProblemSetCreate">
+        <Container>
+          <Header as="h1">
+            New Problem
+            <Button
+              floated="right"
+              id="problemsetcreate-back"
+              onClick={() => this.props.history.goBack()}
+            >
+              Back
+            </Button>
+          </Header>
 
-        <Form>
-          <Form.Field className="Title">
-            <label>Title</label>
-            <Input
-              placeholder="Title"
-              value={this.state.title}
+          <Form>
+            <Form.Field className="Title">
+              <label>Title</label>
+              <Input
+                id="input-title"
+                placeholder="Title"
+                value={this.state.title}
+                onChange={(event) => {
+                  this.setState({ title: event.target.value });
+                }}
+              />
+            </Form.Field>
+
+            <Form.TextArea
+              id="input-content"
+              label="Content"
+              placeholder="Content"
+              value={this.state.content}
               onChange={(event) => {
-                this.setState({ title: event.target.value });
-              }}
-            />
-          </Form.Field>
-
-          <Form.TextArea
-            className="Content"
-            label="Content"
-            placeholder="Content"
-            value={this.state.content}
-            onChange={(event) => {
-              this.setState({ content: event.target.value });
-            }}
-          />
-
-          <Form.Group>
-            <Form.Dropdown
-              className="Scope"
-              item
-              options={scopeOptions}
-              label="Scope"
-              defaultValue="scope-private"
-              onChange={(_, { value }) => {
-                this.setState({ scope: value as string });
+                this.setState({ content: event.target.value });
               }}
             />
 
-            <Form.Dropdown
-              className="Tag"
-              item
-              options={tagOptions.slice(1)}
-              label="Tag"
-              defaultValue="tag-philosophy"
-              onChange={(_, { value }) => {
-                this.setState({ tag: value as string });
-              }}
-            />
+            <Form.Group>
+              <Form.Dropdown
+                className="Scope"
+                item
+                options={scopeOptions}
+                label="Scope"
+                defaultValue="scope-private"
+                onChange={(_, { value }) => {
+                  this.setState({ scope: value as string });
+                }}
+              />
 
-            <Form.Dropdown
-              className="Difficulty"
-              item
-              options={difficultyOptions}
-              label="Difficulty"
-              defaultValue="1"
-              onChange={(_, { value }) => {
-                this.setState({ difficulty: value as string });
-              }}
-            />
-          </Form.Group>
+              <Form.Dropdown
+                className="Tag"
+                item
+                options={tagOptions.slice(1)}
+                label="Tag"
+                defaultValue="tag-philosophy"
+                onChange={(_, { value }) => {
+                  this.setState({ tag: value as string });
+                }}
+              />
 
-          {currentProblemSet}
+              <Form.Dropdown
+                className="Difficulty"
+                item
+                options={difficultyOptions}
+                label="Difficulty"
+                defaultValue="1"
+                onChange={(_, { value }) => {
+                  this.setState({ difficulty: value as string });
+                }}
+              />
+            </Form.Group>
 
-          <Button
-            secondary
-            className="AddProblemButton"
-            onClick={() => this.addProblemHandler(this.state.numberOfProblems)}
-          >
-            Add problem
-          </Button>
+            {currentProblemSet}
 
-          <Button
-            primary
-            className="SubmitProblemSetButton"
-            floated="right"
-            onClick={() => this.submitProblemSetHandler()}
-          >
-            Submit
-          </Button>
-        </Form>
-      </Container>
+            <Button
+              secondary
+              id="problemsetcreate-add"
+              onClick={() =>
+                this.addProblemHandler(this.state.numberOfProblems)
+              }
+            >
+              Add problem
+            </Button>
+
+            <Button
+              primary
+              id="problemsetcreate-submit"
+              floated="right"
+              onClick={() => this.submitProblemSetHandler()}
+            >
+              Submit
+            </Button>
+          </Form>
+        </Container>
+      </div>
     );
   }
 }

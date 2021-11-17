@@ -174,7 +174,6 @@ export const editProblemSet: (
     });
     dispatch(editProblemSet_(data));
     dispatch(push(`/problem/${data.id}/detail/`));
-    // dispatch(push(`/problem/search/`));
   };
 };
 
