@@ -53,7 +53,7 @@ const mockStore2 = getMockStore(UserstateTest2);
 
 describe('<Welcome />', () => {
   let welcome, welcome2;
-  let spyPost;
+  let spyPost, spyGet;
 
   beforeEach(() => {
     welcome = (
@@ -78,6 +78,10 @@ describe('<Welcome />', () => {
       status: 200,
       data: UserstateTest.users[0],
     }));
+    spyGet = jest.spyOn(axios, 'get').mockImplementation(async () => ({
+      status: 200,
+      data: UserstateTest.users[0],
+    }));
   });
 
   afterEach(() => {
@@ -88,6 +92,7 @@ describe('<Welcome />', () => {
     const component = mount(welcome);
     const wrapper = component.find('div.Welcome');
     expect(wrapper.length).toBe(1);
+    history.push('/');
   });
 
   it('should click sign in button', () => {
@@ -96,6 +101,7 @@ describe('<Welcome />', () => {
     const wrapper = component.find('button.signInButton');
     wrapper.simulate('click');
     expect(spyAlert).toBeCalledTimes(1);
+    expect(spyGet).toBeCalledTimes(1);
   });
 
   it('should checking incorrect user', () => {

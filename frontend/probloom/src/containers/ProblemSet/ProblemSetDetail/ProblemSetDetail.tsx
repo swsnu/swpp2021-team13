@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
-import { RouteComponentProps } from 'react-router';
+import { Redirect, RouteComponentProps } from 'react-router';
 import {
   Button,
   Comment,
@@ -120,8 +120,8 @@ class ProblemSetDetail extends Component<
   };
 
   render() {
-    if (this.props.selectedUser === null) {
-      this.props.history.push('/signin');
+    if (!this.props.selectedUser) {
+      return <Redirect to="/" />;
     }
 
     let isCreator = false;
