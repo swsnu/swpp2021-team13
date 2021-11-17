@@ -42,6 +42,8 @@
     "react-scripts": "4.0.3",
     "redux": "^4.1.1",
     "redux-thunk": "^2.3.0",
+    "semantic-ui-css": "^2.4.1",
+    "semantic-ui-react": "^2.0.4",
     "typescript": "^4.1.2",
     "web-vitals": "^1.0.1"
   },
@@ -75,10 +77,11 @@
       "!src/index.tsx",
       "!src/mocks.tsx",
       "!src/store/actions/index.tsx",
+      "!src/react-app-env.d.ts",
       "!src/reportWebVitals.ts",
       "!src/test-utils/mocks.ts",
-      "!src/containers/ProblemSet/ProblemSetDetail/*.tsx",
-      "!src/containers/ProblemSet/ProblemSetSearch/*.tsx"
+      "!src/containers/ProblemSet/ProblemSetSolve/*.tsx",
+      "!src/containers/ProblemSet/ProblemSetExplanation/*.tsx"
     ],
     "resetMocks": false
   },

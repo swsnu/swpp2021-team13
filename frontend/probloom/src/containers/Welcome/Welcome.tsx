@@ -1,10 +1,21 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import axios from 'axios';
+import { Component } from 'react';
+import { connect, ConnectedProps } from 'react-redux';
+import { Redirect } from 'react-router';
+import {
+  Button,
+  Divider,
+  Form,
+  Grid,
+  Header,
+  Input,
+  Segment,
+} from 'semantic-ui-react';
 import * as actionCreators from '../../store/actions/index';
-import { returntypeof } from 'react-redux-typescript';
-import './Welcome.css';
+import { SignInRequest } from '../../store/actions/userActions';
+import { AppDispatch, RootState } from '../../store/store';
 
-interface WelcomeProps {
+interface WelcomeProps extends PropsFromRedux {
   logo: string;
   history: any;
 }
@@ -14,43 +25,24 @@ interface WelcomeState {
   pw: string;
 }
 
-interface StateFromProps {
-  storedUsers: any;
-}
+class Welcome extends Component<WelcomeProps, WelcomeState> {
+  state = { id: '', pw: '' };
 
-interface DispatchFromProps {
-  onGetAllUsers: () => void;
-  onLogIn: (any) => void;
-}
-
-type Props = WelcomeProps & typeof statePropTypes & typeof actionPropTypes;
-type State = WelcomeState;
-
-class Welcome extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-
-    this.state = {
-      id: '',
-      pw: '',
-    };
+  async componentDidMount() {
+    await axios.get('/api/token/');
   }
 
-  componentDidMount() {
-    this.props.onGetAllUsers();
-  }
-
-  onClickSignInButton = () => {
+  onClickSignInButton = async () => {
     const data = {
       id: this.state.id,
       pw: this.state.pw,
     };
 
     let emailCheck = new RegExp(
-      '^[^@\\s]+@[^@\\.\\s]+\\.[a-zA-Z]{2,3}(\\.[a-zA-Z]{2,3})*$'
+      "^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
     );
-    let usernameCheck = new RegExp('[a-zA-Z\\-_\\d]{1,30}');
-    let pwCheck = new RegExp('[a-zA-Z\\d~!@#$%^&*]{8,20}');
+    let usernameCheck = new RegExp('^[A-Za-z0-9_\\+\\.\\-]{3,150}$');
+    let pwCheck = new RegExp('^[a-zA-Z\\d~!@#$%^&*+-_]{8,150}$');
 
     let isProperEmail = emailCheck.test(data.id);
     let isProperUsername = usernameCheck.test(data.id);
@@ -59,16 +51,10 @@ class Welcome extends Component<Props, State> {
     const isValid = (isProperEmail || isProperUsername) && isProperPW;
 
     if (isValid) {
-      const user = this.props.storedUsers.find(
-        (user_) =>
-          (user_.email === this.state.id || user_.username === this.state.id) &&
-          user_.password === this.state.pw
-      );
+      const request = { id: data.id, password: data.pw };
+      await this.props.onSignIn(request);
 
-      if (user) {
-        this.props.onLogIn(user);
-        this.props.history.push('problem/search');
-      } else {
+      if (this.props.selectedUser === null) {
         alert('Incorrect username/email or password');
         this.setState({ id: '', pw: '' });
       }
@@ -83,63 +69,90 @@ class Welcome extends Component<Props, State> {
   };
 
   render() {
+    if (this.props.selectedUser !== null) {
+      return <Redirect to="/problem/search/" />;
+    }
     return (
-      <div className="Welcome">
-        <h1 className="logo">{this.props.logo}</h1>
+      <Grid
+        textAlign="center"
+        style={{ height: '80vh' }}
+        verticalAlign="middle"
+      >
+        <Grid.Column className="Welcome" style={{ maxWidth: '28rem' }}>
+          <Header as="h1">{this.props.logo}</Header>
+          <Header as="h2">Sign In</Header>
+          <Form size="large">
+            <Segment>
+              <Form.Field>
+                <label>Username / Email</label>
+                <Input
+                  fluid
+                  icon="user"
+                  iconPosition="left"
+                  placeholder="Username / Email"
+                  value={this.state.id}
+                  onChange={(event) =>
+                    this.setState({ id: event.target.value })
+                  }
+                />
+              </Form.Field>
 
-        <div className="SignInBox">
-          <label className="idLabel">Username / Email</label>
-          <input
-            type="text"
-            value={this.state.id}
-            className="idlInput"
-            onChange={(event) => this.setState({ id: event.target.value })}
-          />
+              <Form.Field>
+                <label>Password</label>
+                <Input
+                  type="password"
+                  fluid
+                  icon="lock"
+                  iconPosition="left"
+                  placeholder="Password"
+                  value={this.state.pw}
+                  onChange={(event) =>
+                    this.setState({ pw: event.target.value })
+                  }
+                />
+              </Form.Field>
 
-          <label className="pwLabel">Password</label>
-          <input
-            type="password"
-            value={this.state.pw}
-            className="pwInput"
-            onChange={(event) => this.setState({ pw: event.target.value })}
-          />
+              <Button
+                primary
+                type="submit"
+                fluid
+                className="signInButton"
+                onClick={this.onClickSignInButton}
+              >
+                Sign In
+              </Button>
 
-          <button
-            className="signInButton"
-            onClick={() => this.onClickSignInButton()}
-          >
-            Sign In
-          </button>
-        </div>
+              <Divider />
 
-        <button
-          className="signUpButton"
-          onClick={() => this.onClickSignUpButton()}
-        >
-          Sign Up
-        </button>
-      </div>
+              <Button
+                fluid
+                className="signUpButton"
+                onClick={this.onClickSignUpButton}
+              >
+                Sign Up
+              </Button>
+            </Segment>
+          </Form>
+        </Grid.Column>
+      </Grid>
     );
   }
 }
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = (state: RootState) => {
   return {
-    storedUsers: state.user.users,
+    selectedUser: state.user.selectedUser,
   };
 };
 
-const mapDispatchToProps = (dispatch: any) => {
+const mapDispatchToProps = (dispatch: AppDispatch) => {
   return {
-    onGetAllUsers: () => dispatch(actionCreators.getAllUsers()),
-    onLogIn: (user: any) => dispatch(actionCreators.logIn(user)),
+    onSignIn: (request: SignInRequest) =>
+      dispatch(actionCreators.signIn(request)),
   };
 };
 
-const statePropTypes = returntypeof(mapStateToProps);
-const actionPropTypes = returntypeof(mapDispatchToProps);
+const connector = connect(mapStateToProps, mapDispatchToProps);
+type PropsFromRedux = ConnectedProps<typeof connector>;
 
-export default connect<StateFromProps, DispatchFromProps>(
-  mapStateToProps,
-  mapDispatchToProps
-)(Welcome);
+export default connector(Welcome);

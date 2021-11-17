@@ -2,6 +2,9 @@ import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
 import { connectRouter } from 'connected-react-router';
 
 import { history, middlewares } from '../store/store';
+import { UserState } from '../store/reducers/userReducer';
+import { ProblemSetState } from '../store/reducers/problemReducer';
+import { CommentState } from '../store/reducers/commentReducer';
 
 const getMockReducer = jest.fn(
   (initialState) =>
@@ -14,11 +17,38 @@ const getMockReducer = jest.fn(
     }
 );
 
-export const getMockStore = (initialState) => {
-  const mockReducer = getMockReducer(initialState);
+const defaultUserState = {
+  users: [],
+  selectedUser: null,
+  selectedUserProfile: null,
+  selectedUserStatistics: null,
+};
+
+const defaultProblemSetState = {
+  problemSets: [],
+  solvers: [],
+  selectedProblemSet: null,
+  selectedProblems: [],
+};
+
+const defaultCommentState = {
+  comments: [],
+  selectedComment: null,
+};
+
+export const getMockStore = (
+  initialUserState: UserState = defaultUserState,
+  initialProblemSetState: ProblemSetState = defaultProblemSetState,
+  initailCommentState: CommentState = defaultCommentState
+) => {
+  const mockUserReducer = getMockReducer(initialUserState);
+  const mockProblemReducer = getMockReducer(initialProblemSetState);
+  const mockCommentReducer = getMockReducer(initailCommentState);
 
   const rootReducer = combineReducers({
-    user: mockReducer,
+    user: mockUserReducer,
+    problemset: mockProblemReducer,
+    comment: mockCommentReducer,
     router: connectRouter(history),
   });
 

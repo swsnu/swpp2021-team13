@@ -1,93 +1,105 @@
 import axios from 'axios';
 import { ThunkAction } from 'redux-thunk';
 
-import {
-  UserField,
-  UserProfile,
-  UserStatistics,
-} from '../reducers/userReducer';
+import { User, UserProfile, UserStatistics } from '../reducers/userReducer';
 import { AppDispatch, RootState } from '../store';
 import * as actionTypes from './actionTypes';
 
 axios.defaults.xsrfCookieName = 'csrftoken';
-axios.defaults.xsrfHeaderName = 'X-CSFRToken';
-export interface GetAllUsersAction {
-  type: typeof actionTypes.GET_ALL_USERS;
-  users: UserField[];
+axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+
+export interface SignInAction {
+  type: typeof actionTypes.SIGN_IN;
+  target: User | null;
 }
 
-export const getAllUsers_ = (users) => {
-  return {
-    type: actionTypes.GET_ALL_USERS,
-    users: users,
-  };
-};
-
-export const getAllUsers = () => {
-  return (dispatch) => {
-    return axios
-      .get('/api/user/')
-      .then((res) => dispatch(getAllUsers_(res.data)));
-  };
-};
-
-export interface GetUserAction {
-  type: typeof actionTypes.GET_USER;
-  target: UserField;
+export interface SignInRequest {
+  id: string;
+  password: string;
 }
 
-export const getUser_ = (user) => {
+export const signInSuccess = (user) => {
   return {
-    type: actionTypes.GET_USER,
+    type: actionTypes.SIGN_IN,
     target: user,
   };
 };
 
-export const getUser = (id) => {
-  return (dispatch) => {
-    return axios
-      .get(`/api/user/${id}/`)
-      .then((res) => dispatch(getUser_(res.data)));
+export const signInFail = () => {
+  return {
+    type: actionTypes.SIGN_IN,
+    target: null,
   };
 };
 
-export interface LogInAction {
-  type: typeof actionTypes.LOG_IN;
-  targetID: number;
+export const signIn = (request: SignInRequest) => {
+  return (dispatch) => {
+    return axios
+      .post('/api/signin/', request)
+      .then((res) => dispatch(signInSuccess(res.data)))
+      .catch((error) => dispatch(signInFail()));
+  };
+};
+
+export interface SignOutAction {
+  type: typeof actionTypes.SIGN_OUT;
+  target: User | null;
 }
 
-export const logIn_ = (user: any) => {
+export const signOutSuccess = () => {
   return {
-    type: actionTypes.LOG_IN,
-    targetID: user.id,
+    type: actionTypes.SIGN_OUT,
+    target: null,
   };
 };
 
-export const logIn = (user: any) => {
+export const signOutFail = (user) => {
+  return {
+    type: actionTypes.SIGN_OUT,
+    target: user,
+  };
+};
+
+export const signOut = (user: any) => {
   return (dispatch) => {
     return axios
-      .put(`/api/user/${user.id}/`, { ...user, logged_in: true })
-      .then((res) => dispatch(logIn_(res.data)));
+      .get('/api/signout/')
+      .then((res) => dispatch(signOutSuccess()))
+      .catch((error) => dispatch(signOutFail(user)));
   };
 };
 
 export interface SignUpAction {
   type: typeof actionTypes.SIGN_UP;
-  target: UserField;
+  target: User | null;
 }
 
-export const signUp_ = (user: any) => {
+export interface SignUpRequest {
+  username: string;
+  email: string;
+  password: string;
+}
+
+export const signUpSuccess = (user: any) => {
   return {
     type: actionTypes.SIGN_UP,
     target: user,
   };
 };
 
-export const signUp = (user: any) => {
+export const signUpFail = () => {
+  return {
+    type: actionTypes.SIGN_UP,
+    target: null,
+  };
+};
+
+export const signUp = (request: SignUpRequest) => {
   return (dispatch) => {
     return axios
-      .post(`/api/user/`, user)
-      .then((res) => dispatch(signUp_(res.data)));
+      .post('/api/signup/', request)
+      .then((res) => dispatch(signUpSuccess(res.data)))
+      .catch((error) => dispatch(signUpFail()));
   };
 };
 
@@ -107,7 +119,11 @@ export const getUserStatistics: (
   id: number
 ) => ThunkAction<void, RootState, null, GetUserStatisticsAction> = (id) => {
   return async (dispatch: AppDispatch) => {
-    const data: UserStatistics = await axios.get(`/api/user/${id}/statistics`);
+    const { data }: { data: UserStatistics } = await axios.get(
+      `/api/user/${id}/statistics/`
+    );
+    // console.log('*********** ACTION data', data);
+
     dispatch(getUserStatistics_(data));
   };
 };
@@ -124,14 +140,19 @@ export const getUserProfile_: (profile: UserProfile) => GetUserProfileAction = (
   selectedUserProfile: profile,
 });
 
+export interface GetUserProfileResponse {
+  introduction: string;
+}
+
 export const getUserProfile: (
   userId: number
 ) => ThunkAction<void, RootState, null, GetUserProfileAction> = (userId) => {
   return async (dispatch: AppDispatch) => {
-    const { data }: { data: UserProfile } = await axios.get(
-      `/api/user/${userId}/profile`
+    const { data } = await axios.get<GetUserProfileResponse>(
+      `/api/user/${userId}/profile/`
     );
-    dispatch(getUserProfile_(data));
+    const profile: UserProfile = { userId, ...data };
+    dispatch(getUserProfile_(profile));
   };
 };
 
@@ -155,7 +176,7 @@ export const updateUserIntroduction: (
   pendingIntroduction
 ) => {
   return async (dispatch: AppDispatch) => {
-    await axios.put(`/api/user/${userId}/profile`, {
+    await axios.put(`/api/user/${userId}/profile/`, {
       introduction: pendingIntroduction,
     });
     const newIntroduction = pendingIntroduction;
@@ -168,6 +189,5 @@ export type UserAction =
   | GetUserProfileAction
   | UpdateUserIntroductionAction
   | SignUpAction
-  | LogInAction
-  | GetUserAction
-  | GetAllUsersAction;
+  | SignInAction
+  | SignOutAction;

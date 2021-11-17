@@ -1,10 +1,65 @@
 import {
+  SIGN_UP,
+  SIGN_IN,
+  SIGN_OUT,
   GET_USER_PROFILE,
   UPDATE_USER_INTRODUCTION,
 } from '../actions/actionTypes';
 import userReducer, { UserProfile } from './userReducer';
 
 describe('User Reducer', () => {
+  it('sign in/up/out updates selected user', () => {
+    const initialState = {
+      users: [],
+      selectedUser: null,
+      selectedUserProfile: null,
+      selectedUserStatistics: null,
+    };
+
+    const user = {
+      id: 1,
+      username: 'TEST',
+      email: 'TEST',
+      logged_in: false,
+    };
+
+    let state = userReducer(initialState, {
+      type: SIGN_IN,
+      target: user,
+    });
+
+    expect(state).toEqual({
+      users: [],
+      selectedUser: user,
+      selectedUserProfile: null,
+      selectedUserStatistics: null,
+    });
+
+    state = userReducer(initialState, {
+      type: SIGN_UP,
+      target: user,
+    });
+
+    expect(state).toEqual({
+      users: [],
+      selectedUser: user,
+      selectedUserProfile: null,
+      selectedUserStatistics: null,
+    });
+
+    state = userReducer(initialState, {
+      type: SIGN_OUT,
+      target: user,
+    });
+
+    expect(state).toEqual({
+      users: [],
+      selectedUser: user,
+      selectedUserProfile: null,
+      selectedUserStatistics: null,
+    });
+  });
+
   it('gets user profile', () => {
     const oldUserProfile: UserProfile = {
       userId: 42,
