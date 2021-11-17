@@ -110,13 +110,12 @@ class ProblemSetCreate extends Component<Props, State> {
   render() {
     const currentProblemSet = this.state.problems.map((problemSet, index) => {
       return (
-        <div className="NewProblemSet" id={index.toString()}>
+        <div className="NewProblemSet" key={index.toString()}>
           <Form.Dropdown
             className="Type"
             item
             options={typeOptions}
             label="Type"
-            detaultValue="type-multiplechoice"
             onChange={(_, { value }) => {
               const newProblem: NewProblemSet[] = [];
               const editProblem: NewProblemSet = {
