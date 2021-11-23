@@ -191,12 +191,111 @@ describe('<ProblemSetDetail />', () => {
 
   it('click edit problem button', () => {
     const component = mount(problemSetDetail);
-    const wrapper = component.find('button.editButton');
+    const wrapper = component.find('button.editProblemButton');
     wrapper.at(0).simulate('click');
     history.push('/');
   });
 
-  it('click delete problem button', () => {
+  it('click edit problem set button', () => {
+    const component = mount(problemSetDetail);
+    const wrapper = component.find('button.editProblemSetButton');
+    wrapper.at(0).simulate('click');
+    history.push('/');
+  });
+
+  it('click confirm(edit problem set) button', () => {
+    const component = mount(problemSetDetail);
+
+    // click "Edit Problem Set" button
+    const wrapper = component.find('button.editProblemSetButton');
+    wrapper.at(0).simulate('click');
+
+    // edit problem set
+    const wrapper_input = component.find('input');
+    const title = 'TITLE';
+    wrapper_input.simulate('change', { target: { value: title } });
+    const wrapper_description = component.find('textarea');
+    const description = 'DESCRIPTION';
+    wrapper_description.simulate('change', { target: { value: description } });
+
+    const wrapper_inputScope = component.find({ label: 'Scope' });
+    const inputScope = wrapper_inputScope.find('DropdownItem');
+    inputScope.at(1).simulate('click');
+
+    const wrapper_inputTag = component.find({ label: 'Tag' });
+    const inputTag = wrapper_inputTag.find('DropdownItem');
+    inputTag.at(1).simulate('click');
+
+    const wrapper_inputDifficulty = component.find({ label: 'Difficulty' });
+    const inputDifficulty = wrapper_inputDifficulty.find('DropdownItem');
+    inputDifficulty.at(1).simulate('click');
+
+    const wrapper_button = component.find('button.confirmProblemSetEditButton');
+    wrapper_button.at(0).simulate('click');
+
+    expect(spyGetProblemSet).toBeCalledTimes(2);
+    expect(spyGetComments).toBeCalledTimes(2);
+    expect(spyGetSolvers).toBeCalledTimes(2);
+
+    history.push('/');
+  });
+
+  it('other cases: is_open===true and difficulty is not defined', () => {
+    const problemSet1: ProblemSet = {
+      id: 1,
+      title: 'title1',
+      created_time: '2021-01-01',
+      is_open: true,
+      tag: 'math',
+      difficulty: 10,
+      content: 'content1',
+      userID: 1,
+      username: 'user1',
+      solved_num: 1,
+      recommended_num: 1,
+    };
+    const ProblemSetStateTest: ProblemSetState = {
+      problemSets: [problemSet1],
+      solvers: [solver1],
+      selectedProblemSet: problemSet1,
+      selectedProblems: [],
+    };
+    const mockStore = getMockStore(
+      UserStateTest,
+      ProblemSetStateTest,
+      CommentStateTest
+    );
+    const component = mount(
+      <Provider store={mockStore}>
+        <ConnectedRouter history={history}>
+          <Switch>
+            <Route path="/" exact component={ProblemSetDetail} />
+          </Switch>
+        </ConnectedRouter>
+      </Provider>
+    );
+
+    // click "Edit Problem Set" button
+    const wrapper = component.find('button.editProblemSetButton');
+    wrapper.at(0).simulate('click');
+
+    history.push('/');
+  });
+
+  it('click back to problem set detail button', () => {
+    const component = mount(problemSetDetail);
+
+    // click "Edit Problem Set" button
+    const wrapper = component.find('button.editProblemSetButton');
+    wrapper.at(0).simulate('click');
+
+    // go back to problem set detail
+    const wrapper_back_button = component.find('button.backToDetailButton');
+    wrapper_back_button.at(0).simulate('click');
+    history.push('/');
+  });
+
+  it('click delete problem set button', () => {
     const component = mount(problemSetDetail);
     const wrapper = component.find('button.deleteButton');
     wrapper.simulate('click');
@@ -204,14 +303,14 @@ describe('<ProblemSetDetail />', () => {
     history.push('/');
   });
 
-  it('click solve problem button', () => {
+  it('click solve problem set button', () => {
     const component = mount(problemSetDetail);
     const wrapper = component.find('button.solveButton');
     wrapper.simulate('click');
     history.push('/');
   });
 
-  it('click explanation problem button', () => {
+  it('click explanation problem set button', () => {
     const component = mount(problemSetDetail);
     const wrapper = component.find('button.explanationButton');
     wrapper.simulate('click');
@@ -241,7 +340,7 @@ describe('<ProblemSetDetail />', () => {
   it('click create comment button', () => {
     const component = mount(problemSetDetail);
 
-    const wrapper_input = component.find('input');
+    const wrapper_input = component.find('textarea');
     const content = 'iluvswpp';
     wrapper_input.simulate('change', { target: { value: content } });
 
@@ -262,7 +361,7 @@ describe('<ProblemSetDetail />', () => {
     const wrapper_edit = wrapper_action.find('CommentAction.editButton');
     wrapper_edit.simulate('click');
 
-    const wrapper_input = component.find('input');
+    const wrapper_input = component.find('textarea');
     const content = 'iluvswpp';
     wrapper_input.simulate('change', { target: { value: content } });
 

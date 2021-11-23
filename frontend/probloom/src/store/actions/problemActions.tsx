@@ -177,6 +177,31 @@ export const editProblemSet: (
   };
 };
 
+export interface UpdateProblemSetAction {
+  type: typeof actionTypes.UPDATE_PROBLEMSET;
+  targetID: number;
+}
+
+export const updateProblemSet_: (
+  problemSet: ProblemSet
+) => DeleteProblemSetAction = (problemSet) => ({
+  type: actionTypes.DELETE_PROBLEMSET,
+  targetID: problemSet.id,
+});
+
+export const updateProblemSet: (
+  problemSetID: number
+) => ThunkAction<void, RootState, null, DeleteProblemSetAction> = (
+  problemSetID
+) => {
+  return async (dispatch: AppDispatch) => {
+    const { data }: { data: ProblemSet } = await axios.delete(
+      `/api/problem/${problemSetID}/`
+    );
+    dispatch(deleteProblemSet_(data));
+  };
+};
+
 export interface DeleteProblemSetAction {
   type: typeof actionTypes.DELETE_PROBLEMSET;
   targetID: number;
@@ -207,5 +232,6 @@ export type ProblemSetAction =
   | GetProblemSetAction
   | GetAllSolversAction
   | CreateProblemSetAction
+  | UpdateProblemSetAction
   | EditProblemSetAction
   | DeleteProblemSetAction;

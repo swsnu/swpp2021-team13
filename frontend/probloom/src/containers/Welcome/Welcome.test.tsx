@@ -6,7 +6,7 @@ import { mount } from 'enzyme';
 import { Provider } from 'react-redux';
 import { UserState } from '../../store/reducers/userReducer';
 import Welcome from './Welcome';
-import { history } from '../../store/store';
+import store, { history } from '../../store/store';
 import axios from 'axios';
 
 const UserstateTest: UserState = {
@@ -104,13 +104,18 @@ describe('<Welcome />', () => {
     expect(spyGet).toBeCalledTimes(1);
   });
 
-  it('should checking incorrect user', () => {
+  it('should check incorrect user', () => {
+    spyPost = jest.spyOn(axios, 'post').mockImplementation(async () => ({
+      status: 400,
+      data: null,
+    }));
+
     const component = mount(welcome);
     const wrapper = component.find('input');
 
     const id = 'swpp@snu.ac.kr';
     wrapper.at(0).simulate('change', { target: { value: id } });
-    const pw = 'iluvswpppp';
+    const pw = 'iluvswpp';
     wrapper.at(1).simulate('change', { target: { value: pw } });
     const wrapper2 = component.find('button.signInButton');
     wrapper2.simulate('click');
@@ -119,7 +124,7 @@ describe('<Welcome />', () => {
     history.push('/');
   });
 
-  it('should checking pw is fail', () => {
+  it('should check invalid username/email/pw', () => {
     const spyAlert = jest.spyOn(window, 'alert').mockImplementation(() => {});
     const component = mount(welcome);
     const wrapper = component.find('input');
@@ -141,7 +146,30 @@ describe('<Welcome />', () => {
     const component = mount(welcome);
     const wrapper = component.find('button.signUpButton');
     wrapper.simulate('click');
-    expect(window.location.href).toEqual('http://localhost/signup');
+    expect(window.location.href).toEqual('http://localhost/signup/');
+    history.push('/');
+  });
+
+  it('should sign in', () => {
+    const component = mount(
+      <Provider store={store}>
+        <ConnectedRouter history={history}>
+          <Switch>
+            <Route path="/" exact component={Welcome} />
+          </Switch>
+        </ConnectedRouter>
+      </Provider>
+    );
+    const wrapper = component.find('input');
+
+    const id = 'swpp@snu.ac.kr';
+    wrapper.at(0).simulate('change', { target: { value: id } });
+    const pw = 'iluvswpp';
+    wrapper.at(1).simulate('change', { target: { value: pw } });
+    const wrapper2 = component.find('button.signInButton');
+    wrapper2.simulate('click');
+
+    expect(spyPost).toBeCalledTimes(1);
     history.push('/');
   });
 
