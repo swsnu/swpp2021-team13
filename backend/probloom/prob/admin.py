@@ -4,7 +4,7 @@ from .models import (
     UserStatistics,
     UserProfile,
     ProblemSet,
-    Comment,
+    ProblemSetComment,
     Solved,
     Choice,
     Problems,
@@ -15,7 +15,7 @@ admin.site.register(User, UserAdmin)
 admin.site.register(UserStatistics)
 admin.site.register(UserProfile)
 admin.site.register(ProblemSet)
-admin.site.register(Comment)
+admin.site.register(ProblemSetComment)
 admin.site.register(Solved)
 admin.site.register(Choice)
 admin.site.register(Problems)
