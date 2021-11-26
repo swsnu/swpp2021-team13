@@ -1,4 +1,5 @@
 # from django.shortcuts import render
+import dataclasses
 import datetime
 import functools
 import json
@@ -8,6 +9,7 @@ from typing import List
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin as LoginRequiredMixin_
 from django.core.exceptions import BadRequest, PermissionDenied
+from django.db.models import Count, Q
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -25,11 +27,12 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.list import MultipleObjectMixin
 
 from .models import (
-    Choice,
-    Problems,
+    Content,
+    MultipleChoiceProblem,
     ProblemSet,
     ProblemSetComment,
     Solved,
+    SubjectiveProblem,
     User,
     UserProfile,
     UserStatistics,
@@ -154,6 +157,17 @@ class SignOutView(View):
             return JsonResponse(
                 {"result": "FAILURE"}, status=400
             )  # TODO: change status to 200
+
+
+@dataclasses.dataclass
+class UserContextBase:
+    id: int
+    username: str
+    email: str
+
+    @classmethod
+    def from_model(cls, user: User):
+        return cls(id=user.pk, username=user.username, email=user.email)
 
 
 @require_GET
@@ -321,11 +335,11 @@ def get_user_statistics(request: HttpRequest, u_id: int) -> HttpResponse:
     Found)``.
     """
     user_statistics = UserStatistics.objects.get(pk=u_id)
-    created_problem_sets = user_statistics.created_problem_sets.all()
+    # created_problem_sets = user_statistics.created_problem_sets.all()
 
-    created_problem_sets_list = []
-    for created_problem_set in created_problem_sets:
-        created_problem_sets_list.append(created_problem_set.info_dict())
+    # created_problem_sets_list = []
+    # for created_problem_set in created_problem_sets:
+    #     created_problem_sets_list.append(created_problem_set.info_dict())
 
     return JsonResponse(
         {
@@ -333,16 +347,14 @@ def get_user_statistics(request: HttpRequest, u_id: int) -> HttpResponse:
             "lastActiveDays": (
                 datetime.date.today() - user_statistics.last_login_date
             ).days,
-            "createdProblems": created_problem_sets_list,
+            # "createdProblems": created_problem_sets_list,
         },
         safe=False,
     )
 
 
-class ProblemSetListView(LoginRequiredMixin, MultipleObjectMixin, View):
+class ProblemSetListView(LoginRequiredMixin, View):
     """List view methods related to model :class:`ProblemSet`."""
-
-    model = ProblemSet
 
     def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
         """Get list of problem sets matching given query.
@@ -392,7 +404,41 @@ class ProblemSetListView(LoginRequiredMixin, MultipleObjectMixin, View):
              ]
            }
         """
-        res = [prob.info_dict() for prob in ProblemSet.objects.all()]
+        res = (
+            ProblemSet.objects.select_related("creator__user")
+            .values(
+                "id",
+                "title",
+                "created_time",
+                "modified_time",
+                "is_open",
+                "tags",
+                "difficulty",
+                "description",
+                "creator_id",
+                "creator__user__username",
+                recommendedNum=Count("recommenders"),
+            )
+            .all()
+        )
+        res = list(
+            map(
+                lambda value: {
+                    "id": value["id"],
+                    "title": value["title"],
+                    "createdTime": value["created_time"],
+                    "modifiedTime": value["modified_time"],
+                    "isOpen": value["is_open"],
+                    "tag": value["tags"],
+                    "difficulty": value["difficulty"],
+                    "content": value["description"],
+                    "userID": value["creator_id"],
+                    "username": value["creator__user__username"],
+                    "recommendedNum": value["recommendedNum"],
+                },
+                res,
+            )
+        )
 
         return JsonResponse(data=res, safe=False)
 
@@ -475,60 +521,60 @@ class ProblemSetListView(LoginRequiredMixin, MultipleObjectMixin, View):
              cause: 'TAG_NOT_FOUND';
            }
         """
-        try:
-            req_data = json.loads(request.body.decode())
-            title = req_data["title"]
-            content = req_data["content"]
-            is_open = req_data["scope"] == "scope-public"
-            tag = req_data["tag"]
-            difficulty = int(req_data["difficulty"])
-            problems = req_data["problems"]
-        except (JSONDecodeError, KeyError) as error:
-            raise BadRequest() from error
+        # try:
+        #     req_data = json.loads(request.body.decode())
+        #     title = req_data["title"]
+        #     content = req_data["content"]
+        #     is_open = req_data["scope"] == "scope-public"
+        #     tag = req_data["tag"]
+        #     difficulty = int(req_data["difficulty"])
+        #     problems = req_data["problems"]
+        # except (JSONDecodeError, KeyError) as error:
+        #     raise BadRequest() from error
 
-        creator = UserStatistics.objects.get(user=request.user)
-        new_problem_set = ProblemSet(
-            title=title,
-            is_open=is_open,
-            tag=tag,
-            difficulty=difficulty,
-            content=content,
-            creator=creator,
-        )
-        new_problem_set.save()
+        # creator = UserStatistics.objects.get(user=request.user)
+        # new_problem_set = ProblemSet(
+        #     title=title,
+        #     is_open=is_open,
+        #     tag=tag,
+        #     difficulty=difficulty,
+        #     content=content,
+        #     creator=creator,
+        # )
+        # new_problem_set.save()
 
-        problemSet = ProblemSet.objects.get(id=new_problem_set.id)
+        # problemSet = ProblemSet.objects.get(id=new_problem_set.id)
 
-        for problem in problems:
-            newProblem = Problems(
-                index=problem["index"],
-                problem_type=problem["problem_type"],
-                problem_statement=problem["problem_statement"],
-                solution=problem["solution"],
-                explanation=problem["explanation"],
-                problemSet=problemSet,
-            )
-            # print("@@@@@@@@@@@newProblem", newProblem)
-            newProblem.save()
+        # for problem in problems:
+        #     newProblem = Problems(
+        #         index=problem["index"],
+        #         problem_type=problem["problem_type"],
+        #         problem_statement=problem["problem_statement"],
+        #         solution=problem["solution"],
+        #         explanation=problem["explanation"],
+        #         problemSet=problemSet,
+        #     )
+        #     # print("@@@@@@@@@@@newProblem", newProblem)
+        #     newProblem.save()
 
-            newProblems = Problems.objects.get(id=newProblem.id)
+        #     newProblems = Problems.objects.get(id=newProblem.id)
 
-            choice = Choice(
-                choice1=problem["choice"][0],
-                choice2=problem["choice"][1],
-                choice3=problem["choice"][2],
-                choice4=problem["choice"][3],
-                problems=newProblems,
-            )
-            choice.save()
+        #     choice = Choice(
+        #         choice1=problem["choice"][0],
+        #         choice2=problem["choice"][1],
+        #         choice3=problem["choice"][2],
+        #         choice4=problem["choice"][3],
+        #         problems=newProblems,
+        #     )
+        #     choice.save()
 
-        return JsonResponse(data=new_problem_set.info_dict())
+        # return JsonResponse(data=new_problem_set.info_dict())
 
 
-class ProblemSetInfoView(View):
+class ProblemSetInfoView(LoginRequiredMixin, View):
     """Detail view methods related to model :class:`ProblemSet`."""
 
-    def get(self, request: HttpRequest, id, **kwargs):
+    def get(self, request: HttpRequest, ps_id: int, **kwargs):
         """Get details of specific problem set.
 
         .. rubric:: How to use
@@ -561,40 +607,26 @@ class ProblemSetInfoView(View):
 
         If a problem set with id ``ps_id`` does not exist, respond with ``404 (Not Found)``.
         """
-        if request.user.is_authenticated:
-            try:
-                problem_set = ProblemSet.objects.get(id=id)
-            except:
-                return HttpResponse(status=404)
+        try:
+            problem_set = ProblemSet.objects.get(pk=ps_id)
+        except:
+            return HttpResponse(status=404)
 
-            res_pset = problem_set.info_dict()
-            problems = problem_set.problems.all()
-            problems_list = []
-            for problem in problems:
-                choices = problem.problem_choice
-                # print("@@@@@@@@@@@@@choices", choices.choice1)
-                choice = [
-                    choices.choice1,
-                    choices.choice2,
-                    choices.choice3,
-                    choices.choice4,
-                ]
-                problems_list.append(
-                    {
-                        "id": problem.id,
-                        "index": problem.index,
-                        "problem_type": problem.problem_type,
-                        "problem_statement": problem.problem_statement,
-                        "choice": choice,
-                        "solution": problem.solution,
-                        "explanation": problem.explanation,
-                    }
-                )
-            # print("@@@@@@@@@@@@@problems_list", problems_list)
-            res_dict = {"res_pset": res_pset, "problems_list": problems_list}
-            return JsonResponse(res_dict, status=201, safe=False)
-        else:
-            return HttpResponse(status=401)
+        res = problem_set.info_dict()
+        multiple_choice_problems = problem_set.problems.instance_of(
+            MultipleChoiceProblem
+        ).prefetch_related("choices__content")
+        subjective_problems = problem_set.problems.instance_of(
+            SubjectiveProblem
+        ).prefetch_related("solutions")
+        problems_list = []
+        problems_list.extend(
+            problem.info_dict() for problem in multiple_choice_problems
+        )
+        problems_list.extend(problem.info_dict() for problem in subjective_problems)
+        problems_list.sort(key=lambda entry: entry["problemNumber"])
+        res["problems"] = problems_list
+        return JsonResponse(res, status=201, safe=False)
 
     def post(self, request: HttpRequest, ps_id: int, **kwargs):
         """Create a new problem in the problem set.
@@ -648,7 +680,7 @@ class ProblemSetInfoView(View):
         follow the constraints, respond with ``400 (Bad Request)``.
         """
 
-    def put(self, request: HttpRequest, id, **kwargs):
+    def put(self, request: HttpRequest, ps_id, **kwargs):
         """Edit details of specific problem set.
 
         .. rubric:: How to use
@@ -679,76 +711,32 @@ class ProblemSetInfoView(View):
         follow the constraints of the corresponding fields of ``UserProfile``,
         respond with ``400 (Bad Request)``.
         """
-        if request.user.is_authenticated:
-            try:
-                problem_set = ProblemSet.objects.get(id=id)
-            except:
-                return HttpResponse(status=404)
+        try:
+            problem_set = ProblemSet.objects.get(id=ps_id)
+        except:
+            return HttpResponseNotFound()
 
-            if request.user.id == problem_set.creator.user.id:
-                try:
-                    req_data = json.loads(request.body.decode())
-                    title = req_data["title"]
-                    content = req_data["content"]
-                    scope = req_data["scope"] == "scope-public"
-                    tag = req_data["tag"]
-                    difficulty = int(req_data["difficulty"])
-                    edit_problems = req_data["problems"]
-                except (KeyError, JSONDecodeError) as e:
-                    return HttpResponseBadRequest()
+        if request.user.pk != problem_set.creator.user.pk:
+            raise PermissionDenied()
 
-                problem_set.title = title
-                problem_set.content = content
-                problem_set.is_open = scope
-                problem_set.tag = tag
-                problem_set.difficulty = difficulty
-                problem_set.save()
-                res_pset = problem_set.info_dict()
+        try:
+            req_data = json.loads(request.body)
+            title = req_data["title"]
+            is_open = req_data["isOpen"]
+            # tags = req_data["tag"]
+            difficulty = int(req_data["difficulty"])
+            content = req_data["content"]
+        except (KeyError, TypeError, JSONDecodeError) as e:
+            return HttpResponseBadRequest()
 
-                problems = problem_set.problems.all()
-                # print("#########edit_problems", edit_problems)
-                # print("#########problems", problems)
-                problems_list = []
-                for problem, edit_problem in zip(problems, edit_problems):
-                    choices = problem.problem_choice
-                    # print('@@@@@@@@@@edit_problems["choice"]', edit_problem["choice"])
-                    choices.choice1 = edit_problem["choice"][0]
-                    choices.choice2 = edit_problem["choice"][1]
-                    choices.choice3 = edit_problem["choice"][2]
-                    choices.choice4 = edit_problem["choice"][3]
-                    choices.save()
-                    choice = [
-                        choices.choice1,
-                        choices.choice2,
-                        choices.choice3,
-                        choices.choice4,
-                    ]
+        problem_set.title = title
+        problem_set.content.text = content
+        problem_set.is_open = is_open
+        problem_set.difficulty = difficulty
+        problem_set.save()
+        return HttpResponse()
 
-                    problem.problem_type = edit_problem["problem_type"]
-                    problem.problem_statement = edit_problem["problem_statement"]
-                    problem.solution = edit_problem["solution"]
-                    problem.explanation = edit_problem["explanation"]
-                    problem.save()
-                    problems_list.append(
-                        {
-                            "id": problem.id,
-                            "index": problem.index,
-                            "problem_type": problem.problem_type,
-                            "problem_statement": problem.problem_statement,
-                            "choice": choice,
-                            "solution": problem.solution,
-                            "explanation": problem.explanation,
-                        }
-                    )
-
-                res_dict = {"res_pset": res_pset, "problems_list": problems_list}
-                return JsonResponse(res_dict, status=200)
-            else:
-                return HttpResponse(status=403)
-        else:
-            return HttpResponse(status=401)
-
-    def delete(self, request: HttpRequest, id, **kwargs):
+    def delete(self, request: HttpRequest, ps_id, **kwargs):
         """Delete a specific problem set.
 
         .. rubric:: How to use
@@ -763,20 +751,17 @@ class ProblemSetInfoView(View):
         If a problem set with id ``ps_id`` does not exist, respond with ``404
         (Not Found)``.
         """
-        if request.user.is_authenticated:
-            try:
-                problem_set = ProblemSet.objects.get(id=id)
-            except:
-                return HttpResponse(status=404)
+        try:
+            problem_set = ProblemSet.objects.get(id=ps_id)
+        except:
+            return HttpResponseNotFound()
 
-            if request.user.id == problem_set.creator.user.id:
-                res = problem_set.info_dict()
-                problem_set.delete()
-                return HttpResponse(res, status=200)
-            else:
-                return HttpResponse(status=403)
-        else:
-            return HttpResponse(status=401)
+        if request.user.pk != problem_set.creator.user.pk:
+            raise PermissionDenied()
+
+        # res = problem_set.info_dict()
+        problem_set.delete()
+        return HttpResponse()
 
 
 @require_http_methods(["PUT"])
@@ -826,10 +811,10 @@ class ProblemSetCommentView(View):
             return HttpResponse(status=401)
 
 
-class ProblemSetCommentListView(View):
+class ProblemSetCommentListView(LoginRequiredMixin, View):
     """List view methods related to model :class:`ProblemSetComment`."""
 
-    def get(self, request: HttpRequest, **kwargs):
+    def get(self, request: HttpRequest, ps_id: int, **kwargs):
         """Get comments of specific problem set.
 
         .. rubric:: How to use
@@ -861,17 +846,19 @@ class ProblemSetCommentListView(View):
         If a problem set with id ``ps_id`` does not exist, respond with ``404
         (Not Found)``.
         """
-        if request.user.is_authenticated:
-            comment_set = ProblemSetComment.objects.all()
-            res = []
-            for comment in comment_set:
-                res.append(comment.to_dict())
+        if not ProblemSet.objects.filter(pk=ps_id).exists():
+            return HttpResponseNotFound()
 
-            return JsonResponse(res, status=201, safe=False)
-        else:
-            return HttpResponse(status=401)
+        comment_set = ProblemSetComment.objects.filter(
+            problem_set_id=ps_id
+        ).select_related("content")
+        res = []
+        for comment in comment_set:
+            res.append(comment.to_dict())
 
-    def post(self, request: HttpRequest, **kwargs):
+        return JsonResponse(res, safe=False)
+
+    def post(self, request: HttpRequest, ps_id: int, **kwargs):
         """Create a new comment to a specific problem set.
 
         .. rubric:: How to use
@@ -897,35 +884,31 @@ class ProblemSetCommentListView(View):
         follow the constraints of the fields of ``ProblemSetComment``, respond
         with ``400 (Bad Request)``.
         """
-        if request.user.is_authenticated:
-            try:
-                req_data = json.loads(request.body.decode())
-                user_id = req_data["userID"]
-                username = req_data["username"]
-                problem_set_id = req_data["problemSetID"]
-                content = req_data["content"]
-            except (KeyError, JSONDecodeError) as e:
-                return HttpResponseBadRequest()
+        try:
+            problem_set = ProblemSet.objects.get(id=ps_id)
+        except ProblemSet.DoesNotExist:
+            return HttpResponseNotFound()
 
-            user = User.objects.get(username=username)
-            creator = user.statistics
+        try:
+            req_data = json.loads(request.body)
+            content = req_data["content"]
+        except (KeyError, JSONDecodeError) as e:
+            return HttpResponseBadRequest()
 
-            problem_set = ProblemSet.objects.get(id=problem_set_id)
-            comment = ProblemSetComment(
-                content=content, creator=creator, problem_set=problem_set
-            )
-            comment.save()
+        creator = request.user.statistics
+        content = Content.objects.create(text=content)
+        comment = ProblemSetComment.objects.create(
+            content=content, creator=creator, problem_set=problem_set
+        )
 
-            res = comment.to_dict()
-            return JsonResponse(res, status=201, safe=False)
-        else:
-            return HttpResponse(status=401)
+        res = comment.to_dict()
+        return JsonResponse(res, status=201, safe=False)
 
 
-class ProblemSetCommentInfoView(View):
+class ProblemSetCommentInfoView(LoginRequiredMixin, View):
     """Detail view methods related to model :class:`ProblemSetComment`."""
 
-    def get(self, request: HttpRequest, id, **kwargs):
+    def get(self, request: HttpRequest, ps_id: int, c_id: int, **kwargs):
         """Get a specific comment to a specific problem set.
 
         .. rubric:: How to use
@@ -949,18 +932,18 @@ class ProblemSetCommentInfoView(View):
 
         If either problem set or comment does not exist, respond with ``404 (Not Found)``.
         """
-        if request.user.is_authenticated:
-            try:
-                comment = ProblemSetComment.objects.get(id=id)
-            except:
-                return HttpResponse(status=404)
+        if not ProblemSet.objects.filter(pk=ps_id).exists():
+            return HttpResponseNotFound()
 
-            res = comment.to_dict()
-            return JsonResponse(res, status=201, safe=False)
-        else:
-            return HttpResponse(status=401)
+        try:
+            comment = ProblemSetComment.objects.get(id=c_id, problem_set_id=ps_id)
+        except:
+            return HttpResponseNotFound()
 
-    def put(self, request: HttpRequest, id, **kwargs):
+        res = comment.to_dict()
+        return JsonResponse(res, safe=False)
+
+    def put(self, request: HttpRequest, ps_id: int, c_id: int, **kwargs):
         """Edit a specific comment to a specific problem set.
 
         .. rubric:: How to use
@@ -987,29 +970,30 @@ class ProblemSetCommentInfoView(View):
         the constraints of the corresponding fields of ``ProblemSetComment``,
         respond with ``400 (Bad Request)``.
         """
-        if request.user.is_authenticated:
-            try:
-                comment = ProblemSetComment.objects.get(id=id)
-            except:
-                return HttpResponse(status=404)
+        if not ProblemSet.objects.filter(pk=ps_id).exists():
+            return HttpResponseNotFound()
 
-            if request.user.id == comment.creator.user.id:
-                try:
-                    req_data = json.loads(request.body.decode())
-                    content = req_data["content"]
-                except (KeyError, JSONDecodeError) as e:
-                    return HttpResponseBadRequest()
+        try:
+            comment = ProblemSetComment.objects.get(id=c_id, problem_set_id=ps_id)
+        except:
+            return HttpResponseNotFound()
 
-                comment.content = content
-                comment.save()
-                res = comment.to_dict()
-                return JsonResponse(res, status=200)
-            else:
-                return HttpResponse(status=403)
-        else:
-            return HttpResponse(status=401)
+        if request.user.pk != comment.creator.user.pk:
+            raise PermissionDenied()
 
-    def delete(self, request: HttpRequest, id, **kwargs):
+        try:
+            req_data = json.loads(request.body.decode())
+            content = req_data["content"]
+        except (KeyError, JSONDecodeError) as e:
+            return HttpResponseBadRequest()
+
+        comment.content = content
+        comment.save()
+
+        res = comment.to_dict()
+        return JsonResponse(res)
+
+    def delete(self, request: HttpRequest, ps_id: int, c_id: int, **kwargs):
         """Delete a specific comment to a specific problem set.
 
         .. rubric:: How to use
@@ -1022,20 +1006,20 @@ class ProblemSetCommentInfoView(View):
 
         If either problem set or comment does not exist, respond with ``404 (Not Found)``.
         """
-        if request.user.is_authenticated:
-            try:
-                comment = ProblemSetComment.objects.get(id=id)
-            except:
-                return HttpResponse(status=404)
+        if not ProblemSet.objects.filter(pk=ps_id).exists():
+            return HttpResponseNotFound()
 
-            if request.user.id == comment.creator.user.id:
-                res = comment.to_dict()
-                comment.delete()
-                return HttpResponse(res, status=200)
-            else:
-                return HttpResponse(status=403)
-        else:
-            return HttpResponse(status=401)
+        try:
+            comment = ProblemSetComment.objects.get(id=c_id, problem_set_id=ps_id)
+        except:
+            return HttpResponseNotFound()
+
+        if request.user.pk != comment.creator.user.pk:
+            raise PermissionDenied()
+
+        res = comment.to_dict()
+        comment.delete()
+        return HttpResponse(res)
 
 
 class ProblemInfoView(LoginRequiredMixin, View):
@@ -1093,6 +1077,45 @@ class ProblemInfoView(LoginRequiredMixin, View):
 
         If a problem with id ``p_id`` does not exist, respond with ``404 (Not Found)``.
         """
+        # res_pset = problem_set.info_dict()
+
+        # problems = problem_set.problems.all()
+        # print("#########edit_problems", edit_problems)
+        # print("#########problems", problems)
+        # problems_list = []
+        # for problem, edit_problem in zip(problems, edit_problems):
+        #     choices = problem.problem_choice
+        #     # print('@@@@@@@@@@edit_problems["choice"]', edit_problem["choice"])
+        #     choices.choice1 = edit_problem["choice"][0]
+        #     choices.choice2 = edit_problem["choice"][1]
+        #     choices.choice3 = edit_problem["choice"][2]
+        #     choices.choice4 = edit_problem["choice"][3]
+        #     choices.save()
+        #     choice = [
+        #         choices.choice1,
+        #         choices.choice2,
+        #         choices.choice3,
+        #         choices.choice4,
+        #     ]
+
+        #     problem.problem_type = edit_problem["problem_type"]
+        #     problem.problem_statement = edit_problem["problem_statement"]
+        #     problem.solution = edit_problem["solution"]
+        #     problem.explanation = edit_problem["explanation"]
+        #     problem.save()
+        #     problems_list.append(
+        #         {
+        #             "id": problem.id,
+        #             "index": problem.index,
+        #             "problem_type": problem.problem_type,
+        #             "problem_statement": problem.problem_statement,
+        #             "choice": choice,
+        #             "solution": problem.solution,
+        #             "explanation": problem.explanation,
+        #         }
+        #     )
+
+        # res_dict = {"res_pset": res_pset, "problems_list": problems_list}
 
     def put(self, request: HttpRequest, p_id: int, **kwargs) -> HttpResponse:
         """Edit details of a specific problem.

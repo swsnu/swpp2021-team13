@@ -1,21 +1,28 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+
 from .models import (
-    User,
-    UserStatistics,
-    UserProfile,
+    Content,
+    MultipleChoiceProblem,
+    MultipleChoiceProblemChoice,
     ProblemSet,
     ProblemSetComment,
     Solved,
-    Choice,
-    Problems,
+    SubjectiveProblem,
+    SubjectiveProblemSolution,
+    User,
+    UserProfile,
+    UserStatistics,
 )
-from django.contrib.auth.admin import UserAdmin
 
 admin.site.register(User, UserAdmin)
 admin.site.register(UserStatistics)
 admin.site.register(UserProfile)
 admin.site.register(ProblemSet)
+admin.site.register(Content)
 admin.site.register(ProblemSetComment)
+admin.site.register(MultipleChoiceProblem)
+admin.site.register(MultipleChoiceProblemChoice)
+admin.site.register(SubjectiveProblem)
+admin.site.register(SubjectiveProblemSolution)
 admin.site.register(Solved)
-admin.site.register(Choice)
-admin.site.register(Problems)

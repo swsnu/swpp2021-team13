@@ -25,14 +25,11 @@ from polymorphic.models import PolymorphicModel
 class User(AbstractUser):
     """User model.
 
-    Inherited Fields
+    Attributes
     ----------------
     username : str
     email : str
     password : str
-
-    Automatically Generated Properties
-    ----------------------------------
     profile : UserProfile
     statistics : UserStatistics
     inventory : UserInventory
@@ -46,16 +43,16 @@ def get_sentinel_user():
 class UserProfile(Model):
     """User profile model.
 
-    Fields
+    Attributes
     ------
     user : User
-    introduction : str
+    introduction : str, default=""
     """
 
     user = OneToOneField(
         User, on_delete=CASCADE, related_name="profile", primary_key=True
     )
-    introduction = TextField(default="")
+    introduction = TextField(default="", blank=True)
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -67,14 +64,11 @@ class UserProfile(Model):
 class UserStatistics(Model):
     """User statistics model.
 
-    Fields
+    Attributes
     ------
     user : User
     created_time : datetime
     last_login_date : date
-
-    Automatically Generated Properties
-    ----------------------------------
     created_problem_sets : QuerySet[ProblemSet]
     recommended_problem_sets : QuerySet[ProblemSet]
     created_comments : QuerySet[ProblemSetComment]
@@ -88,7 +82,7 @@ class UserStatistics(Model):
         User, on_delete=CASCADE, related_name="statistics", primary_key=True
     )
     created_time = DateTimeField(auto_now_add=True)
-    last_login_date = DateField(blank=True)
+    last_login_date = DateField(blank=True, null=True)
 
 
 def get_sentinel_user_statistics():
@@ -98,27 +92,26 @@ def get_sentinel_user_statistics():
 class Tag(Model):
     """Tag model.
 
-    Fields
+    Attributes
     ------
     name : str
     level : int
     parent : Optional[Tag]
-
-    Automatically Generated Properties
-    ----------------------------------
     children : QuerySet[Tag]
     problem_sets : QuerySet[ProblemSet]
     """
 
     name = CharField(max_length=100)
     level = PositiveSmallIntegerField()
-    parent = ForeignKey("self", related_name="children", on_delete=CASCADE, null=True)
+    parent = ForeignKey(
+        "self", related_name="children", on_delete=CASCADE, blank=True, null=True
+    )
 
 
 class ProblemSet(Model):
     """Problem set model.
 
-    Fields
+    Attributes
     ------
     title : str
     created_time : datetime
@@ -129,9 +122,6 @@ class ProblemSet(Model):
     creator : UserStatistics
     recommenders : QuerySet[UserStatistics]
     tags : QuerySet[Tag]
-
-    Automatically Generated Properties
-    ----------------------------------
     problems : QuerySet[Problem]
     solved_set : QuerySet[Solved]
     comments : QuerySet[ProblemSetComment]
@@ -147,57 +137,34 @@ class ProblemSet(Model):
         UserStatistics, related_name="created_problem_sets", on_delete=CASCADE
     )
     recommenders = ManyToManyField(
-        UserStatistics, related_name="recommended_problem_sets"
+        UserStatistics, related_name="recommended_problem_sets", blank=True
     )
-    tags = ManyToManyField(Tag, related_name="problem_sets")
+    tags = ManyToManyField(Tag, related_name="problem_sets", blank=True)
 
     def info_dict(self):
-        solved_num = self.solved_user.all().count()
         recommended_num = self.recommenders.all().count()
         return {
             "id": self.pk,
             "title": self.title,
-            "created_time": self.created_time,
-            "modified_time": self.modified_time,
-            "is_open": self.is_open,
-            "tag": self.tags,
+            "createdTime": self.created_time,
+            "modifiedTime": self.modified_time,
+            "isOpen": self.is_open,
+            "tag": [],
             "difficulty": self.difficulty,
-            "content": str(self.description),
+            "content": self.description,
             "userID": self.creator.user.pk,
             "username": self.creator.user.username,
-            "solved_num": solved_num,
-            "recommended_num": recommended_num,
+            "solvedNum": 0,
+            "recommendedNum": recommended_num,
         }
-
-
-class Problems(Model):
-    index = IntegerField(blank=True, null=True)
-    problem_type = CharField(max_length=100, default="default type")
-    problem_statement = TextField(max_length=1000, default="default statement")
-    solution = CharField(max_length=10, default="default solution")
-    explanation = TextField(max_length=1000, default="default explanation")
-
-    problemSet = ForeignKey(ProblemSet, related_name="problems", on_delete=CASCADE)
-
-
-class Choice(Model):
-    choice1 = TextField(max_length=1000, default="choice1")
-    choice2 = TextField(max_length=1000, default="choice2")
-    choice3 = TextField(max_length=1000, default="choice3")
-    choice4 = TextField(max_length=1000, default="choice4")
-
-    problems = OneToOneField(Problems, related_name="problem_choice", on_delete=CASCADE)
 
 
 class Content(Model):
     """Content model.
 
-    Fields
+    Attributes
     ------
     text : str
-
-    Automatically Generated Properties
-    ----------------------------------
     images : QuerySet[ContentImage]
     """
 
@@ -207,7 +174,7 @@ class Content(Model):
 class ContentImage(Model):
     """Content image model.
 
-    Fields
+    Attributes
     ------
     id : UUID
     content : Content
@@ -220,7 +187,7 @@ class ContentImage(Model):
 class ProblemSetComment(Model):
     """Problem set comment model.
 
-    Fields
+    Attributes
     ------
     created_time : datetime
     content : Content
@@ -228,7 +195,7 @@ class ProblemSetComment(Model):
     problem_set : ProblemSet
     """
 
-    date = DateTimeField(auto_now=True)
+    created_time = DateTimeField(auto_now=True)
     content = OneToOneField(Content, on_delete=RESTRICT)
     creator = ForeignKey(
         UserStatistics, on_delete=CASCADE, related_name="created_comments"
@@ -241,15 +208,15 @@ class ProblemSetComment(Model):
             "userID": self.creator.user.pk,
             "username": self.creator.user.username,
             "problemSetID": self.problem_set.pk,
-            "date": self.date,
-            "content": str(self.content),
+            "createdTime": self.created_time,
+            "content": self.content.text,
         }
 
 
 class Problem(PolymorphicModel):
     """Base model for problems.
 
-    Fields
+    Attributes
     ------
     problem_set : ProblemSet
     number : int
@@ -257,9 +224,6 @@ class Problem(PolymorphicModel):
     content : Content
     creator : UserStatistics
     solvers : QuerySet[UserStatistics]
-
-    Automatically Generated Properties
-    ----------------------------------
     explanations : QuerySet[Explanation]
     """
 
@@ -278,26 +242,51 @@ class Problem(PolymorphicModel):
         UserStatistics, through="Solved", through_fields=("problem", "solver")
     )
 
+    def info_dict(self, with_solution=True):
+        return {
+            "problemType": "",
+            "problemSetID": self.problem_set.pk,
+            "problemNumber": self.number,
+            "creatorID": self.creator.pk,
+            "createdTime": self.created_time,
+            "content": self.content.text,
+            "solverIDs": [],  ## TODO
+        }
+
 
 class MultipleChoiceProblem(Problem):
     """Multiple-choice problem model.
 
-    Fields
+    Attributes
     ------
     solution : str
-
-    Automatically Generated Properties
-    ----------------------------------
     choices : QuerySet[MultipleChoiceProblemChoice]
     """
 
     solution = CharField(max_length=30)
 
+    def info_dict(self, with_solution=True):
+        ret = super().info_dict()
+        choices = self.choices.order_by("number").values(
+            "number", "is_solution", "content__text"
+        )
+        ret.update(
+            {
+                "problemType": "multiple-choice",
+                "choices": [value["content__text"] for value in choices],
+            }
+        )
+        if with_solution:
+            ret["solution"] = [
+                value["number"] for value in choices if value["is_solution"]
+            ]
+        return ret
+
 
 class MultipleChoiceProblemChoice(Model):
     """Choice model for multiple-choice problems.
 
-    Fields
+    Attributes
     ------
     problem : MultipleChoiceProblem
     number : int
@@ -316,16 +305,25 @@ class MultipleChoiceProblemChoice(Model):
 class SubjectiveProblem(Problem):
     """Subjective problem model.
 
-    Automatically Generated Properties
+    Attributes
     ----------------------------------
     solutions : QuerySet[SubjectiveProblemSolution]
     """
 
+    def info_dict(self, with_solution=True):
+        ret = super().info_dict()
+        ret["problemType"] = "subjective"
+        if with_solution:
+            ret["solutions"] = [
+                value["text"] for value in self.solutions.values("text")
+            ]
+        return ret
 
-class SubjectiveProblemSolution(Problem):
+
+class SubjectiveProblemSolution(Model):
     """Solution model for subjective problems.
 
-    Fields
+    Attributes
     ------
     problem : SubjectiveProblem
     text : str
@@ -340,11 +338,10 @@ class SubjectiveProblemSolution(Problem):
 class Solved(Model):
     """Problem solving status model.
 
-    Fields
+    Attributes
     ------
     solver : UserStatistics
     problem : Problem
-    problem_set : ProblemSet
     result : bool
     """
 
@@ -352,7 +349,6 @@ class Solved(Model):
         UserStatistics, related_name="solved_problems", on_delete=CASCADE
     )
     problem = ForeignKey(Problem, on_delete=CASCADE)
-    problem_set = ForeignKey(ProblemSet, on_delete=CASCADE)
     result = BooleanField(default=False)
 
     def to_dict(self):
