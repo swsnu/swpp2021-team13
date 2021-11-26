@@ -76,39 +76,6 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
         ...state,
         problemSets: [...state.problemSets, action.problemSet],
       };
-    case actionTypes.EDIT_PROBLEM_SET:
-      // const otherProblemSets = state.problemSets.filter((problemSet) => {
-      //   return problemSet.id !== action.pset.id;
-      // });
-      const editProblemSets = {
-        id: action.pset.id,
-        title: action.pset.title,
-        created_time: action.pset.created_time,
-        is_open: action.pset.is_open,
-        tag: action.pset.tag,
-        difficulty: action.pset.difficulty,
-        content: action.pset.content,
-        userID: action.pset.userID,
-        username: action.pset.username,
-        solved_num: action.pset.solved_num,
-        recommended_num: action.pset.recommended_num,
-      };
-      // const editProblems: NewProblemSet[] = [];
-      // action.problems_list.forEach((problem) => {
-      //   editProblems.push({
-      //     index: problem.index,
-      //     problem_type: problem.problem_type,
-      //     problem_statement: problem.problem_statement,
-      //     choice: problem.choice,
-      //     solution: problem.solution,
-      //     explanation: problem.explanation,
-      //   });
-      // });
-
-      return {
-        ...state,
-        selectedProblemSet: editProblemSets,
-      };
 
     case actionTypes.DELETE_PROBLEMSET:
       const remainProblemSet = state.problemSets.filter((problemset) => {

@@ -12,7 +12,6 @@ export {
   getProblemSet,
   getAllSolvers,
   createProblemSet,
-  editProblemSet,
   deleteProblemSet,
 } from './problemActions';
 

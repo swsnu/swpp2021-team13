@@ -130,53 +130,6 @@ export const createProblemSet: (
     dispatch(push(`/problem/${data.id}/detail/`));
   };
 };
-
-export interface EditProblemSetAction {
-  type: typeof actionTypes.EDIT_PROBLEM_SET;
-  pset: ProblemSet;
-  problems_list: NewProblemSet[];
-}
-
-export const editProblemSet_: (editData) => EditProblemSetAction = (
-  editData
-) => ({
-  type: actionTypes.EDIT_PROBLEM_SET,
-  pset: editData.res_pset,
-  problems_list: editData.problems_list,
-});
-
-export const editProblemSet: (
-  id: number,
-  title: string,
-  content: string,
-  scope: string,
-  tag: string,
-  difficulty: string,
-  problems: NewProblemSet[]
-) => ThunkAction<void, RootState, null, CreateProblemSetAction> = (
-  id: number,
-  title: string,
-  content: string,
-  scope: string,
-  tag: string,
-  difficulty: string,
-  problems: NewProblemSet[]
-) => {
-  return async (dispatch: AppDispatch) => {
-    const { data } = await axios.put(`/api/problem/${id}/`, {
-      id: id,
-      title: title,
-      content: content,
-      scope: scope,
-      tag: tag,
-      difficulty: difficulty,
-      problems: problems,
-    });
-    dispatch(editProblemSet_(data));
-    dispatch(push(`/problem/${data.id}/detail/`));
-  };
-};
-
 export interface UpdateProblemSetAction {
   type: typeof actionTypes.UPDATE_PROBLEMSET;
   targetID: number;
@@ -233,5 +186,4 @@ export type ProblemSetAction =
   | GetAllSolversAction
   | CreateProblemSetAction
   | UpdateProblemSetAction
-  | EditProblemSetAction
   | DeleteProblemSetAction;

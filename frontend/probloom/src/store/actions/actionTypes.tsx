@@ -13,7 +13,6 @@ export const UPDATE_PROBLEMSET = 'UPDATE_PROBLEMSET';
 export const DELETE_PROBLEMSET = 'DELETE_PROBLEMSET';
 export const GET_ALL_SOLVER_OF_PROBLEMSET = 'GET_ALL_SOLVER_OF_PROBLEMSET';
 export const CREATE_PROBLEM_SET = 'CREATE_PROBLEM_SET'; // Please match the name form with another actionTypes.
-export const EDIT_PROBLEM_SET = 'EDIT_PROBLEM_SET'; // Please match the name form with another actionTypes.
 
 // Action for Comment
 export const CREATE_COMMENT = 'CREATE_COMMENT';
