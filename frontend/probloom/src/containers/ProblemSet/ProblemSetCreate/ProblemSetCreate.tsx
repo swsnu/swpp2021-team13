@@ -387,31 +387,34 @@ class ProblemSetCreate extends Component<Props, State> {
                 <div className="Solution">
                   <Form.Group grouped>
                     <label>Solution</label>
-                    <input
+                    <Form.Field
                       id="problem-solution1-input"
-                      type="radio"
-                      name={`choice${currentProblem.problemNumber}${index}1`}
-                      value="1"
-                      checked={(currentProblem.solutions as number[]).includes(
-                        1
-                      )}
-                      onChange={(event) => {
+                      label="1"
+                      control="input"
+                      type="checkbox"
+                      onChange={() => {
                         let _currentProblem =
                           currentProblem as CreateMultipleChoiceProblemRequest;
+                        let newSolutions;
+                        if (_currentProblem.solutions.includes(1)) {
+                          let arr = _currentProblem.solutions.filter(
+                            (element) => element !== 1
+                          );
+                          newSolutions = [...Array.from(new Set([...arr]))];
+                        } else {
+                          newSolutions = [
+                            ...Array.from(
+                              new Set([..._currentProblem.solutions, 1])
+                            ),
+                          ];
+                        }
                         const editProblem: CreateProblemRequest = {
                           problemType: _currentProblem.problemType,
                           problemSetID: _currentProblem.problemSetID,
                           problemNumber: _currentProblem.problemNumber,
                           content: _currentProblem.content,
                           choices: _currentProblem.choices,
-                          solutions: [
-                            ...Array.from(
-                              new Set([
-                                ..._currentProblem.solutions,
-                                +event.target.value,
-                              ])
-                            ),
-                          ],
+                          solutions: newSolutions,
                         };
 
                         const newProblem: CreateProblemRequest[] = [];
@@ -429,33 +432,34 @@ class ProblemSetCreate extends Component<Props, State> {
                         });
                       }}
                     />
-                    1
-                    <input
+                    <Form.Field
                       id="problem-solution2-input"
-                      type="radio"
-                      name={`choice${currentProblem.problemNumber}${index}2`}
-                      value="2"
-                      checked={(currentProblem.solutions as number[]).includes(
-                        2
-                      )}
-                      onChange={(event) => {
+                      label="2"
+                      control="input"
+                      type="checkbox"
+                      onChange={() => {
                         let _currentProblem =
                           currentProblem as CreateMultipleChoiceProblemRequest;
-
+                        let newSolutions;
+                        if (_currentProblem.solutions.includes(2)) {
+                          let arr = _currentProblem.solutions.filter(
+                            (element) => element !== 2
+                          );
+                          newSolutions = [...Array.from(new Set([...arr]))];
+                        } else {
+                          newSolutions = [
+                            ...Array.from(
+                              new Set([..._currentProblem.solutions, 2])
+                            ),
+                          ];
+                        }
                         const editProblem: CreateProblemRequest = {
                           problemType: _currentProblem.problemType,
                           problemSetID: _currentProblem.problemSetID,
                           problemNumber: _currentProblem.problemNumber,
                           content: _currentProblem.content,
                           choices: _currentProblem.choices,
-                          solutions: [
-                            ...Array.from(
-                              new Set([
-                                ..._currentProblem.solutions,
-                                +event.target.value,
-                              ])
-                            ),
-                          ],
+                          solutions: newSolutions,
                         };
 
                         const newProblem: CreateProblemRequest[] = [];
@@ -473,32 +477,34 @@ class ProblemSetCreate extends Component<Props, State> {
                         });
                       }}
                     />
-                    2
-                    <input
+                    <Form.Field
                       id="problem-solution3-input"
-                      type="radio"
-                      name={`choice${currentProblem.problemNumber}${index}3`}
-                      value="3"
-                      checked={(currentProblem.solutions as number[]).includes(
-                        3
-                      )}
-                      onChange={(event) => {
+                      label="3"
+                      control="input"
+                      type="checkbox"
+                      onChange={() => {
                         let _currentProblem =
                           currentProblem as CreateMultipleChoiceProblemRequest;
+                        let newSolutions;
+                        if (_currentProblem.solutions.includes(3)) {
+                          let arr = _currentProblem.solutions.filter(
+                            (element) => element !== 3
+                          );
+                          newSolutions = [...Array.from(new Set([...arr]))];
+                        } else {
+                          newSolutions = [
+                            ...Array.from(
+                              new Set([..._currentProblem.solutions, 3])
+                            ),
+                          ];
+                        }
                         const editProblem: CreateProblemRequest = {
                           problemType: _currentProblem.problemType,
                           problemSetID: _currentProblem.problemSetID,
                           problemNumber: _currentProblem.problemNumber,
                           content: _currentProblem.content,
                           choices: _currentProblem.choices,
-                          solutions: [
-                            ...Array.from(
-                              new Set([
-                                ..._currentProblem.solutions,
-                                +event.target.value,
-                              ])
-                            ),
-                          ],
+                          solutions: newSolutions,
                         };
 
                         const newProblem: CreateProblemRequest[] = [];
@@ -516,32 +522,34 @@ class ProblemSetCreate extends Component<Props, State> {
                         });
                       }}
                     />
-                    3
-                    <input
+                    <Form.Field
                       id="problem-solution4-input"
-                      type="radio"
-                      name={`choice${currentProblem.problemNumber}${index}4`}
-                      value="4"
-                      checked={(currentProblem.solutions as number[]).includes(
-                        4
-                      )}
-                      onChange={(event) => {
+                      label="4"
+                      control="input"
+                      type="checkbox"
+                      onChange={() => {
                         let _currentProblem =
                           currentProblem as CreateMultipleChoiceProblemRequest;
+                        let newSolutions;
+                        if (_currentProblem.solutions.includes(4)) {
+                          let arr = _currentProblem.solutions.filter(
+                            (element) => element !== 4
+                          );
+                          newSolutions = [...Array.from(new Set([...arr]))];
+                        } else {
+                          newSolutions = [
+                            ...Array.from(
+                              new Set([..._currentProblem.solutions, 4])
+                            ),
+                          ];
+                        }
                         const editProblem: CreateProblemRequest = {
                           problemType: _currentProblem.problemType,
                           problemSetID: _currentProblem.problemSetID,
                           problemNumber: _currentProblem.problemNumber,
                           content: _currentProblem.content,
                           choices: _currentProblem.choices,
-                          solutions: [
-                            ...Array.from(
-                              new Set([
-                                ..._currentProblem.solutions,
-                                +event.target.value,
-                              ])
-                            ),
-                          ],
+                          solutions: newSolutions,
                         };
 
                         const newProblem: CreateProblemRequest[] = [];
@@ -559,12 +567,20 @@ class ProblemSetCreate extends Component<Props, State> {
                         });
                       }}
                     />
-                    4
                   </Form.Group>
                 </div>
               </div>
             )}
-            {currentProblem.problemType === 'subjective' && <div></div>}
+            {currentProblem.problemType === 'subjective' && (
+              <div>
+                <Form>
+                  <Form.Field>
+                    <label>Subjective problem answer</label>
+                    <input />
+                  </Form.Field>
+                </Form>
+              </div>
+            )}
 
             <button
               id="problemsetcreate-remove"
@@ -667,11 +683,6 @@ class ProblemSetCreate extends Component<Props, State> {
             </Form.Group>
 
             {newProblems}
-
-            <Form.Group grouped>
-              <Form.Field label="This one" control="input" type="checkbox" />
-              <Form.Field label="That one" control="input" type="checkbox" />
-            </Form.Group>
 
             <Button
               secondary

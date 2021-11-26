@@ -4,7 +4,7 @@ import { returntypeof } from 'react-redux-typescript';
 import { RouteComponentProps } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import { Button, Container, Form, Header, Input } from 'semantic-ui-react';
-import { tagOptions } from '../ProblemSetSearch/ProblemSetSearch';
+import { tagOptions2 } from '../ProblemSetSearch/ProblemSetSearch';
 
 import * as actionCreators from '../../../store/actions/index';
 import {
@@ -125,7 +125,6 @@ class ProblemSetEdit extends Component<Props, State> {
                 problem_statement: problemSet.problem_statement,
                 choice: problemSet.choice,
                 solution: problemSet.solution,
-                explanation: problemSet.explanation,
               };
               this.state.problems.forEach((problem) => {
                 if (problem.index === index) {
@@ -156,7 +155,6 @@ class ProblemSetEdit extends Component<Props, State> {
                   problem_statement: event.target.value,
                   choice: problemSet.choice,
                   solution: problemSet.solution,
-                  explanation: problemSet.explanation,
                 };
                 this.state.problems.forEach((problem) => {
                   if (problem.index === index) {
@@ -198,7 +196,6 @@ class ProblemSetEdit extends Component<Props, State> {
                   problem_statement: problemSet.problem_statement,
                   choice: newChoice1,
                   solution: problemSet.solution,
-                  explanation: problemSet.explanation,
                 };
                 this.state.problems.forEach((problem) => {
                   if (problem.index === index) {
@@ -238,7 +235,6 @@ class ProblemSetEdit extends Component<Props, State> {
                   problem_statement: problemSet.problem_statement,
                   choice: newChoice1,
                   solution: problemSet.solution,
-                  explanation: problemSet.explanation,
                 };
                 this.state.problems.forEach((problem) => {
                   if (problem.index === index) {
@@ -278,7 +274,6 @@ class ProblemSetEdit extends Component<Props, State> {
                   problem_statement: problemSet.problem_statement,
                   choice: newChoice1,
                   solution: problemSet.solution,
-                  explanation: problemSet.explanation,
                 };
                 this.state.problems.forEach((problem) => {
                   if (problem.index === index) {
@@ -318,7 +313,6 @@ class ProblemSetEdit extends Component<Props, State> {
                   problem_statement: problemSet.problem_statement,
                   choice: newChoice1,
                   solution: problemSet.solution,
-                  explanation: problemSet.explanation,
                 };
                 this.state.problems.forEach((problem) => {
                   if (problem.index === index) {
@@ -352,7 +346,6 @@ class ProblemSetEdit extends Component<Props, State> {
                   problem_statement: problemSet.problem_statement,
                   choice: problemSet.choice,
                   solution: event.target.value,
-                  explanation: problemSet.explanation,
                 };
                 this.state.problems.forEach((problem) => {
                   if (problem.index === index) {
@@ -383,7 +376,6 @@ class ProblemSetEdit extends Component<Props, State> {
                   problem_statement: problemSet.problem_statement,
                   choice: problemSet.choice,
                   solution: event.target.value,
-                  explanation: problemSet.explanation,
                 };
                 this.state.problems.forEach((problem) => {
                   if (problem.index === index) {
@@ -414,7 +406,6 @@ class ProblemSetEdit extends Component<Props, State> {
                   problem_statement: problemSet.problem_statement,
                   choice: problemSet.choice,
                   solution: event.target.value,
-                  explanation: problemSet.explanation,
                 };
                 this.state.problems.forEach((problem) => {
                   if (problem.index === index) {
@@ -445,7 +436,6 @@ class ProblemSetEdit extends Component<Props, State> {
                   problem_statement: problemSet.problem_statement,
                   choice: problemSet.choice,
                   solution: event.target.value,
-                  explanation: problemSet.explanation,
                 };
                 this.state.problems.forEach((problem) => {
                   if (problem.index === index) {
@@ -462,38 +452,6 @@ class ProblemSetEdit extends Component<Props, State> {
               }}
             />
             4
-          </div>
-
-          <div className="SolutionExplanation">
-            <label>Solution explanation</label>
-            <textarea
-              id="problemset-solution-explanation-input"
-              rows={4}
-              value={`${problemSet.explanation}`}
-              onChange={(event) => {
-                const newProblem: NewProblemSet[] = [];
-                const editProblem: NewProblemSet = {
-                  index: problemSet.index,
-                  problem_type: problemSet.problem_type,
-                  problem_statement: problemSet.problem_statement,
-                  choice: problemSet.choice,
-                  solution: problemSet.solution,
-                  explanation: event.target.value,
-                };
-                this.state.problems.forEach((problem) => {
-                  if (problem.index === index) {
-                    newProblem.push(editProblem);
-                  } else {
-                    newProblem.push(problem);
-                  }
-                });
-
-                this.setState({
-                  ...this.state,
-                  problems: newProblem,
-                });
-              }}
-            />
           </div>
         </div>
       );
@@ -547,7 +505,7 @@ class ProblemSetEdit extends Component<Props, State> {
           <Form.Dropdown
             className="Tag"
             item
-            options={tagOptions.slice(1)}
+            options={tagOptions2.slice(1)}
             label="Tag"
             defaultValue="tag-philosophy"
             onChange={(_, { value }) => {

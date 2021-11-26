@@ -49,21 +49,23 @@ export type CreateProblemRequest =
   | CreateSubjectiveProblemRequest;
 
 interface CreateProblemRequestBase {
-  problemType: string;
+  problemType: string; // problem_type
   problemSetID: number;
-  problemNumber: number;
-  content: string;
+  problemNumber: number; // index
+  content: string; // problem_statement
 }
 
-interface CreateMultipleChoiceProblemRequest extends CreateProblemRequestBase {
+export interface CreateMultipleChoiceProblemRequest
+  extends CreateProblemRequestBase {
   problemType: 'multiple-choice';
   choices: string[];
-  solutions?: number[];
+  solutions: number[];
 }
 
-interface CreateSubjectiveProblemRequest extends CreateProblemRequestBase {
+export interface CreateSubjectiveProblemRequest
+  extends CreateProblemRequestBase {
   problemType: 'subjective';
-  solutions?: string[];
+  solutions: string[];
 }
 
 export interface CreateProblemSetRequest {
