@@ -1,11 +1,17 @@
 from django.test import TestCase, Client
-from prob.models import User
+from prob.models import User, UserStatistics
 
 
 class SignTestCase(TestCase):
     def setUp(self):
-        User.objects.create_user(username="John", email="12@asd.com", password="123")
-        User.objects.create_user(username="Anna", email="23@asd.com", password="123")
+        self.user_1 = User.objects.create_user(
+            username="John", email="12@asd.com", password="123"
+        )
+        UserStatistics.objects.create(user=self.user_1)
+        self.user_2 = User.objects.create_user(
+            username="Anna", email="23@asd.com", password="123"
+        )
+        UserStatistics.objects.create(user=self.user_2)
 
     def test_signup(self):
         client = Client()

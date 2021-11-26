@@ -106,6 +106,7 @@ class SignUpView(View):
         }
         return JsonResponse(res, status=201, safe=False)
 
+
 class SignInView(View):
     def post(self, request: HttpRequest, **kwargs) -> HttpResponse:
         try:
@@ -144,6 +145,7 @@ class SignInView(View):
         else:
             return HttpResponse(status=401)
 
+
 class SignOutView(View):
     def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
         if request.user.is_authenticated:
@@ -151,6 +153,7 @@ class SignOutView(View):
             return HttpResponse(status=204)
         else:
             return HttpResponse(status=401)
+
 
 @dataclasses.dataclass
 class UserContextBase:
@@ -795,24 +798,6 @@ def update_problem_set_recommendation(request: HttpRequest, ps_id: int) -> HttpR
     """
 
 
-class ProblemSetCommentView(View):
-    def get(self, request: HttpRequest, id, **kwargs):
-        if request.user.is_authenticated:
-            try:
-                problem_set = ProblemSet.objects.get(id=id)
-            except:
-                return HttpResponse(status=404)
-
-            comment_set = problem_set.comment.all()
-            res = []
-            for comment in comment_set:
-                res.append(comment.to_dict())
-
-            return JsonResponse(res, status=201, safe=False)
-        else:
-            return HttpResponse(status=401)
-
-
 class ProblemSetCommentListView(LoginRequiredMixin, View):
     """List view methods related to model :class:`ProblemSetComment`."""
 
@@ -850,14 +835,12 @@ class ProblemSetCommentListView(LoginRequiredMixin, View):
         """
         if not ProblemSet.objects.filter(pk=ps_id).exists():
             return HttpResponseNotFound()
-        '''
+        """
         comment_set = ProblemSetComment.objects.filter(
             problem_set_id=ps_id
         ).select_related("content")
-        '''
-        comment_set = ProblemSetComment.objects.filter(
-            problem_set_id=ps_id
-        )
+        """
+        comment_set = ProblemSetComment.objects.filter(problem_set_id=ps_id)
 
         res = []
         for comment in comment_set:
