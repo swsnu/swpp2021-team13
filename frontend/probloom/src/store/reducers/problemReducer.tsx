@@ -24,23 +24,55 @@ export interface Solver {
   result: boolean;
 }
 
+// <------------ Deprecated : will be removed later
 export interface NewProblemSet {
-  index: number;
   problem_type: string;
+  index: number;
   problem_statement: string;
   choice: string[];
   solution: string;
-  explanation: string;
 }
 
 export interface ProblemSetCreateState {
   title: string;
-  content: string;
   scope: string;
   tag: string;
   difficulty: string;
+  content: string;
   problems: NewProblemSet[];
   numberOfProblems: number;
+}
+// Deprecated : will be removed later ------------>
+
+export type CreateProblemRequest =
+  | CreateMultipleChoiceProblemRequest
+  | CreateSubjectiveProblemRequest;
+
+interface CreateProblemRequestBase {
+  problemType: string;
+  problemSetID: number;
+  problemNumber: number;
+  content: string;
+}
+
+interface CreateMultipleChoiceProblemRequest extends CreateProblemRequestBase {
+  problemType: 'multiple-choice';
+  choices: string[];
+  solutions?: number[];
+}
+
+interface CreateSubjectiveProblemRequest extends CreateProblemRequestBase {
+  problemType: 'subjective';
+  solutions?: string[];
+}
+
+export interface CreateProblemSetRequest {
+  title: string;
+  scope: string;
+  tag: string[];
+  difficulty: number;
+  content: string;
+  problems: CreateProblemRequest[];
 }
 
 export interface ProblemSetState {

@@ -2,7 +2,12 @@ import axios from 'axios';
 import { ThunkAction } from 'redux-thunk';
 import { push } from 'connected-react-router';
 
-import { ProblemSet, Solver, NewProblemSet } from '../reducers/problemReducer';
+import {
+  ProblemSet,
+  Solver,
+  NewProblemSet,
+  CreateProblemRequest,
+} from '../reducers/problemReducer';
 import { AppDispatch, RootState } from '../store';
 import * as actionTypes from './actionTypes';
 
@@ -104,28 +109,31 @@ export const createProblemSet_: (
 
 export const createProblemSet: (
   title: string,
-  content: string,
   scope: string,
-  tag: string,
-  difficulty: string,
-  problems: NewProblemSet[]
+  tag: string[],
+  difficulty: number,
+  content: string,
+  problems: CreateProblemRequest[]
 ) => ThunkAction<void, RootState, null, CreateProblemSetAction> = (
   title: string,
-  content: string,
   scope: string,
-  tag: string,
-  difficulty: string,
-  problems: NewProblemSet[]
+  tag: string[],
+  difficulty: number,
+  content: string,
+  problems: CreateProblemRequest[]
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data }: { data: ProblemSet } = await axios.post(`/api/problem/`, {
-      title: title,
-      content: content,
-      scope: scope,
-      tag: tag,
-      difficulty: difficulty,
-      problems: problems,
-    });
+    const { data }: { data: ProblemSet } = await axios.post(
+      `/api/problem_set/`,
+      {
+        title: title,
+        scope: scope,
+        tag: tag,
+        difficulty: difficulty,
+        content: content,
+        problems: problems,
+      }
+    );
     dispatch(createProblemSet_(data));
     dispatch(push(`/problem/${data.id}/detail/`));
   };
