@@ -77,6 +77,21 @@ class ProblemSetDetail extends Component<
     this.props.onGetProblemSet(parseInt(this.props.match.params.id));
     this.props.onGetCommentsOfProblemSet(parseInt(this.props.match.params.id));
     this.props.onGetAllSolvers(parseInt(this.props.match.params.id));
+
+    if (this.props.selectedProblemSet) {
+      this.setState({
+        ...this.state,
+        editProblemSetTitle: this.props.selectedProblemSet.title,
+        editProblemSetDescription: this.props.selectedProblemSet.content,
+        editProblemSetScope: this.props.selectedProblemSet.isOpen
+          ? 'scope-public'
+          : 'scope-private',
+        editProblemSetDifficulty: String(
+          this.props.selectedProblemSet.difficulty
+        ),
+        //editProblemSetTag: this.props.selectedProblemSet.tag
+      });
+    }
   }
 
   onClickBackButton = () => {
@@ -104,9 +119,11 @@ class ProblemSetDetail extends Component<
       content: this.state.editProblemSetDescription,
       isOpen: this.state.editProblemSetScope === 'scope-public' ? true : false,
       difficulty: parseInt(this.state.editProblemSetDifficulty),
-      //tag:
+      /////////////////////////////////tag:
     };
     this.props.onUpdateProblemSet(problemSet);
+    this.props.onGetCommentsOfProblemSet(parseInt(this.props.match.params.id));
+    this.props.onGetAllSolvers(parseInt(this.props.match.params.id));
     this.setState({ isProblemSetEdit: false });
   };
 
@@ -311,7 +328,7 @@ class ProblemSetDetail extends Component<
                   <Input
                     className="problemSetTitleInput"
                     placeholder="Title"
-                    value={this.props.selectedProblemSet.title}
+                    value={this.state.editProblemSetTitle}
                     onChange={(event) => {
                       this.setState({
                         editProblemSetTitle: event.target.value,
@@ -324,7 +341,7 @@ class ProblemSetDetail extends Component<
                   className="problemSetDescriptionInput"
                   label="Description"
                   placeholder="Description"
-                  value={this.props.selectedProblemSet.content}
+                  value={this.state.editProblemSetDescription}
                   onChange={(event) => {
                     this.setState({
                       editProblemSetDescription: event.target.value,
@@ -338,11 +355,7 @@ class ProblemSetDetail extends Component<
                     item
                     options={scopeOptions}
                     label="Scope"
-                    defaultValue={
-                      this.props.selectedProblemSet.isOpen
-                        ? 'scope-public'
-                        : 'scope-private'
-                    }
+                    defaultValue={this.state.editProblemSetScope}
                     onChange={(_, { value }) => {
                       this.setState({ editProblemSetScope: value as string });
                     }}
@@ -353,7 +366,7 @@ class ProblemSetDetail extends Component<
                     item
                     options={tagOptions}
                     label="Tag"
-                    //defaultValue={this.props.selectedProblemSet.tag}
+                    //defaultValue={this.state.editProblemSetTag}
                     onChange={(_, { value }) => {
                       this.setState({ editProblemSetTag: value as string });
                     }}
@@ -364,9 +377,7 @@ class ProblemSetDetail extends Component<
                     item
                     options={difficultyOptions}
                     label="Difficulty"
-                    defaultValue={String(
-                      this.props.selectedProblemSet.difficulty
-                    )}
+                    defaultValue={this.state.editProblemSetDifficulty}
                     onChange={(_, { value }) => {
                       this.setState({
                         editProblemSetDifficulty: value as string,

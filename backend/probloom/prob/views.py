@@ -858,7 +858,6 @@ class ProblemSetCommentListView(LoginRequiredMixin, View):
         comment_set = ProblemSetComment.objects.filter(
             problem_set_id=ps_id
         )
-        print(comment_set)
 
         res = []
         for comment in comment_set:

@@ -175,7 +175,7 @@ export const deleteProblemSet: (
 ) => {
   return async (dispatch: AppDispatch) => {
     const { data }: { data: ProblemSet } = await axios.delete(
-      `/api/problem/${problemSetID}/`
+      `/api/problem_set/${problemSetID}/`
     );
     dispatch(deleteProblemSet_(data));
   };
