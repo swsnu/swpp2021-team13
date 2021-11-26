@@ -706,7 +706,8 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
 
         If a problem set with id ``ps_id`` exists and the request follows the
         constraints of the corresponding fields of ``ProblemSet``, update the
-        problem set and respond with ``200 (OK)``.
+        problem set and respond with ``200 (OK)`` and ``GetProblemSetResponse``
+        of :meth:`ProblemSetInfoView.get`.
 
         if a problem set with id ``ps_id`` does not exist, respond with ``404
         (Not Found)``.
@@ -738,7 +739,11 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
         problem_set.is_open = is_open
         problem_set.difficulty = difficulty
         problem_set.save()
-        return HttpResponse()
+
+        res = problem_set.info_dict()
+        problems_list = problem_set.problems.order_by("number").values("id").all()
+        res["problems"] = list(map(lambda entry: entry["id"], problems_list))
+        return JsonResponse(res, safe=False)
 
     def delete(self, request: HttpRequest, ps_id, **kwargs):
         """Delete a specific problem set.
