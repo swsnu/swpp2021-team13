@@ -9,7 +9,7 @@ from typing import List
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin as LoginRequiredMixin_
 from django.core.exceptions import BadRequest, PermissionDenied
-from django.db.models import Count, Q
+from django.db.models import Count
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -24,7 +24,6 @@ from django.views.decorators.http import require_GET as require_GET_
 from django.views.decorators.http import require_http_methods as require_http_methods_
 from django.views.decorators.http import require_POST as require_POST_
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.list import MultipleObjectMixin
 
 from .models import (
     Content,
@@ -1004,8 +1003,8 @@ class ProblemSetCommentInfoView(LoginRequiredMixin, View):
         except (KeyError, JSONDecodeError) as e:
             return HttpResponseBadRequest()
 
-        comment.content = content
-        comment.save()
+        comment.content.text = content
+        comment.content.save()
 
         res = comment.to_dict()
         return JsonResponse(res)
@@ -1034,9 +1033,9 @@ class ProblemSetCommentInfoView(LoginRequiredMixin, View):
         if request.user.pk != comment.creator.user.pk:
             raise PermissionDenied()
 
-        res = comment.to_dict()
+        # res = comment.to_dict()
         comment.delete()
-        return HttpResponse(res)
+        return HttpResponse()
 
 
 class ProblemInfoView(LoginRequiredMixin, View):
