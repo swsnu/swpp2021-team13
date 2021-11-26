@@ -2,7 +2,7 @@ import axios from 'axios';
 import { ThunkAction } from 'redux-thunk';
 import { push } from 'connected-react-router';
 
-import { ProblemSet, Solver, NewProblemSet } from '../reducers/problemReducer';
+import * as interfaces from '../reducers/problemReducerInterface';
 import { AppDispatch, RootState } from '../store';
 import * as actionTypes from './actionTypes';
 
@@ -202,10 +202,86 @@ export const deleteProblemSet: (
   };
 };
 
+export interface CreateProblemAction {
+  type: typeof actionTypes.CREATE_PROBLEM;
+  newProblem: interfaces.UpdateProblemRequest;
+}
+
+export const createProblem_: (problemData) => CreateProblemAction = (
+  problemData
+) => ({
+  type: actionTypes.CREATE_PROBLEM,
+  newProblem: problemData
+});
+
+export const createProblem: (
+  ps_id: number,
+  problemData: interfaces.CreateProblemRequest
+) => ThunkAction<void, RootState, null, CreateProblemAction> = (
+  ps_id: number,
+  problemData: interfaces.CreateProblemRequest
+) => {
+  return async (dispatch: AppDispatch) => {
+    const { data } = await axios.get(`/api/problem_set/${ps_id}/`);
+    dispatch(createProblem_(problemData));
+  };
+};
+
+export interface GetProblemAction {
+  type: typeof actionTypes.GET_PROBLEM;
+  selectedProblem: interfaces.GetProblemResponse;
+}
+
+export const getProblem_: (problemData) => GetProblemAction = (
+  problemData
+) => ({
+  type: actionTypes.GET_PROBLEM,
+  selectedProblem: problemData
+});
+
+export const getProblem: (
+  id: number,
+) => ThunkAction<void, RootState, null, GetProblemAction> = (
+  id: number,
+) => {
+  return async (dispatch: AppDispatch) => {
+    const { data } = await axios.get(`/api/problem/${id}/`);
+    dispatch(getProblem_(data));
+  };
+};
+
+export interface UpdateProblemAction {
+  type: typeof actionTypes.UPDATE_PROBLEM;
+  selectedProblem: interfaces.UpdateProblemRequest;
+}
+
+export const updateProblem_: (problemData) => UpdateProblemAction = (
+  problemData
+) => ({
+  type: actionTypes.UPDATE_PROBLEM,
+  selectedProblem: problemData
+});
+
+export const updateProblem: (
+  id: number,
+  problemData: interfaces.UpdateProblemRequest
+) => ThunkAction<void, RootState, null, UpdateProblemAction> = (
+  id: number,
+  problemData: interfaces.UpdateProblemRequest
+) => {
+  return async (dispatch: AppDispatch) => {
+    const { data } = await axios.get(`/api/problem/${id}/`);
+    dispatch(updateProblem_(problemData));
+  };
+};
+
 export type ProblemSetAction =
   | GetAllProblemSetsAction
   | GetProblemSetAction
   | GetAllSolversAction
   | CreateProblemSetAction
   | EditProblemSetAction
-  | DeleteProblemSetAction;
+  | DeleteProblemSetAction
+  | CreateProblemAction
+  | GetProblemAction
+  | UpdateProblemAction;

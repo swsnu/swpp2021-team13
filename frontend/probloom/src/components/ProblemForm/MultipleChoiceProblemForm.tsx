@@ -1,41 +1,46 @@
 import Choice from './Choice'
+import { GetMultipleChoiceProblemResponse } from '../../store/reducers/problemReducerInterface'
 
-interface MultipelChoiceProblemProps {
-  problem: any;
+interface MultipleChoiceProblemFormProps {
+  problem: GetMultipleChoiceProblemResponse;
   editContent: (
     target: string,
-    problemNumber: number,
-    choiceNumber: number,
-    content: string
+    content?: any,
+    index?: number
   ) => void;
 }
 
-const MultipleChoiceProblem = (props: MultipelChoiceProblemProps) => {
-  const choices = props.problem.choice.map((choice) => (
+const MultipleChoiceProblemForm = (
+  props: MultipleChoiceProblemFormProps
+) => {
+  const choices = props.problem.choices.map((choice, index) => (
     <Choice
-      problemNumber={props.problem.number}
+      index={index}
       choice={choice}
+      isSolution={
+        props.problem.solution != undefined 
+        && index in props.problem.solution
+      }
       editContent={props.editContent}
     />
   ))
   return (
     <div className="MultipleChoiceProblem">
-      <div className="ProblemStatement">
-        <label>Problem statement</label>
+      <div>
         <textarea
-          id="problemset-problem-statement-input"
           rows={4}
-          value={`${props.problem.problem_statement}`}
+          value={`${props.problem.content}`}
           onChange={(event) => props.editContent(
-            'statement',
-            props.problem.number, 
-            0,
-            event.target.value)}
+            'content', event.target.value
+          )}
         />
+        <button onClick={() => props.editContent(
+          'add_choice'
+        )}>New</button>
       </div>
       {choices}
     </div>
   );
 };
 
-export default MultipleChoiceProblem;
+export default MultipleChoiceProblemForm;

@@ -13,6 +13,11 @@ export const GET_ALL_SOLVER_OF_PROBLEMSET = 'GET_ALL_SOLVER_OF_PROBLEMSET';
 export const CREATE_PROBLEM_SET = 'CREATE_PROBLEM_SET';
 export const EDIT_PROBLEM_SET = 'EDIT_PROBLEM_SET';
 export const DELETE_PROBLEMSET = 'DELETE_PROBLEMSET';
+export const CREATE_PROBLEM = 'CREATE_PROBLEM';
+
+// Action for Problem
+export const GET_PROBLEM = 'GET_PROBLEM';
+export const UPDATE_PROBLEM = 'UPDATE_PROBLEM';
 
 // Action for Comment
 export const CREATE_COMMENT = 'CREATE_COMMENT';

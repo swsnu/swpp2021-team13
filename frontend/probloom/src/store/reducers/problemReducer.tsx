@@ -1,60 +1,20 @@
-import { ProblemSetAction } from '../actions/problemActions';
+import { ProblemSetAction, updateProblem } from '../actions/problemActions';
 import * as actionTypes from '../actions/actionTypes';
 import { Reducer } from 'redux';
-
-export interface ProblemSet {
-  id: number;
-  title: string;
-  created_time: string;
-  is_open: boolean;
-  tag: string;
-  difficulty: number;
-  content: string;
-  userID: number;
-  username: string;
-  solved_num: number;
-  recommended_num: number;
-}
-
-export interface Solver {
-  userID: number;
-  username: string;
-  problemID: number;
-  problemtitle: string;
-  result: boolean;
-}
-
-export interface NewProblemSet {
-  index: number;
-  problem_type: string;
-  problem_statement: string;
-  choice: string[];
-  solution: string;
-  explanation: string;
-}
-
-export interface ProblemSetCreateState {
-  title: string;
-  content: string;
-  scope: string;
-  tag: string;
-  difficulty: string;
-  problems: NewProblemSet[];
-  numberOfProblems: number;
-}
+import * as interfaces from './problemReducerInterface';
 
 export interface ProblemSetState {
-  problemSets: ProblemSet[];
+  problemSets: ProblemSetInterface[];
   solvers: Solver[];
-  selectedProblemSet: ProblemSet | null;
-  selectedProblems: NewProblemSet[];
+  selectedProblemSet: interfaces.GetProblemSetResponse | null;
+  selectedProblem: interfaces.GetProblemResponse | null;
 }
 
 const initialState: ProblemSetState = {
   problemSets: [],
   solvers: [],
   selectedProblemSet: null,
-  selectedProblems: [],
+  selectedProblem: null
 };
 
 export type ProblemReducer = Reducer<ProblemSetState, ProblemSetAction>;
@@ -67,7 +27,6 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
       return {
         ...state,
         selectedProblemSet: action.pset,
-        selectedProblems: action.problems_list,
       };
     case actionTypes.GET_ALL_SOLVER_OF_PROBLEMSET:
       return { ...state, solvers: action.solvers };
@@ -115,6 +74,29 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
         return problemset.id !== action.targetID;
       });
       return { ...state, problemSets: remainProblemSet };
+
+    case actionTypes.CREATE_PROBLEM:
+      break;
+    
+    case actionTypes.GET_PROBLEM:
+      return { ...state, selectedProblem: action.selectedProblem }
+
+    case actionTypes.UPDATE_PROBLEM:
+      const updatedProblem = {
+        ...state.selectedProblem,
+        problemType: action.selectedProblem.problemType,
+        problemNumber: action.selectedProblem.problemNumber,
+        content: action.selectedProblem.content
+      }
+      if (updatedProblem.problemType === 'multiple-choice') {
+        const updatedMultipleChoiceProblem : any = action.selectedProblem;
+        updatedProblem['choices'] = updatedMultipleChoiceProblem.choices;
+      } else if (updatedProblem.problemType === 'subjective') {
+        const updatedSubjectiveProblem : any = action.selectedProblem;
+        updatedProblem['solutions'] = updatedSubjectiveProblem.solutions;
+      }
+      return { ...state, selectedProblem: updatedProblem }
+
     default:
       break;
   }

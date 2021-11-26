@@ -1,41 +1,42 @@
-import Choice from './Choice'
+import Solution from './Solution'
+import { GetSubjectiveProblemResponse } from '../../store/reducers/problemReducerInterface'
 
-interface MultipelChoiceProblemProps {
-  problem: any;
+interface SubjectiveProblemFormProps {
+  problem: GetSubjectiveProblemResponse;
   editContent: (
     target: string,
-    problemNumber: number,
-    choiceNumber: number,
-    content: string
+    content?: any,
+    index?: number
   ) => void;
 }
 
-const MultipleChoiceProblem = (props: MultipelChoiceProblemProps) => {
-  const choices = props.problem.choice.map((choice) => (
-    <Choice
-      problemNumber={props.problem.number}
-      choice={choice}
+const ProblemForm = (props: SubjectiveProblemFormProps) => {
+  const answer = props.problem.solutions != undefined ?
+  props.problem.solutions.map((solution, index) => (
+    <Solution
+      index={index}
+      solution={solution}
       editContent={props.editContent}
     />
   ))
+  : null;
   return (
     <div className="MultipleChoiceProblem">
       <div className="ProblemStatement">
-        <label>Problem statement</label>
         <textarea
-          id="problemset-problem-statement-input"
           rows={4}
-          value={`${props.problem.problem_statement}`}
+          value={`${props.problem.content}`}
           onChange={(event) => props.editContent(
-            'statement',
-            props.problem.number, 
-            0,
+            'content',
             event.target.value)}
         />
       </div>
-      {choices}
+      <button onClick={() => props.editContent(
+        'add_solution'
+      )}>New</button>
+      {answer}
     </div>
   );
 };
 
-export default MultipleChoiceProblem;
+export default ProblemForm;

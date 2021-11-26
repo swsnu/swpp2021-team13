@@ -1,36 +1,32 @@
 export interface ChoiceProps {
-  problemNumber: number;
-  choice: any;
+  index: number;
+  choice: string;
+  isSolution: boolean;
   editContent: (
     target: string,
-    problemNumber: number,
-    index: number,
-    content: string
+    content?: any,
+    index?: number,
   ) => void;
 }
 
 const Choice = (props: ChoiceProps) => {
   return (
-    <div className="MultipleChoice" >
-      <label>choice {props.choice.number}</label>
+    <div className="Choice" >
+      <label>choice {props.index}</label>
       <input
-        value={`${props.choice.content}`}
+        value={`${props.choice}`}
         onChange={(event) => props.editContent(
           'choice_content',
-          props.problemNumber, 
-          props.choice.number,
-          event.target.value)}
+          event.target.value,
+          props.index)}
       />
-      <label>Solution</label>
       <input
-        type="radio"
-        value="1"
-        checked={`${props.choice.isSolution}` === '1'}
+        type="checkbox"
+        checked={props.isSolution}
         onChange={(event) => props.editContent(
-          'choice_isSolution',
-          props.problemNumber,
-          props.choice.number,
-          event.target.value)}
+          props.isSolution ? 'choice_not_solution' : 'choice_solution',
+          event.target.value,
+          props.index)}
       />
     </div>
   )
