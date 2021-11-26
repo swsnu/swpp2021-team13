@@ -625,7 +625,7 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
         try:
             problem_set = ProblemSet.objects.get(pk=ps_id)
         except:
-            return HttpResponse(status=404)
+            return HttpResponseNotFound()
 
         res = problem_set.info_dict()
         multiple_choice_problems = problem_set.problems.instance_of(
@@ -641,7 +641,7 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
         problems_list.extend(problem.info_dict() for problem in subjective_problems)
         problems_list.sort(key=lambda entry: entry["problemNumber"])
         res["problems"] = problems_list
-        return JsonResponse(res, status=201, safe=False)
+        return JsonResponse(res, safe=False)
 
     def post(self, request: HttpRequest, ps_id: int, **kwargs):
         """Create a new problem in the problem set.
@@ -658,7 +658,6 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
 
            interface CreateProblemRequestBase {
              problemType: string;
-             problemSetID: number;
              problemNumber?: number;
              content: string;
            }
@@ -746,7 +745,7 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
             return HttpResponseBadRequest()
 
         problem_set.title = title
-        problem_set.content.text = content
+        problem_set.description = content
         problem_set.is_open = is_open
         problem_set.difficulty = difficulty
         problem_set.save()
@@ -776,6 +775,8 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
             raise PermissionDenied()
 
         # res = problem_set.info_dict()
+        for problem in problem_set.problems.all():
+            problem.delete()
         problem_set.delete()
         return HttpResponse()
 
@@ -1066,6 +1067,7 @@ class ProblemInfoView(LoginRequiredMixin, View):
              | GetSubjectiveProblemResponse;
 
            interface GetProblemResponseBase {
+             id: number;
              problemType: string;
              problemSetID: number;
              problemNumber: number;
