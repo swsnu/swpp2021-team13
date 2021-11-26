@@ -244,6 +244,7 @@ class Problem(PolymorphicModel):
 
     def info_dict(self, with_solution=True):
         return {
+            "id": self.pk,
             "problemType": "",
             "problemSetID": self.problem_set.pk,
             "problemNumber": self.number,
