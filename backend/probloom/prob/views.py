@@ -17,12 +17,9 @@ from django.http import (
     JsonResponse,
 )
 from django.http.request import HttpRequest
-from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_GET as require_GET_
-from django.views.decorators.http import require_http_methods as require_http_methods_
-from django.views.decorators.http import require_POST as require_POST_
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.generic.detail import SingleObjectMixin
 
 from .models import (
@@ -44,36 +41,6 @@ from .models import (
 class LoginRequiredMixin(LoginRequiredMixin_):
     login_url = "/api/signin/"
     redirect_field_name = None
-
-
-@functools.wraps(require_GET_)
-def require_GET(f):
-    @functools.wraps(f)
-    def wrapped_f(*args, **kwargs):
-        return require_GET_(f)(*args, **kwargs)
-
-    return wrapped_f
-
-
-@functools.wraps(require_http_methods_)
-def require_http_methods(request_method_list: List[str]):
-    def wrapper(f):
-        @functools.wraps(f)
-        def wrapped_f(*args, **kwargs):
-            return require_http_methods_(request_method_list)(f)(*args, **kwargs)
-
-        return wrapped_f
-
-    return wrapper
-
-
-@functools.wraps(require_POST_)
-def require_POST(f):
-    @functools.wraps(f)
-    def wrapped_f(*args, **kwargs):
-        return require_POST_(f)(*args, **kwargs)
-
-    return wrapped_f
 
 
 # Create your views here.
@@ -337,11 +304,6 @@ def get_user_statistics(request: HttpRequest, u_id: int) -> HttpResponse:
     Found)``.
     """
     user_statistics = UserStatistics.objects.get(pk=u_id)
-    # created_problem_sets = user_statistics.created_problem_sets.all()
-
-    # created_problem_sets_list = []
-    # for created_problem_set in created_problem_sets:
-    #     created_problem_sets_list.append(created_problem_set.info_dict())
 
     return JsonResponse(
         {
@@ -349,7 +311,6 @@ def get_user_statistics(request: HttpRequest, u_id: int) -> HttpResponse:
             "lastActiveDays": (
                 datetime.date.today() - user_statistics.last_login_date
             ).days,
-            # "createdProblems": created_problem_sets_list,
         },
         safe=False,
     )
@@ -528,9 +489,12 @@ class ProblemSetListView(LoginRequiredMixin, View):
             title = req_data["title"]
             description = req_data["content"]
             is_open = req_data["scope"] == "scope-public"
-            tag = req_data["tag"]  # TODO
+            tags_list = req_data["tag"]  # TODO
+            assert isinstance(tags_list, list), "tag should be an array"
+            for i, tags in enumerate(tags_list):
+                assert isinstance(tags, list), f"tag[{i}] should be an array"
             difficulty = int(req_data["difficulty"])
-        except (JSONDecodeError, KeyError, ValueError) as error:
+        except (JSONDecodeError, KeyError, AssertionError, ValueError) as error:
             raise BadRequest() from error
 
         creator = request.user.statistics
@@ -630,7 +594,7 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
         res = problem_set.info_dict()
         problems_list = problem_set.problems.order_by("number").values("id").all()
         res["problems"] = list(map(lambda entry: entry["id"], problems_list))
-        return JsonResponse(res, safe=False)
+        return JsonResponse(res)
 
     def post(self, request: HttpRequest, ps_id: int, **kwargs):
         """Create a new problem in the problem set.
@@ -768,7 +732,6 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
         if request.user.pk != problem_set.creator.user.pk:
             raise PermissionDenied()
 
-        # res = problem_set.info_dict()
         for problem in problem_set.problems.all():
             problem.delete()
         problem_set.delete()
@@ -1028,7 +991,6 @@ class ProblemSetCommentInfoView(LoginRequiredMixin, View):
         if request.user.pk != comment.creator.user.pk:
             raise PermissionDenied()
 
-        # res = comment.to_dict()
         comment.delete()
         return HttpResponse()
 
@@ -1158,12 +1120,11 @@ class ProblemInfoView(LoginRequiredMixin, View):
         try:
             problem = Problem.objects.get(pk=p_id)
         except:
-            return HttpResponse(status=404)
+            return HttpResponseNotFound()
 
         if request.user.pk != problem.creator.pk:
             raise PermissionDenied()
 
-        # res = problem.info_dict()
         problem.delete()
         return HttpResponse()
 
