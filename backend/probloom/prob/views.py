@@ -903,7 +903,6 @@ class ProblemSetCommentListView(LoginRequiredMixin, View):
             return HttpResponseBadRequest()
 
         creator = request.user.statistics
-        content = Content.objects.create(text=content)
         comment = ProblemSetComment.objects.create(
             content=content, creator=creator, problem_set=problem_set
         )
@@ -994,8 +993,8 @@ class ProblemSetCommentInfoView(LoginRequiredMixin, View):
         except (KeyError, JSONDecodeError) as e:
             return HttpResponseBadRequest()
 
-        comment.content.text = content
-        comment.content.save()
+        comment.content = content
+        comment.save()
 
         res = comment.to_dict()
         return JsonResponse(res)
@@ -1024,7 +1023,6 @@ class ProblemSetCommentInfoView(LoginRequiredMixin, View):
         if request.user.pk != comment.creator.user.pk:
             raise PermissionDenied()
 
-        # res = comment.to_dict()
         comment.delete()
         return HttpResponse()
 

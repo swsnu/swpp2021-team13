@@ -190,13 +190,13 @@ class ProblemSetComment(Model):
     Attributes
     ------
     created_time : datetime
-    content : Content
+    content : text
     creator : UserStatistics
     problem_set : ProblemSet
     """
 
     created_time = DateTimeField(auto_now=True)
-    content = OneToOneField(Content, on_delete=RESTRICT)
+    content = TextField(max_length=1000, default="default content")
     creator = ForeignKey(
         UserStatistics, on_delete=CASCADE, related_name="created_comments"
     )
@@ -209,7 +209,7 @@ class ProblemSetComment(Model):
             "username": self.creator.user.username,
             "problemSetID": self.problem_set.pk,
             "createdTime": self.created_time,
-            "content": self.content.text,
+            "content": self.content,
         }
 
 
