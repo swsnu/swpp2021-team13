@@ -160,27 +160,27 @@ export const createProblemSet_: (
 
 export const createProblemSet: (
   title: string,
-  content: string,
   scope: string,
-  tag: string,
-  difficulty: string,
-  problems: r_interfaces.NewProblemSet[]
+  tag: string[],
+  difficulty: number,
+  content: string,
+  problems: r_interfaces.CreateProblemType[]
 ) => ThunkAction<void, RootState, null, CreateProblemSetAction> = (
   title: string,
-  content: string,
   scope: string,
-  tag: string,
-  difficulty: string,
-  problems: r_interfaces.NewProblemSet[]
+  tag: string[],
+  difficulty: number,
+  content: string,
+  problems: r_interfaces.CreateProblemType[]
 ) => {
   return async (dispatch: AppDispatch) => {
     const { data }: { data: r_interfaces.ProblemSetInterface } =
       await axios.post(`/api/problem/`, {
         title: title,
-        content: content,
         scope: scope,
         tag: tag,
         difficulty: difficulty,
+        content: content,
         problems: problems,
       });
     dispatch(createProblemSet_(data));

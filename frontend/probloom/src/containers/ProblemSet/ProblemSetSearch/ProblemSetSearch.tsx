@@ -40,19 +40,121 @@ const creatorOptions = [
   { key: 'own', text: 'Your Problems', value: 'own' },
 ];
 
-export const tagOptions = [
-  { key: 'all', text: 'all', value: 'all' },
-  { key: 'tag-philosophy', text: 'philosophy', value: 'tag-philosophy' },
-  { key: 'tag-psychology', text: 'psychology', value: 'tag-psychology' },
-  { key: 'tag-statistics', text: 'statistics', value: 'tag-statistics' },
-  { key: 'tag-economics', text: 'economics', value: 'tag-economics' },
-  { key: 'tag-mathematics', text: 'mathematics', value: 'tag-mathematics' },
-  { key: 'tag-physics', text: 'physics', value: 'tag-physics' },
-  { key: 'tag-chemistry', text: 'chemistry', value: 'tag-chemistry' },
-  { key: 'tag-biology', text: 'biology', value: 'tag-biology' },
+export const tagOptions1 = [
+  { key: 'tag-all', text: 'all', value: 'tag-all' },
+  { key: 'tag-humanities', text: 'humanities', value: 'tag-humanities' },
+  {
+    key: 'tag-social-science',
+    text: 'social-science',
+    value: 'tag-social-science',
+  },
+  { key: 'tag-science', text: 'science', value: 'tag-science' },
   { key: 'tag-engineering', text: 'engineering', value: 'tag-engineering' },
-  { key: 'tag-history', text: 'history', value: 'tag-history' },
+  { key: 'tag-etc', text: 'etc', value: 'tag-etc' },
 ];
+
+export const tagOptions2 = {
+  'tag-all': [{ key: 'tag-all', text: 'all', value: 'tag-all' }],
+  'tag-humanities': [
+    { key: 'tag-philosophy', text: 'philosophy', value: 'tag-philosophy' },
+    { key: 'tag-history', text: 'history', value: 'tag-history' },
+    { key: 'tag-linguistics', text: 'linguistics', value: 'tag-linguistics' },
+    { key: 'tag-aesthetics', text: 'aesthetics', value: 'tag-aesthetics' },
+    {
+      key: 'tag-religious-studies',
+      text: 'religious-studies',
+      value: 'tag-religious-studies',
+    },
+  ],
+  'tag-social-science': [
+    { key: 'tag-psychology', text: 'psychology', value: 'tag-psychology' },
+    { key: 'tag-economics', text: 'economics', value: 'tag-economics' },
+    {
+      key: 'tag-political-science',
+      text: 'political-science',
+      value: 'tag-political-science',
+    },
+    { key: 'tag-sociology', text: 'sociology', value: 'tag-sociology' },
+    {
+      key: 'tag-anthropology',
+      text: 'anthropology',
+      value: 'tag-anthropology',
+    },
+    { key: 'tag-geography', text: 'geography', value: 'tag-geography' },
+    {
+      key: 'tag-social-welfare',
+      text: 'social-welfare',
+      value: 'tag-social-welfare',
+    },
+  ],
+  'tag-science': [
+    { key: 'tag-statistics', text: 'statistics', value: 'tag-statistics' },
+    { key: 'tag-mathematics', text: 'mathematics', value: 'tag-mathematics' },
+    { key: 'tag-biology', text: 'biology', value: 'tag-biology' },
+    { key: 'tag-physics', text: 'physics', value: 'tag-physics' },
+    { key: 'tag-chemistry', text: 'chemistry', value: 'tag-chemistry' },
+    { key: 'tag-astronomy', text: 'astronomy', value: 'tag-astronomy' },
+  ],
+  'tag-engineering': [
+    {
+      key: 'tag-mechanical-engineering',
+      text: 'mechanical-engineering',
+      value: 'tag-mechanical-engineering',
+    },
+    {
+      key: 'tag-electrical-and-electronic-engineering',
+      text: 'electrical-and-electronic-engineering',
+      value: 'tag-electrical-and-electronic-engineering',
+    },
+    {
+      key: 'tag-computer-engineering',
+      text: 'computer-engineering',
+      value: 'tag-computer-engineering',
+    },
+    {
+      key: 'tag-materials-engineering',
+      text: 'materials-engineering',
+      value: 'tag-materials-engineering',
+    },
+    {
+      key: 'tag-nuclear-engineering',
+      text: 'nuclear-engineering',
+      value: 'tag-nuclear-engineering',
+    },
+    {
+      key: 'tag-industrial-engineering',
+      text: 'industrial-engineering',
+      value: 'tag-industrial-engineering',
+    },
+    {
+      key: 'tag-chemical-engineering',
+      text: 'chemical-engineering',
+      value: 'tag-chemical-engineering',
+    },
+    {
+      key: 'tag-biological-engineering',
+      text: 'biological-engineering',
+      value: 'tag-biological-engineering',
+    },
+  ],
+  'tag-etc': [
+    {
+      key: 'tag-art',
+      text: 'art',
+      value: 'tag-art',
+    },
+    {
+      key: 'tag-music',
+      text: 'music',
+      value: 'tag-music',
+    },
+    {
+      key: 'tag-business',
+      text: 'business',
+      value: 'tag-business',
+    },
+  ],
+};
 
 const sortOptions = [
   { key: 'date', text: 'Date', value: 'date' },
@@ -228,7 +330,7 @@ class ProblemSetSearch extends Component<
               <Form.Dropdown
                 width={4}
                 item
-                options={tagOptions}
+                options={tagOptions2['tag-science']}
                 label="Tag"
                 defaultValue="all"
                 onChange={(_, { value }) =>

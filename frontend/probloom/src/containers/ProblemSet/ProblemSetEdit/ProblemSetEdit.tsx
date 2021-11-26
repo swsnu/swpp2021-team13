@@ -27,9 +27,15 @@ interface StateFromProps {
 }
 
 interface DispatchFromProps {
-  onCreateProblem: (id: number, problemData: a_interfaces.CreateProblemRequest) => void;
+  onCreateProblem: (
+    id: number,
+    problemData: a_interfaces.CreateProblemRequest
+  ) => void;
   onGetProblem: (id: number) => void;
-  onUpdateProblem: (id: number, problemData: a_interfaces.UpdateProblemRequest) => void;
+  onUpdateProblem: (
+    id: number,
+    problemData: a_interfaces.UpdateProblemRequest
+  ) => void;
   onDeleteProblem: (id: number) => void;
 }
 
@@ -44,132 +50,145 @@ type Props = ProblemSetEditProps &
 type State = ProblemSetEditState;
 
 class ProblemSetEdit extends Component<Props, State> {
-  state = { editingProblem: null }
+  state = { editingProblem: null };
 
   onClickDeleteButton = () => {
-    this.props.onDeleteProblem(this.props.selectedProblem.id)
-  }
+    this.props.onDeleteProblem(this.props.selectedProblem.id);
+  };
 
   onClickProblemNumberButton = async (number: number) => {
-    await this.props.onGetProblem(this.props.selectedProblemSet.problems[number]);
+    await this.props.onGetProblem(
+      this.props.selectedProblemSet.problems[number]
+    );
     this.setState({ editingProblem: this.props.selectedProblem });
-  }
+  };
 
-  onClickNewProblemButton = (type: "multiple-choice" | "subjective") => {
-    const newProblem  = {
+  onClickNewProblemButton = (type: 'multiple-choice' | 'subjective') => {
+    const newProblem = {
       problemSetID: Number(this.props.match.params.id),
       content: 'new problem',
-    }
-    if (type === "multiple-choice") {
-      const newMultipleChoiceProblem : a_interfaces.CreateMultipleChoiceProblemRequest= {
-        ...newProblem, problemType: "multiple-choice", choices: [], solution: []
-      }
+    };
+    if (type === 'multiple-choice') {
+      const newMultipleChoiceProblem: a_interfaces.CreateMultipleChoiceProblemRequest =
+        {
+          ...newProblem,
+          problemType: 'multiple-choice',
+          choices: [],
+          solution: [],
+        };
       this.props.onCreateProblem(
-        Number(this.props.match.params.id), 
+        Number(this.props.match.params.id),
         newMultipleChoiceProblem
       );
     } else {
-      const newSubjectiveProblem : a_interfaces.CreateSubjectiveProblemRequest= {
-        ...newProblem, problemType: "subjective", solutions: []
-      }
+      const newSubjectiveProblem: a_interfaces.CreateSubjectiveProblemRequest =
+        {
+          ...newProblem,
+          problemType: 'subjective',
+          solutions: [],
+        };
       this.props.onCreateProblem(
-        Number(this.props.match.params.id), 
+        Number(this.props.match.params.id),
         newSubjectiveProblem
       );
     }
-  }
+  };
 
-  editProblemHandler = (
-    target: string,
-    content?: any,
-    index?: any,
-  ) => {
-    const newProblem : any = this.state.editingProblem;
+  editProblemHandler = (target: string, content?: any, index?: any) => {
+    const newProblem: any = this.state.editingProblem;
     switch (target) {
       case 'content':
-        newProblem.content = content; break;
+        newProblem.content = content;
+        break;
       case 'add_choice':
-        newProblem.choices.push('new choice'); break;
+        newProblem.choices.push('new choice');
+        break;
       case 'choice_content':
-        newProblem.choices[index] = content; break;
+        newProblem.choices[index] = content;
+        break;
       case 'choice_solution':
-        newProblem.solution.push(index); break;
+        newProblem.solution.push(index);
+        break;
       case 'choice_not_solution':
-        newProblem.solution.splice(newProblem.solution.indexOf(index), 1); break;
+        newProblem.solution.splice(newProblem.solution.indexOf(index), 1);
+        break;
       case 'add_solution':
-        newProblem.solutions.push('new solution'); break;
+        newProblem.solutions.push('new solution');
+        break;
       case 'solution_content':
-        newProblem.solutions[index] = content; break;
+        newProblem.solutions[index] = content;
+        break;
     }
-    this.setState({ editingProblem: newProblem })
-  }
+    this.setState({ editingProblem: newProblem });
+  };
 
   onClickSaveButton = () => {
-    const currentProblem : any = this.state.editingProblem;
-    const updateProblem : any = {
+    const currentProblem: any = this.state.editingProblem;
+    const updateProblem: any = {
       problemType: currentProblem.problemType,
       problemNumber: currentProblem.problemNumber,
       content: currentProblem.content,
-    }
+    };
     if (updateProblem.problemType === 'multiple-choice') {
       updateProblem['choices'] = currentProblem.choices;
       updateProblem['solution'] = currentProblem.solution;
     } else {
       updateProblem['solutions'] = currentProblem.solutions;
     }
-    this.props.onUpdateProblem(
-      currentProblem.id, 
-      updateProblem
-    )
+    this.props.onUpdateProblem(currentProblem.id, updateProblem);
   };
 
   render() {
-    const problemNumberButtons = this.props.selectedProblemSet.problems
-      .map((_, index) => (
+    const problemNumberButtons = this.props.selectedProblemSet.problems.map(
+      (_, index) => (
         <Button
           key={index}
           primary
           size="tiny"
           className={`${index}Button`}
-          onClick={() => this.onClickProblemNumberButton(index)}>
+          onClick={() => this.onClickProblemNumberButton(index)}
+        >
           {index}
         </Button>
-      ));
+      )
+    );
 
     let currentProblem;
     if (this.state.editingProblem == null) {
       currentProblem = null;
     } else {
-      const editingProblem : any = this.state.editingProblem;
-      currentProblem = 
-      <div>
-        <Button
-          primary
-          size="small"
-          className="Delete"
-          onClick={() => this.onClickDeleteButton()}
-        >
-          Delete
-        </Button>
-        {editingProblem.problemType === 'multiple-choice' ?
-          <MultipleChoiceProblemForm 
-            problem={this.state.editingProblem}
-            editContent={this.editProblemHandler}
-          />
-        : <SubjectiveProblemForm
-            problem={this.state.editingProblem}
-            editContent={this.editProblemHandler}
-          />
-        }
-        <Button 
-          primary
-          size="small"
-          className="SaveButton" 
-          onClick={() => this.onClickSaveButton()}
-        >
-          Save
-        </Button>
-      </div>
+      const editingProblem: any = this.state.editingProblem;
+      currentProblem = (
+        <div>
+          <Button
+            primary
+            size="small"
+            className="Delete"
+            onClick={() => this.onClickDeleteButton()}
+          >
+            Delete
+          </Button>
+          {editingProblem.problemType === 'multiple-choice' ? (
+            <MultipleChoiceProblemForm
+              problem={this.state.editingProblem}
+              editContent={this.editProblemHandler}
+            />
+          ) : (
+            <SubjectiveProblemForm
+              problem={this.state.editingProblem}
+              editContent={this.editProblemHandler}
+            />
+          )}
+          <Button
+            primary
+            size="small"
+            className="SaveButton"
+            onClick={() => this.onClickSaveButton()}
+          >
+            Save
+          </Button>
+        </div>
+      );
     }
 
     return (
@@ -185,19 +204,19 @@ class ProblemSetEdit extends Component<Props, State> {
           </NavLink>
 
           <div>
-            <Button 
+            <Button
               primary
               size="small"
               className="NewMCPButton"
-              onClick={() => this.onClickNewProblemButton("multiple-choice")}
+              onClick={() => this.onClickNewProblemButton('multiple-choice')}
             >
               new multiple choice problem
             </Button>
-            <Button 
+            <Button
               primary
               size="small"
               className="NewSPButton"
-              onClick={() => this.onClickNewProblemButton("subjective")}
+              onClick={() => this.onClickNewProblemButton('subjective')}
             >
               new subjective problem
             </Button>
@@ -215,23 +234,29 @@ const mapStateToProps = (state: any) => {
   return {
     selectedProblemSet: state.problemset.selectedProblemSet,
     selectedProblem: state.problemset.selectedProblem,
-  }
+  };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    onCreateProblem: (id: number, problem: a_interfaces.CreateProblemRequest) => {
-      dispatch(actionCreators.createProblem(id, problem)); 
+    onCreateProblem: (
+      id: number,
+      problem: a_interfaces.CreateProblemRequest
+    ) => {
+      dispatch(actionCreators.createProblem(id, problem));
     },
     onGetProblem: (id: number) => {
-      dispatch(actionCreators.getProblem(id)); 
+      dispatch(actionCreators.getProblem(id));
     },
-    onUpdateProblem: (id: number, problem: a_interfaces.UpdateProblemRequest) => {
-      dispatch(actionCreators.updateProblem(id, problem)); 
+    onUpdateProblem: (
+      id: number,
+      problem: a_interfaces.UpdateProblemRequest
+    ) => {
+      dispatch(actionCreators.updateProblem(id, problem));
     },
     onDeleteProblem: (id: number) => {
       dispatch(actionCreators.deleteProblem(id));
-    }
+    },
   };
 };
 
