@@ -48,15 +48,17 @@ const solver1: Solver = {
 const problemSet1: ProblemSet = {
   id: 1,
   title: 'title1',
-  created_time: '2021-01-01',
-  is_open: false,
-  tag: 'math',
+  createdTime: '2021-01-01',
+  modifiedTime: '2021-01-01',
+  isOpen: false,
+  tag: [['tag1'], ['tag2']],
   difficulty: 1,
   content: 'content1',
   userID: 1,
   username: 'user1',
-  solved_num: 1,
-  recommended_num: 1,
+  solverIDs: [1],
+  recommendedNum: 1,
+  problems: [1],
 };
 
 const ProblemSetStateTest: ProblemSetState = {
@@ -68,7 +70,7 @@ const ProblemSetStateTest: ProblemSetState = {
 
 const comment1: Comment = {
   id: 1,
-  date: '2020-10-10',
+  createdTime: '2020-10-10',
   content: 'comment',
   userID: 1,
   username: 'user1',
@@ -92,6 +94,7 @@ describe('<ProblemSetDetail />', () => {
     spyGetComments,
     spyGetSolvers,
     spyDeleteProblemSet,
+    spyUpdateProblemSet,
     spyCreateComment,
     spyUpdateComment,
     spyDeleteComment;
@@ -114,6 +117,11 @@ describe('<ProblemSetDetail />', () => {
     spyDeleteProblemSet = jest
       .spyOn(problemActions, 'deleteProblemSet')
       .mockImplementation((problemID: number) => {
+        return (dispatch) => {};
+      });
+    spyUpdateProblemSet = jest
+      .spyOn(problemActions, 'updateProblemSet')
+      .mockImplementation((problemSet: any) => {
         return (dispatch) => {};
       });
     spyGetSolvers = jest
@@ -218,10 +226,6 @@ describe('<ProblemSetDetail />', () => {
     const description = 'DESCRIPTION';
     wrapper_description.simulate('change', { target: { value: description } });
 
-    const wrapper_inputScope = component.find({ label: 'Scope' });
-    const inputScope = wrapper_inputScope.find('DropdownItem');
-    inputScope.at(1).simulate('click');
-
     const wrapper_inputTag = component.find({ label: 'Tag' });
     const inputTag = wrapper_inputTag.find('DropdownItem');
     inputTag.at(1).simulate('click');
@@ -233,9 +237,18 @@ describe('<ProblemSetDetail />', () => {
     const wrapper_button = component.find('button.confirmProblemSetEditButton');
     wrapper_button.at(0).simulate('click');
 
-    expect(spyGetProblemSet).toBeCalledTimes(2);
-    expect(spyGetComments).toBeCalledTimes(2);
-    expect(spyGetSolvers).toBeCalledTimes(2);
+    // click again "Edit Problem Set" button
+    wrapper.at(0).simulate('click');
+
+    const wrapper_inputScope = component.find({ label: 'Scope' });
+    const inputScope = wrapper_inputScope.find('DropdownItem');
+    inputScope.at(1).simulate('click');
+
+    wrapper_button.at(0).simulate('click');
+
+    expect(spyUpdateProblemSet).toBeCalledTimes(2);
+    expect(spyGetComments).toBeCalledTimes(3);
+    expect(spyGetSolvers).toBeCalledTimes(3);
 
     history.push('/');
   });
@@ -244,15 +257,17 @@ describe('<ProblemSetDetail />', () => {
     const problemSet1: ProblemSet = {
       id: 1,
       title: 'title1',
-      created_time: '2021-01-01',
-      is_open: true,
-      tag: 'math',
+      createdTime: '2021-01-01',
+      modifiedTime: '2021-01-01',
+      isOpen: true,
+      tag: [['tag1'], ['tag2']],
       difficulty: 10,
       content: 'content1',
       userID: 1,
       username: 'user1',
-      solved_num: 1,
-      recommended_num: 1,
+      solverIDs: [1],
+      recommendedNum: 1,
+      problems: [1],
     };
     const ProblemSetStateTest: ProblemSetState = {
       problemSets: [problemSet1],
@@ -278,6 +293,9 @@ describe('<ProblemSetDetail />', () => {
     // click "Edit Problem Set" button
     const wrapper = component.find('button.editProblemSetButton');
     wrapper.at(0).simulate('click');
+
+    const wrapper_button = component.find('button.confirmProblemSetEditButton');
+    wrapper_button.at(0).simulate('click');
 
     history.push('/');
   });

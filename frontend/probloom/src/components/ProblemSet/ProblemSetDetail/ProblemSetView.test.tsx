@@ -6,7 +6,13 @@ import { Button, Grid, Header } from 'semantic-ui-react';
 describe('<ProblemSetView />', () => {
   it('should render without creator and solver', () => {
     const component = shallow(
-      <ProblemSetView isCreator={false} isSolver={false} scope={false} />
+      <ProblemSetView
+        isCreator={false}
+        isSolver={false}
+        scope={false}
+        createdTime={'1'}
+        modifiedTime={'1'}
+      />
     );
     const wrapper = component.find('.ProblemSetView');
     expect(wrapper.length).toBe(1);
@@ -18,6 +24,8 @@ describe('<ProblemSetView />', () => {
         isCreator={true}
         isSolver={true}
         scope={true}
+        createdTime={'1'}
+        modifiedTime={'2'}
         onClickSolveProblemButton={() => {}}
         onClickExplanationButton={() => {}}
         onClickBackButton={() => {}}

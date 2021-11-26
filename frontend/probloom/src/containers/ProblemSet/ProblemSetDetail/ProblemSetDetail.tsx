@@ -121,6 +121,7 @@ class ProblemSetDetail extends Component<
       difficulty: parseInt(this.state.editProblemSetDifficulty),
       /////////////////////////////////tag:
     };
+
     this.props.onUpdateProblemSet(problemSet);
     this.props.onGetCommentsOfProblemSet(parseInt(this.props.match.params.id));
     this.props.onGetAllSolvers(parseInt(this.props.match.params.id));
