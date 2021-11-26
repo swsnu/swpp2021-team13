@@ -26,7 +26,7 @@ urlpatterns = [
         views.ProblemSetCommentInfoView.as_view(),
         name="comment_info",
     ),
-    path("problem/<int:p_id>/", views.ProblemInfoView),
+    path("problem/<int:p_id>/", views.ProblemInfoView.as_view()),
     path("problem/<int:p_id>/solve/", views.solve_problem),
     path("solved/<int:u_id>/<int:p_id>/", views.ProblemSetSolvedView.as_view()),
     path("solved/<int:p_id>/", views.ProblemSetSolvedListView.as_view()),
