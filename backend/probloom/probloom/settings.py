@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "polymorphic",
     "prob.apps.ProbConfig",
     "django.contrib.admin",
     "django.contrib.auth",
