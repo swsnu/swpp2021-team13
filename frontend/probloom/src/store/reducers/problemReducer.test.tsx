@@ -17,15 +17,16 @@ describe('Problem Reducer', () => {
     const problemset1: ProblemSet = {
       id: 1,
       title: 'title1',
-      created_time: 'create_time1',
-      is_open: false,
-      tag: 'math',
+      createdTime: 'create_time1',
+      isOpen: false,
+      tag: [['tag1'], ['tag2']],
       difficulty: 1,
       content: 'content1',
       userID: 1,
       username: 'creator1',
-      solved_num: 1,
-      recommended_num: 1,
+      solverIDs: [1],
+      recommendedNum: 1,
+      problems: [1],
     };
     const problemset2: ProblemSet = {
       id: 2,

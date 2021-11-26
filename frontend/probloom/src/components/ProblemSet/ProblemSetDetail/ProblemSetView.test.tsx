@@ -6,7 +6,13 @@ import { Button, Grid, Header } from 'semantic-ui-react';
 describe('<ProblemSetView />', () => {
   it('should render without creator and solver', () => {
     const component = shallow(
-      <ProblemSetView isCreator={false} isSolver={false} />
+      <ProblemSetView
+        isCreator={false}
+        isSolver={false}
+        scope={false}
+        createdTime={'1'}
+        modifiedTime={'1'}
+      />
     );
     const wrapper = component.find('.ProblemSetView');
     expect(wrapper.length).toBe(1);
@@ -17,10 +23,14 @@ describe('<ProblemSetView />', () => {
       <ProblemSetView
         isCreator={true}
         isSolver={true}
+        scope={true}
+        createdTime={'1'}
+        modifiedTime={'2'}
         onClickSolveProblemButton={() => {}}
         onClickExplanationButton={() => {}}
         onClickBackButton={() => {}}
         onClickEditProblemButton={() => {}}
+        onClickEditProblemSetButton={() => {}}
         onClickDeleteProblemButton={() => {}}
       />
     );
@@ -32,8 +42,10 @@ describe('<ProblemSetView />', () => {
     explanationButton.simulate('click');
     const backButton = component.find('.backButton');
     backButton.simulate('click');
-    const editButton = component.find('.editButton');
-    editButton.simulate('click');
+    const editProblemButton = component.find('.editProblemButton');
+    editProblemButton.simulate('click');
+    const editProblemSetButton = component.find('.editProblemSetButton');
+    editProblemSetButton.simulate('click');
     const deleteButton = component.find('.deleteButton');
     deleteButton.simulate('click');
   });

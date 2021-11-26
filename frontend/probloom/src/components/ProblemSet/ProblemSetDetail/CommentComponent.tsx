@@ -3,7 +3,10 @@ import { Comment } from 'semantic-ui-react';
 const CommentComponent = (props) => {
   return (
     <Comment className="CommentComponent">
-      <Comment.Author>{props.username}</Comment.Author>
+      <Comment.Author>
+        {props.username}
+        <Comment.Metadata>{props.createdTime}</Comment.Metadata>
+      </Comment.Author>
       <Comment.Text>{props.content}</Comment.Text>
       <Comment.Actions>
         {props.isCreator && (
