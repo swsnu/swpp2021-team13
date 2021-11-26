@@ -628,19 +628,8 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
             return HttpResponseNotFound()
 
         res = problem_set.info_dict()
-        multiple_choice_problems = problem_set.problems.instance_of(
-            MultipleChoiceProblem
-        ).prefetch_related("choices__content")
-        subjective_problems = problem_set.problems.instance_of(
-            SubjectiveProblem
-        ).prefetch_related("solutions")
-        problems_list = []
-        problems_list.extend(
-            problem.info_dict() for problem in multiple_choice_problems
-        )
-        problems_list.extend(problem.info_dict() for problem in subjective_problems)
-        problems_list.sort(key=lambda entry: entry["problemNumber"])
-        res["problems"] = problems_list
+        problems_list = problem_set.problems.order_by("number").values("id").all()
+        res["problems"] = list(map(lambda entry: entry["id"], problems_list))
         return JsonResponse(res, safe=False)
 
     def post(self, request: HttpRequest, ps_id: int, **kwargs):
