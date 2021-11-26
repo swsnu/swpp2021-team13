@@ -67,7 +67,7 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
       return {
         ...state,
         selectedProblemSet: action.pset,
-        selectedProblems: action.problems_list,
+        //selectedProblems: action.problems_list,
       };
     case actionTypes.GET_ALL_SOLVER_OF_PROBLEMSET:
       return { ...state, solvers: action.solvers };

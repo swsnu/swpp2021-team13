@@ -603,17 +603,7 @@ const mapDispatchToProps = (dispatch: any) => {
       difficulty: string,
       problems: NewProblemSet[]
     ) => {
-      dispatch(
-        actionCreators.editProblemSet(
-          id,
-          title,
-          content,
-          scope,
-          tag,
-          difficulty,
-          problems
-        )
-      );
+      dispatch({});
     },
   };
 };

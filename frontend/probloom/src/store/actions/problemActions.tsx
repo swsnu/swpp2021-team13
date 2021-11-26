@@ -36,15 +36,15 @@ export const getAllProblemSets: () => ThunkAction<
 export interface GetProblemSetAction {
   type: typeof actionTypes.GET_PROBLEMSET;
   pset: ProblemSet;
-  problems_list: NewProblemSet[];
+  problems_list: any;
 }
 
 export const getProblemSet_: (problemSet) => GetProblemSetAction = (
   problemSet
 ) => ({
   type: actionTypes.GET_PROBLEMSET,
-  pset: problemSet.res_pset,
-  problems_list: problemSet.problems_list,
+  pset: problemSet.pop('problems'),
+  problems_list: problemSet.problems,
 });
 
 export const getProblemSet: (
@@ -53,7 +53,7 @@ export const getProblemSet: (
   problemSetID
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data } = await axios.get(`/api/problem/${problemSetID}/`);
+    const { data } = await axios.get(`/api/problem_set/${problemSetID}/`);
     dispatch(getProblemSet_(data));
   };
 };

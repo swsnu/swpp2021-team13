@@ -27,7 +27,7 @@ export const getCommentsOfProblemSet: (
 ) => {
   return async (dispatch: AppDispatch) => {
     const { data }: { data: Comment[] } = await axios.get(
-      `/api/problem/${problemSetID}/comment/`
+      `/api/problem_set/${problemSetID}/comment/`
     );
     dispatch(getCommentsOfProblemSet_(data));
   };
