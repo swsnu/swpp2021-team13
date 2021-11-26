@@ -14,7 +14,7 @@ const initialState: ProblemSetState = {
   problemSets: [],
   solvers: [],
   selectedProblemSet: null,
-  selectedProblem: null
+  selectedProblem: null,
 };
 
 export type ProblemReducer = Reducer<ProblemSetState, ProblemSetAction>;

@@ -6,7 +6,7 @@ interface MultipleChoiceProblemFormProps {
   editContent: (
     target: string,
     content?: any,
-    index?: number
+    index?: any,
   ) => void;
 }
 

@@ -5,7 +5,7 @@ export interface ChoiceProps {
   editContent: (
     target: string,
     content?: any,
-    index?: number,
+    index?: any,
   ) => void;
 }
 

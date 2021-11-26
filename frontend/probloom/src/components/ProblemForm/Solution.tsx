@@ -24,4 +24,3 @@ export interface SolutionProps {
   }
   
   export default Solution;
-  

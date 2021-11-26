@@ -239,7 +239,7 @@ export const getProblem_: (problemData) => GetProblemAction = (
   selectedProblem: problemData
 });
 
-export const getProblem: (
+export const getProblem: ( 
   id: number,
 ) => ThunkAction<void, RootState, null, GetProblemAction> = (
   id: number,

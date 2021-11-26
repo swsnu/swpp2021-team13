@@ -6,12 +6,12 @@ interface SubjectiveProblemFormProps {
   editContent: (
     target: string,
     content?: any,
-    index?: number
+    index?: any,
   ) => void;
 }
 
-const ProblemForm = (props: SubjectiveProblemFormProps) => {
-  const answer = props.problem.solutions != undefined ?
+const SubjectiveProblemForm = (props: SubjectiveProblemFormProps) => {
+  const solutions = props.problem.solutions != undefined ?
   props.problem.solutions.map((solution, index) => (
     <Solution
       index={index}
@@ -34,9 +34,9 @@ const ProblemForm = (props: SubjectiveProblemFormProps) => {
       <button onClick={() => props.editContent(
         'add_solution'
       )}>New</button>
-      {answer}
+      {solutions}
     </div>
   );
 };
 
-export default ProblemForm;
+export default SubjectiveProblemForm;

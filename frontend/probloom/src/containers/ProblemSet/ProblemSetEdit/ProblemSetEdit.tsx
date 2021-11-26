@@ -156,7 +156,7 @@ const mapDispatchToProps = (dispatch: any) => {
     },
     onUpdateProblem: (id: number, problem: interfaces.UpdateProblemRequest) => {
       dispatch(actionCreators.updateProblem(id, problem)); 
-    },
+    }
   };
 };
 
