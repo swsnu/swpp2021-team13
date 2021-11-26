@@ -50,8 +50,8 @@ export const createComment: (
 ) => ThunkAction<void, RootState, null, CreateCommentAction> = (comment) => {
   return async (dispatch: AppDispatch) => {
     const { data }: { data: Comment } = await axios.post(
-      `/api/comment/`,
-      comment
+      `/api/problem_set/${comment.problemSetID}/comment/`,
+      { content: comment.content }
     );
     dispatch(createComment_(data));
   };
@@ -76,7 +76,7 @@ export const updateComment: (
 ) => ThunkAction<void, RootState, null, UpdateCommentAction> = (comment) => {
   return async (dispatch: AppDispatch) => {
     const { data }: { data: Comment } = await axios.put(
-      `/api/comment/${comment.id}/`,
+      `/api/problem_set/${comment.problemSetID}/comment/${comment.id}/`,
       { content: comment.content }
     );
     dispatch(updateComment_(data));
@@ -96,11 +96,11 @@ export const deleteComment_: (comment: Comment) => DeleteCommentAction = (
 });
 
 export const deleteComment: (
-  commentID: number
-) => ThunkAction<void, RootState, null, DeleteCommentAction> = (commentID) => {
+  idList: any
+) => ThunkAction<void, RootState, null, DeleteCommentAction> = (idList) => {
   return async (dispatch: AppDispatch) => {
     const { data }: { data: Comment } = await axios.delete(
-      `/api/comment/${commentID}/`
+      `/api/problem_set/${idList.problemSetID}/comment/${idList.id}/`
     );
     dispatch(deleteComment_(data));
   };

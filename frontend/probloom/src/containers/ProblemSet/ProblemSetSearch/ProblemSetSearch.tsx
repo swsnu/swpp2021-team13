@@ -108,21 +108,21 @@ class ProblemSetSearch extends Component<
             return check.test(prob.title) || check.test(prob.content);
         }
       })
-      .filter((prob) => prob.userID === this.props.user?.id || prob.is_open)
+      .filter((prob) => prob.userID === this.props.user?.id || prob.isOpen)
       .filter(
         (prob) =>
           prob.userID === this.props.user?.id || this.state.creator !== 'own'
       )
-      .filter((prob) => this.state.tag === 'all' || prob.tag === this.state.tag)
+      .filter((prob) => this.state.tag === 'all') //|| prob.tag === this.state.tag)
       .sort((a, b) => {
         switch (this.state.sort) {
           case 'solved':
-            return b.solved_num - a.solved_num;
+            return b.solverIDs.length - a.solverIDs.length;
           case 'recommended':
-            return b.recommended_num - a.recommended_num;
+            return b.recommendedNum - a.recommendedNum;
           case 'date':
           default:
-            return b.created_time.localeCompare(a.created_time);
+            return b.createdTime.localeCompare(a.createdTime);
         }
       })
       .map((prob) => {
@@ -130,10 +130,10 @@ class ProblemSetSearch extends Component<
           <ProblemSetSearchResult
             key={prob.id}
             title={prob.title}
-            date={prob.created_time}
+            date={prob.createdTime}
             creator={prob.username}
-            solved={prob.solved_num}
-            recommended={prob.recommended_num}
+            solved={0} //{prob.solverIDs.length}
+            recommended={prob.recommendedNum}
             clickProb={() => this.onClickProbHandler(prob)}
           />
         );

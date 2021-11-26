@@ -13,6 +13,7 @@ export {
   getAllSolvers,
   createProblemSet,
   deleteProblemSet,
+  updateProblemSet,
 } from './problemActions';
 
 export {

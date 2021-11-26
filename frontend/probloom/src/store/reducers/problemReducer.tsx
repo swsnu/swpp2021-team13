@@ -5,15 +5,17 @@ import { Reducer } from 'redux';
 export interface ProblemSet {
   id: number;
   title: string;
-  created_time: string;
-  is_open: boolean;
-  tag: string;
+  createdTime: string;
+  modifiedTime: string;
+  isOpen: boolean;
+  tag: string[][];
   difficulty: number;
   content: string;
   userID: number;
   username: string;
-  solved_num: number;
-  recommended_num: number;
+  solverIDs: number[];
+  recommendedNum: number;
+  problems: number[];
 }
 
 export interface Solver {
@@ -67,7 +69,6 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
       return {
         ...state,
         selectedProblemSet: action.pset,
-        //selectedProblems: action.problems_list,
       };
     case actionTypes.GET_ALL_SOLVER_OF_PROBLEMSET:
       return { ...state, solvers: action.solvers };
@@ -76,7 +77,11 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
         ...state,
         problemSets: [...state.problemSets, action.problemSet],
       };
-
+    case actionTypes.UPDATE_PROBLEMSET:
+      return {
+        ...state,
+        selectedProblemSet: action.pset,
+      };
     case actionTypes.DELETE_PROBLEMSET:
       const remainProblemSet = state.problemSets.filter((problemset) => {
         return problemset.id !== action.targetID;

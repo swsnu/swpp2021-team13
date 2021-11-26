@@ -856,10 +856,16 @@ class ProblemSetCommentListView(LoginRequiredMixin, View):
         """
         if not ProblemSet.objects.filter(pk=ps_id).exists():
             return HttpResponseNotFound()
-
+        '''
         comment_set = ProblemSetComment.objects.filter(
             problem_set_id=ps_id
         ).select_related("content")
+        '''
+        comment_set = ProblemSetComment.objects.filter(
+            problem_set_id=ps_id
+        )
+        print(comment_set)
+
         res = []
         for comment in comment_set:
             res.append(comment.to_dict())

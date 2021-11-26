@@ -4,7 +4,7 @@ import { Reducer } from 'redux';
 
 export interface Comment {
   id: number;
-  date: string;
+  createdTime: string;
   content: string;
   userID: number;
   username: string;

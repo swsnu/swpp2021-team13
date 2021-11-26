@@ -14,13 +14,15 @@ const ProblemSetView = (props) => {
             <Header.Subheader>Tag: {props.tag}</Header.Subheader>
             <Header.Subheader>Difficulty: {props.difficulty}</Header.Subheader>
             <Header.Subheader>
-              Recommend: {props.recommended_num}
+              Recommend: {props.recommendedNum}
             </Header.Subheader>
-            <Header.Subheader>Solve: {props.solved_num}</Header.Subheader>
+            <Header.Subheader>Solve: {props.solvedNum}</Header.Subheader>
           </Header>
           <Grid.Column textAlign="right">
             <Header as="h6" textAlign="right">
-              Create: {props.created_time}
+              Create: {props.createdTime} <br></br>
+              {props.modifiedTime !== props.createdTime &&
+                `Modify: ${props.modifiedTime}`}
             </Header>
           </Grid.Column>
         </Grid>

@@ -23,6 +23,7 @@ import {
   createComment,
   updateComment,
   deleteComment,
+  updateProblemSet,
 } from '../../../store/actions';
 import { tagOptions } from '../ProblemSetSearch/ProblemSetSearch';
 import {
@@ -97,10 +98,15 @@ class ProblemSetDetail extends Component<
   };
 
   onClickConfirmProblemSetEditButton = () => {
-    //this.props.onUpdateProblemSet(parseInt(this.props.match.params.id));
-    this.props.onGetProblemSet(parseInt(this.props.match.params.id));
-    this.props.onGetCommentsOfProblemSet(parseInt(this.props.match.params.id));
-    this.props.onGetAllSolvers(parseInt(this.props.match.params.id));
+    let problemSet = {
+      id: parseInt(this.props.match.params.id),
+      title: this.state.editProblemSetTitle,
+      content: this.state.editProblemSetDescription,
+      isOpen: this.state.editProblemSetScope === 'scope-public' ? true : false,
+      difficulty: parseInt(this.state.editProblemSetDifficulty),
+      //tag:
+    };
+    this.props.onUpdateProblemSet(problemSet);
     this.setState({ isProblemSetEdit: false });
   };
 
@@ -129,7 +135,8 @@ class ProblemSetDetail extends Component<
   };
 
   onClickDeleteCommentButton = (comment: CommentData) => {
-    this.props.onDeleteComment(comment.id);
+    let idList = { id: comment.id, problemSetID: comment.problemSetID };
+    this.props.onDeleteComment(idList);
     this.props.onGetCommentsOfProblemSet(parseInt(this.props.match.params.id));
     this.setState({
       commentContent: '',
@@ -142,6 +149,7 @@ class ProblemSetDetail extends Component<
     if (this.state.isCommentEdit) {
       const comment = {
         id: this.state.editComment?.id,
+        problemSetID: this.state.editComment?.problemSetID,
         content: this.state.commentContent,
       };
       this.props.onUpdateComment(comment);
@@ -152,8 +160,6 @@ class ProblemSetDetail extends Component<
       });
     } else {
       const comment = {
-        userID: this.props.selectedUser?.id,
-        username: this.props.selectedUser?.username,
         problemSetID: parseInt(this.props.match.params.id),
         content: this.state.commentContent,
       };
@@ -161,6 +167,13 @@ class ProblemSetDetail extends Component<
       this.setState({ commentContent: '' });
     }
     this.props.onGetCommentsOfProblemSet(parseInt(this.props.match.params.id));
+  };
+
+  formatTime = (text: string) => {
+    let timeList = text.split(/T|\./);
+    let timeText = timeList[0] + '\u00A0\u00A0' + timeList[1];
+
+    return timeText;
   };
 
   render() {
@@ -172,7 +185,8 @@ class ProblemSetDetail extends Component<
     let isSolver = false;
     let tag = '';
     let difficulty = '';
-    let created_time = '';
+    let createdTime = '';
+    let modifiedTime = '';
     if (this.props.selectedProblemSet) {
       const selectedUserID = this.props.selectedUser?.id;
       isCreator = this.props.selectedProblemSet.userID === selectedUserID;
@@ -181,16 +195,17 @@ class ProblemSetDetail extends Component<
       );
       isSolver = solver !== undefined;
 
-      tag = this.props.selectedProblemSet.tag.split('-')[1];
+      //tag = this.props.selectedProblemSet.tag.split('-')[1];
       let dict = difficultyOptions.find(
         (dict_ele) =>
           dict_ele['key'] === this.props.selectedProblemSet?.difficulty
       );
       if (dict) difficulty = dict['text'];
-      let created_time_list =
-        this.props.selectedProblemSet.created_time.split(/T|\./);
-      created_time =
-        created_time_list[0] + '\u00A0\u00A0' + created_time_list[1];
+
+      createdTime = this.formatTime(this.props.selectedProblemSet.createdTime);
+      modifiedTime = this.formatTime(
+        this.props.selectedProblemSet.modifiedTime
+      );
     } else {
       return <NotFound />;
     }
@@ -201,12 +216,13 @@ class ProblemSetDetail extends Component<
           <Container text>
             <ProblemSetView
               creator={this.props.selectedUser.username}
-              created_time={created_time}
+              createdTime={createdTime}
+              modifiedTime={modifiedTime}
               difficulty={difficulty}
-              scope={this.props.selectedProblemSet.is_open}
+              scope={this.props.selectedProblemSet.isOpen}
               tag={tag}
-              recommended_num={this.props.selectedProblemSet.recommended_num}
-              solved_num={this.props.selectedProblemSet.solved_num}
+              recommendedNum={this.props.selectedProblemSet.recommendedNum}
+              solvedNum={0} //{this.props.selectedProblemSet.solverIDs.length}
               isCreator={isCreator}
               isSolver={isSolver}
               title={this.props.selectedProblemSet.title}
@@ -233,6 +249,7 @@ class ProblemSetDetail extends Component<
                   <CommentComponent
                     key={com.id}
                     username={com.username}
+                    createdTime={this.formatTime(com.createdTime)}
                     content={com.content}
                     isCreator={isCreator}
                     onClickEditCommentButton={() =>
@@ -322,7 +339,7 @@ class ProblemSetDetail extends Component<
                     options={scopeOptions}
                     label="Scope"
                     defaultValue={
-                      this.props.selectedProblemSet.is_open
+                      this.props.selectedProblemSet.isOpen
                         ? 'scope-public'
                         : 'scope-private'
                     }
@@ -336,7 +353,7 @@ class ProblemSetDetail extends Component<
                     item
                     options={tagOptions}
                     label="Tag"
-                    defaultValue={this.props.selectedProblemSet.tag}
+                    //defaultValue={this.props.selectedProblemSet.tag}
                     onChange={(_, { value }) => {
                       this.setState({ editProblemSetTag: value as string });
                     }}
@@ -392,11 +409,13 @@ const mapDispatchToProps = (dispatch: AppDispatch) => {
       dispatch(getProblemSet(problemSetID)),
     onGetAllSolvers: (problemSetID: number) =>
       dispatch(getAllSolvers(problemSetID)),
+    onUpdateProblemSet: (problemSet: any) =>
+      dispatch(updateProblemSet(problemSet)),
     onDeleteProblemSet: (problemSetID: number) =>
       dispatch(deleteProblemSet(problemSetID)),
     onCreateComment: (comment: any) => dispatch(createComment(comment)),
     onUpdateComment: (comment: any) => dispatch(updateComment(comment)),
-    onDeleteComment: (commentID: number) => dispatch(deleteComment(commentID)),
+    onDeleteComment: (idList: any) => dispatch(deleteComment(idList)),
   };
 };
 

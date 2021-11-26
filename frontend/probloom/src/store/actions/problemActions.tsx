@@ -28,7 +28,9 @@ export const getAllProblemSets: () => ThunkAction<
   GetAllProblemSetsAction
 > = () => {
   return async (dispatch: AppDispatch) => {
-    const { data }: { data: ProblemSet[] } = await axios.get(`/api/problem/`);
+    const { data }: { data: ProblemSet[] } = await axios.get(
+      `/api/problem_set/`
+    );
     dispatch(getAllProblemSets_(data));
   };
 };
@@ -36,15 +38,13 @@ export const getAllProblemSets: () => ThunkAction<
 export interface GetProblemSetAction {
   type: typeof actionTypes.GET_PROBLEMSET;
   pset: ProblemSet;
-  problems_list: any;
 }
 
 export const getProblemSet_: (problemSet) => GetProblemSetAction = (
   problemSet
 ) => ({
   type: actionTypes.GET_PROBLEMSET,
-  pset: problemSet.pop('problems'),
-  problems_list: problemSet.problems,
+  pset: problemSet,
 });
 
 export const getProblemSet: (
@@ -132,26 +132,27 @@ export const createProblemSet: (
 };
 export interface UpdateProblemSetAction {
   type: typeof actionTypes.UPDATE_PROBLEMSET;
-  targetID: number;
+  pset: ProblemSet;
 }
 
 export const updateProblemSet_: (
   problemSet: ProblemSet
-) => DeleteProblemSetAction = (problemSet) => ({
-  type: actionTypes.DELETE_PROBLEMSET,
-  targetID: problemSet.id,
+) => UpdateProblemSetAction = (problemSet) => ({
+  type: actionTypes.UPDATE_PROBLEMSET,
+  pset: problemSet,
 });
 
 export const updateProblemSet: (
-  problemSetID: number
-) => ThunkAction<void, RootState, null, DeleteProblemSetAction> = (
-  problemSetID
+  problemSet: any
+) => ThunkAction<void, RootState, null, UpdateProblemSetAction> = (
+  problemSet
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data }: { data: ProblemSet } = await axios.delete(
-      `/api/problem/${problemSetID}/`
+    const { data }: { data: ProblemSet } = await axios.put(
+      `/api/problem_set/${problemSet.id}/`,
+      problemSet
     );
-    dispatch(deleteProblemSet_(data));
+    dispatch(updateProblemSet_(data));
   };
 };
 
