@@ -1,13 +1,15 @@
-from typing import Any, Dict
 import uuid
+from typing import Any, Dict, Mapping, Optional
 
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import BadRequest
 from django.db.models import (
     BooleanField,
     CharField,
     DateField,
     DateTimeField,
     ForeignKey,
-    IntegerField,
     ManyToManyField,
     Model,
     OneToOneField,
@@ -17,9 +19,8 @@ from django.db.models import (
     UUIDField,
 )
 from django.db.models.deletion import CASCADE, RESTRICT, SET
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AbstractUser
 from polymorphic.models import PolymorphicModel
+
 
 # Create your models here.
 class User(AbstractUser):
@@ -334,6 +335,75 @@ class SubjectiveProblemSolution(Model):
         SubjectiveProblem, on_delete=CASCADE, related_name="solutions", db_index=True
     )
     text = CharField(max_length=200)
+
+
+def verify_problem_request(request: Mapping[str, str]):
+    try:
+        problem_type = request["problemType"]
+        assert isinstance(problem_type, str), "problemType should be a string"
+        assert isinstance(request["content"], str), "content should be a string"
+        problem_number = request.get("problemNumber")
+        if problem_number is not None:
+            assert isinstance(problem_number, int), "problemNumber should be an integer"
+        assert problem_type in [
+            "multiple-choice",
+            "subjective",
+        ], 'problemType should be one of "multiple-choice" and "subjective"'
+        if problem_type == "multiple-choice":
+            assert isinstance(request["choices"], list), "choices should be an array"
+            assert isinstance(request["solution"], list), "solution should be an array"
+        elif problem_type == "subjective":
+            assert isinstance(
+                request["solutions"], list
+            ), "solutions should be an array"
+    except (KeyError, AssertionError) as error:
+        raise BadRequest() from error
+
+
+def create_problem(
+    request: Mapping[str, Any], creator_id: int, ps_id: int, p_id: Optional[int] = None
+):
+    kwargs = {}
+    if p_id is not None:
+        kwargs["pk"] = p_id
+
+    problem_number = request["problemNumber"]
+    problem_content = Content.objects.create(text=request["content"])
+    if request["problemType"] == "multiple-choice":
+        new_problem = MultipleChoiceProblem.objects.create(
+            problem_set_id=ps_id,
+            number=problem_number,
+            content=problem_content,
+            creator_id=creator_id,
+            solution="",
+            **kwargs
+        )
+        choices = request["choices"]
+        is_solution_list = [False] * len(choices)
+        for solution_number in request["solution"]:
+            is_solution_list[solution_number - 1] = True
+        for i, (is_solution, choice_text) in enumerate(zip(is_solution_list, choices)):
+            choice_content = Content.objects.create(text=choice_text)
+            MultipleChoiceProblemChoice.objects.create(
+                problem=new_problem,
+                number=i + 1,
+                is_solution=is_solution,
+                content=choice_content,
+            )
+    else:
+        new_problem = SubjectiveProblem.objects.create(
+            problem_set_id=ps_id,
+            number=problem_number,
+            content=problem_content,
+            creator_id=creator_id,
+            **kwargs
+        )
+        for solution_text in request["solutions"]:
+            SubjectiveProblemSolution.objects.create(
+                problem=new_problem, text=solution_text
+            )
+
+    return new_problem
 
 
 class Solved(Model):

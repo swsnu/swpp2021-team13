@@ -10,14 +10,18 @@
 
 ### Back-End
 
+First, you should install poetry. Follow the instructions [here](https://python-poetry.org/docs/).
+
 ```bash
 cd swpp2021-team13/backend/probloom
-pip install -r requirements.txt
-python manage.py makemigrations
-python manage.py migrate
+poetry install -E ipython
+poetry run python manage.py makemigrations
+poetry run python manage.py migrate
 ```
 
 ### Front-End
+
+First, you should install yarn 1.x. Follow the instructions [here](https://classic.yarnpkg.com/en/docs/install).
 
 ```bash
 cd swpp2021-team13/frontend/probloom
@@ -30,8 +34,8 @@ yarn
 
 ```bash
 cd swpp2021-team13/backend/probloom
-coverage run --branch --source='.' manage.py test
-coverage report -m
+poetry run coverage run
+poetry run coverage report -m
 ```
 
 ### Front-End
@@ -47,7 +51,7 @@ yarn test --coverage --watchAll=false
 
 ```bash
 cd swpp2021-team13/backend/probloom
-python manage.py runserver
+poetry run python manage.py runserver
 ```
 
 ### Front-End
