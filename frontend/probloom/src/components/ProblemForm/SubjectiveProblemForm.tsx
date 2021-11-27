@@ -11,19 +11,21 @@ interface SubjectiveProblemFormProps {
 }
 
 const SubjectiveProblemForm = (props: SubjectiveProblemFormProps) => {
-  const solutions = props.problem.solutions != undefined ?
-  props.problem.solutions.map((solution, index) => (
+  const solutionExist : any = props.problem.solutions;
+  const solutions = solutionExist.map((solution, index) => (
     <Solution
+      key={index}
       index={index}
       solution={solution}
       editContent={props.editContent}
     />
-  ))
-  : null;
+  ));
+
   return (
-    <div className="MultipleChoiceProblem">
-      <div className="ProblemStatement">
+    <div className="SubjectiveProblemForm">
+      <div>
         <textarea
+          id='sp-textarea'
           rows={4}
           value={`${props.problem.content}`}
           onChange={(event) => props.editContent(
@@ -31,9 +33,11 @@ const SubjectiveProblemForm = (props: SubjectiveProblemFormProps) => {
             event.target.value)}
         />
       </div>
-      <button onClick={() => props.editContent(
+      <button 
+        id='sp-addsolution'
+        onClick={() => props.editContent(
         'add_solution'
-      )}>New</button>
+        )}>New</button>
       {solutions}
     </div>
   );

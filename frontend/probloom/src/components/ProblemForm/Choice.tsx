@@ -12,8 +12,9 @@ export interface ChoiceProps {
 const Choice = (props: ChoiceProps) => {
   return (
     <div className="Choice" >
-      <label>choice {props.index}</label>
+      <label>{`choice ${props.index}`}</label>
       <input
+        id='choice-input'
         value={`${props.choice}`}
         onChange={(event) => props.editContent(
           'choice_content',
@@ -21,11 +22,12 @@ const Choice = (props: ChoiceProps) => {
           props.index)}
       />
       <input
+        id='choice-checkbox'
         type="checkbox"
         checked={props.isSolution}
-        onChange={(event) => props.editContent(
+        onChange={() => props.editContent(
           props.isSolution ? 'choice_not_solution' : 'choice_solution',
-          event.target.value,
+          null,
           props.index)}
       />
     </div>

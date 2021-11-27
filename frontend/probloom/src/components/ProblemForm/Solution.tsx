@@ -11,8 +11,9 @@ export interface SolutionProps {
   const Solution = (props: SolutionProps) => {
     return (
       <div className="Solution" >
-        <label>solution {props.index}</label>
+        <label>{`solution ${props.index}`}</label>
         <input
+          id='solution-input'
           value={`${props.solution}`}
           onChange={(event) => props.editContent(
             'solution_content',

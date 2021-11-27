@@ -15,6 +15,7 @@ const MultipleChoiceProblemForm = (
 ) => {
   const choices = props.problem.choices.map((choice, index) => (
     <Choice
+      key={index}
       index={index}
       choice={choice}
       isSolution={
@@ -25,18 +26,21 @@ const MultipleChoiceProblemForm = (
     />
   ))
   return (
-    <div className="MultipleChoiceProblem">
+    <div className="MultipleChoiceProblemForm">
       <div>
         <textarea
+          id='mcp-textarea'
           rows={4}
           value={`${props.problem.content}`}
           onChange={(event) => props.editContent(
             'content', event.target.value
           )}
         />
-        <button onClick={() => props.editContent(
-          'add_choice'
-        )}>New</button>
+        <button 
+          id='mcp-addchoice' 
+          onClick={() => props.editContent(
+            'add_choice'
+          )}>New</button>
       </div>
       {choices}
     </div>

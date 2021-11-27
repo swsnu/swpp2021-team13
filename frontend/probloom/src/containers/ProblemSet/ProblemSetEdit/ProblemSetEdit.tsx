@@ -77,39 +77,52 @@ class ProblemSetEdit extends Component<Props, State> {
       case 'content':
         newProblem.content = content; break;
       case 'add_choice':
-        newProblem.choices.push({ content: 'new choice' }); break;
+        newProblem.choices.push('new choice'); break;
       case 'choice_content':
-        newProblem.choices[index].content = content; break;
+        newProblem.choices[index] = content; break;
       case 'choice_solution':
         newProblem.solution.push(index); break;
       case 'choice_not_solution':
-        newProblem.solution.splice(newProblem.solutions.indexOf(index), 1); break;
+        newProblem.solution.splice(newProblem.solution.indexOf(index), 1); break;
       case 'add_solution':
-        newProblem.solutions.push({ content: 'new solution' }); break;
+        newProblem.solutions.push('new solution'); break;
       case 'solution_content':
-        newProblem.solutions[index].content = content; break;
+        newProblem.solutions[index] = content; break;
     }
     this.setState({ editingProblem: newProblem })
   }
 
   render() {
     const problemNumberButtons = this.props.selectedProblemSet.problems
-      .map((_, index) => <button onClick={() => this.onClickProblemNumberButton(index)} />);
+      .map((_, index) => (
+        <button
+          key={index}
+          id={`problemsetedit-p${index}`}
+          onClick={() => this.onClickProblemNumberButton(index)}>
+          {index}
+        </button>
+      ));
 
     let currentProblem;
     if (this.state.editingProblem == null) {
       currentProblem = null;
     } else {
       const editingProblem : any = this.state.editingProblem;
-      currentProblem = editingProblem.problemType === 'multiple-choice' ?
-        <MultipleChoiceProblemForm 
-          problem={this.state.editingProblem}
-          editContent={this.editProblemHandler}
-        />
-      : <SubjectiveProblemForm
-          problem={this.state.editingProblem}
-          editContent={this.editProblemHandler}
-        />
+      currentProblem = 
+      <div>
+        {editingProblem.problemType === 'multiple-choice' ?
+          <MultipleChoiceProblemForm 
+            problem={this.state.editingProblem}
+            editContent={this.editProblemHandler}
+          />
+        : <SubjectiveProblemForm
+            problem={this.state.editingProblem}
+            editContent={this.editProblemHandler}
+          />
+        }
+        <button id="problemsetedit-save" 
+          onClick={() => this.onClickSaveButton()}>Save</button>
+      </div>
     }
 
     return (
@@ -122,18 +135,9 @@ class ProblemSetEdit extends Component<Props, State> {
         >
           Back to problem set search
         </NavLink>
+
         {problemNumberButtons}
-
         {currentProblem}
-
-        <div className="SubmitProblemSetButton">
-          <button
-            id="problemsetedit-submit"
-            onClick={() => this.onClickSaveButton()}
-          >
-            Save
-          </button>
-        </div>
       </div>
     );
   }

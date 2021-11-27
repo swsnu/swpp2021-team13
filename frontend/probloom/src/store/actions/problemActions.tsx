@@ -204,14 +204,14 @@ export const deleteProblemSet: (
 
 export interface CreateProblemAction {
   type: typeof actionTypes.CREATE_PROBLEM;
-  newProblem: interfaces.UpdateProblemRequest;
+  newProblemID: number;
 }
 
-export const createProblem_: (problemData) => CreateProblemAction = (
-  problemData
+export const createProblem_: (id) => CreateProblemAction = (
+  id
 ) => ({
   type: actionTypes.CREATE_PROBLEM,
-  newProblem: problemData
+  newProblemID: id
 });
 
 export const createProblem: (
@@ -222,8 +222,8 @@ export const createProblem: (
   problemData: interfaces.CreateProblemRequest
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data } = await axios.get(`/api/problem_set/${ps_id}/`);
-    dispatch(createProblem_(problemData));
+    const { data } = await axios.get(`/api/problem_set/${ps_id}/`, problemData);
+    dispatch(createProblem_(data.id));
   };
 };
 
