@@ -1,11 +1,11 @@
-import { ProblemSetAction } from '../actions/problemActions';
+import { ProblemSetAction } from '../actions/problemSetActions';
 import * as actionTypes from '../actions/actionTypes';
 import { Reducer } from 'redux';
 import * as interfaces from './problemReducerInterface';
 
 export interface ProblemSetState {
   problemSets: interfaces.ProblemSetInterface[];
-  solvers: any[];
+  solvers: interfaces.Solver[];
   selectedProblemSet: interfaces.ProblemSetInterface | null;
   selectedProblem: interfaces.ProblemInterface | null;
 }
@@ -35,40 +35,11 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
         ...state,
         problemSets: [...state.problemSets, action.problemSet],
       };
-    case actionTypes.EDIT_PROBLEM_SET:
-      // const otherProblemSets = state.problemSets.filter((problemSet) => {
-      //   return problemSet.id !== action.pset.id;
-      // });
-      const editProblemSets = {
-        id: action.pset.id,
-        title: action.pset.title,
-        created_time: action.pset.created_time,
-        is_open: action.pset.is_open,
-        tag: action.pset.tag,
-        difficulty: action.pset.difficulty,
-        content: action.pset.content,
-        userID: action.pset.userID,
-        username: action.pset.username,
-        solved_num: action.pset.solved_num,
-        recommended_num: action.pset.recommended_num,
-      };
-      // const editProblems: NewProblemSet[] = [];
-      // action.problems_list.forEach((problem) => {
-      //   editProblems.push({
-      //     index: problem.index,
-      //     problem_type: problem.problem_type,
-      //     problem_statement: problem.problem_statement,
-      //     choice: problem.choice,
-      //     solution: problem.solution,
-      //     explanation: problem.explanation,
-      //   });
-      // });
-
+    case actionTypes.UPDATE_PROBLEMSET:
       return {
         ...state,
-        selectedProblemSet: editProblemSets,
+        selectedProblemSet: action.pset,
       };
-
     case actionTypes.DELETE_PROBLEMSET:
       const remainProblemSet = state.problemSets.filter((problemset) => {
         return problemset.id !== action.targetID;
@@ -76,7 +47,15 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
       return { ...state, problemSets: remainProblemSet };
 
     case actionTypes.CREATE_PROBLEM:
-      break;
+      if (state.selectedProblemSet == null) break;
+      const afterCreateProblem = [
+        ...state.selectedProblemSet.problems,
+        action.newProblemID
+      ];
+      return { ...state, selectedProblemSet: {
+        ...state.selectedProblemSet,
+        problems: afterCreateProblem
+      }}
     
     case actionTypes.GET_PROBLEM:
       return { ...state, selectedProblem: action.selectedProblem }
@@ -98,7 +77,8 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
       return { ...state, selectedProblem: updatedProblem }
 
     case actionTypes.DELETE_PROBLEM:
-      const afterDeleteProblem = state.selectedProblemSet?.problems
+      if (state.selectedProblemSet == null) break;
+      const afterDeleteProblem = state.selectedProblemSet.problems
         .filter((id) => id != action.targetProblemID)
       return {
         ...state, 

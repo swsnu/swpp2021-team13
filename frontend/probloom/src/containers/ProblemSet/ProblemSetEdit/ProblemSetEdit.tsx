@@ -3,8 +3,13 @@ import { connect } from 'react-redux';
 import { returntypeof } from 'react-redux-typescript';
 import { RouteComponentProps } from 'react-router';
 import { NavLink } from 'react-router-dom';
+<<<<<<< HEAD
+=======
+import { Form, Input } from 'semantic-ui-react';
+import { tagOptions } from '../ProblemSetSearch/ProblemSetSearch';
+>>>>>>> d967029b34dfb0568e5cc81c3450224dd1b63f03
 
-import * as actionCreators from '../../../store/actions/index';
+import * as actionCreators from '../../../store/actions';
 import * as interfaces from '../../../store/actions/problemActionInterface';
 import MultipleChoiceProblemForm from '../../../components/ProblemForm/MultipleChoiceProblemForm';
 import SubjectiveProblemForm from '../../../components/ProblemForm/SubjectiveProblemForm';
@@ -190,8 +195,24 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
+<<<<<<< HEAD
     onCreateProblem: (id: number, problem: interfaces.CreateProblemRequest) => {
       dispatch(actionCreators.createProblem(id, problem)); 
+=======
+    onGetProblemSet: (problemSetID: number) =>
+      dispatch(actionCreators.getProblemSet(problemSetID)),
+
+    onEditProblemSet: (
+      id: number,
+      title: string,
+      content: string,
+      scope: string,
+      tag: string,
+      difficulty: string,
+      problems: NewProblemSet[]
+    ) => {
+      dispatch({});
+>>>>>>> d967029b34dfb0568e5cc81c3450224dd1b63f03
     },
     onGetProblem: (id: number) => {
       dispatch(actionCreators.getProblem(id)); 

@@ -2,7 +2,7 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 import { returntypeof } from 'react-redux-typescript';
 
-import * as actionCreators from '../../../store/actions/index';
+import * as actionCreators from '../../../store/actions';
 import {
   NewProblemSet,
   ProblemSetCreateState,
@@ -32,12 +32,12 @@ type Props = ProblemSetCreateProps &
   typeof actionPropTypes;
 type State = ProblemSetCreateState;
 
-const scopeOptions = [
+export const scopeOptions = [
   { text: 'Private', value: 'scope-private' },
   { text: 'Public', value: 'scope-public' },
 ];
 
-const difficultyOptions = [
+export const difficultyOptions = [
   { key: 1, text: 'Basic', value: '1' },
   { key: 2, text: 'Intermediate', value: '2' },
   { key: 3, text: 'Advanced', value: '3' },

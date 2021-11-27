@@ -1,5 +1,6 @@
 import * as actionTypes from '../actions/actionTypes';
-import problemReducer, { ProblemSet } from './problemReducer';
+import problemReducer from './problemReducer';
+import * as interfaces from './problemReducerInterface';
 
 describe('Problem Reducer', () => {
   it('should return default state', () => {
@@ -14,20 +15,22 @@ describe('Problem Reducer', () => {
   });
 
   test('gets problemsets', () => {
-    const problemset1: ProblemSet = {
+    const problemset1: interfaces.ProblemSetInterface = {
       id: 1,
       title: 'title1',
-      created_time: 'create_time1',
-      is_open: false,
-      tag: 'math',
+      createdTime: 'create_time1',
+      modifiedTime: 'modified_time1',
+      isOpen: false,
+      tag: [['tag1'], ['tag2']],
       difficulty: 1,
       content: 'content1',
       userID: 1,
       username: 'creator1',
-      solved_num: 1,
-      recommended_num: 1,
+      solverIDs: [1],
+      recommendedNum: 1,
+      problems: [1],
     };
-    const problemset2: ProblemSet = {
+    const problemset2: interfaces.ProblemSetInterface = {
       id: 2,
       title: 'title2',
       created_time: 'create_time2',
@@ -40,7 +43,7 @@ describe('Problem Reducer', () => {
       solved_num: 2,
       recommended_num: 2,
     };
-    const problemSets: ProblemSet[] = [problemset1, problemset2];
+    const problemSets: interfaces.ProblemSetInterface[] = [problemset1, problemset2];
     const state = problemReducer(undefined, {
       type: actionTypes.GET_ALL_PROBLEMSETS,
       problemSets: problemSets,

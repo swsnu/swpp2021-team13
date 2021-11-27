@@ -12,12 +12,12 @@ export {
   getProblemSet,
   getAllSolvers,
   createProblemSet,
-  editProblemSet,
   deleteProblemSet,
   createProblem,
   getProblem,
   updateProblem,
-} from './problemActions';
+  updateProblemSet,
+} from './problemSetActions';
 
 export {
   getCommentsOfProblemSet,

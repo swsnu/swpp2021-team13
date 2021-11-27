@@ -37,6 +37,11 @@ describe('<App />', () => {
       expect(screen.getByRole('heading')).toHaveTextContent('TEST_NOT_FOUND');
     });
 
+    it('routes to signup page', () => {
+      render(app);
+      history.push('/signup/');
+    });
+
     it.each([
       ['/user/123/summary', '123', 'summary'],
       ['/user/123/statistics', '123', 'statistics'],

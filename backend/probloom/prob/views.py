@@ -87,10 +87,10 @@ class SignUpView(View):
         except (KeyError, JSONDecodeError) as e:
             return HttpResponseBadRequest()
 
-        user_set = User.objects.filter(username=username)
-        if user_set.exists():
-            res = {"id": "FAILURE", "username": "DUPLICATE_USERNAME"}
-            return HttpResponse(status=400)  # TODO: change status to 200
+        user_set = User.objects.all()
+        for user in user_set:
+            if (user.username == username) or (user.email == email):
+                return HttpResponse(status=401)
 
         User.objects.create_user(username=username, email=email, password=password)
         new_user = User.objects.get(username=username)
@@ -111,21 +111,19 @@ class SignInView(View):
     def post(self, request: HttpRequest, **kwargs) -> HttpResponse:
         try:
             req_data = json.loads(request.body.decode())
-            email_or_username = req_data["id"]
+            id = req_data["id"]
             password = req_data["password"]
         except (KeyError, JSONDecodeError) as e:
             return HttpResponseBadRequest()
 
-        is_email = email_or_username.find("@") > 0
-        if is_email:
-            try:
-                username = User.objects.get(email=email_or_username).username
-            except:
-                return JsonResponse(
-                    {"result": "FAILURE"}, status=400
-                )  # TODO: change status to 200
-        else:
-            username = email_or_username
+        isEmail = id.find("@") > 0
+        try:
+            if isEmail:
+                username = User.objects.get(email=id).username
+            else:
+                username = id
+        except:
+            return HttpResponse(status=401)
 
         user = authenticate(request, username=username, password=password)
 
@@ -143,22 +141,18 @@ class SignInView(View):
                 "email": user_.email,
                 "logged_in": True,
             }
-            return JsonResponse(res)
+            return JsonResponse(res, status=201, safe=False)
         else:
-            return JsonResponse(
-                {"result": "FAILURE"}, status=400
-            )  # TODO: change status to 200
+            return HttpResponse(status=401)
 
 
 class SignOutView(View):
     def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
         if request.user.is_authenticated:
             logout(request)
-            return JsonResponse({"result": "SUCCESS"}, status=200)
+            return HttpResponse(status=204)
         else:
-            return JsonResponse(
-                {"result": "FAILURE"}, status=400
-            )  # TODO: change status to 200
+            return HttpResponse(status=401)
 
 
 @dataclasses.dataclass
@@ -706,7 +700,8 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
 
         If a problem set with id ``ps_id`` exists and the request follows the
         constraints of the corresponding fields of ``ProblemSet``, update the
-        problem set and respond with ``200 (OK)``.
+        problem set and respond with ``200 (OK)`` and ``GetProblemSetResponse``
+        of :meth:`ProblemSetInfoView.get`.
 
         if a problem set with id ``ps_id`` does not exist, respond with ``404
         (Not Found)``.
@@ -738,7 +733,11 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
         problem_set.is_open = is_open
         problem_set.difficulty = difficulty
         problem_set.save()
-        return HttpResponse()
+
+        res = problem_set.info_dict()
+        problems_list = problem_set.problems.order_by("number").values("id").all()
+        res["problems"] = list(map(lambda entry: entry["id"], problems_list))
+        return JsonResponse(res, safe=False)
 
     def delete(self, request: HttpRequest, ps_id, **kwargs):
         """Delete a specific problem set.
@@ -799,24 +798,6 @@ def update_problem_set_recommendation(request: HttpRequest, ps_id: int) -> HttpR
     """
 
 
-class ProblemSetCommentView(View):
-    def get(self, request: HttpRequest, id, **kwargs):
-        if request.user.is_authenticated:
-            try:
-                problem_set = ProblemSet.objects.get(id=id)
-            except:
-                return HttpResponse(status=404)
-
-            comment_set = problem_set.comment.all()
-            res = []
-            for comment in comment_set:
-                res.append(comment.to_dict())
-
-            return JsonResponse(res, status=201, safe=False)
-        else:
-            return HttpResponse(status=401)
-
-
 class ProblemSetCommentListView(LoginRequiredMixin, View):
     """List view methods related to model :class:`ProblemSetComment`."""
 
@@ -854,10 +835,13 @@ class ProblemSetCommentListView(LoginRequiredMixin, View):
         """
         if not ProblemSet.objects.filter(pk=ps_id).exists():
             return HttpResponseNotFound()
-
+        """
         comment_set = ProblemSetComment.objects.filter(
             problem_set_id=ps_id
         ).select_related("content")
+        """
+        comment_set = ProblemSetComment.objects.filter(problem_set_id=ps_id)
+
         res = []
         for comment in comment_set:
             res.append(comment.to_dict())
@@ -902,7 +886,6 @@ class ProblemSetCommentListView(LoginRequiredMixin, View):
             return HttpResponseBadRequest()
 
         creator = request.user.statistics
-        content = Content.objects.create(text=content)
         comment = ProblemSetComment.objects.create(
             content=content, creator=creator, problem_set=problem_set
         )
@@ -993,8 +976,8 @@ class ProblemSetCommentInfoView(LoginRequiredMixin, View):
         except (KeyError, JSONDecodeError) as e:
             return HttpResponseBadRequest()
 
-        comment.content.text = content
-        comment.content.save()
+        comment.content = content
+        comment.save()
 
         res = comment.to_dict()
         return JsonResponse(res)
@@ -1023,7 +1006,6 @@ class ProblemSetCommentInfoView(LoginRequiredMixin, View):
         if request.user.pk != comment.creator.user.pk:
             raise PermissionDenied()
 
-        # res = comment.to_dict()
         comment.delete()
         return HttpResponse()
 

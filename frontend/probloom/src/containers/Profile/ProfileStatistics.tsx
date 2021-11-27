@@ -2,7 +2,7 @@ import { Component } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
 import './ProfileStatistics.css';
-import * as actionCreators from '../../store/actions/index';
+import * as actionCreators from '../../store/actions';
 import { AppDispatch, RootState } from '../../store/store';
 import { UserStatisticsProblemSet } from '../../store/reducers/userReducer';
 
