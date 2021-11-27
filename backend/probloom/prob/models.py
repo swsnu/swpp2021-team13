@@ -1,6 +1,8 @@
-from typing import Any, Dict, Mapping, Optional
 import uuid
+from typing import Any, Dict, Mapping, Optional
 
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import BadRequest
 from django.db.models import (
     BooleanField,
@@ -17,9 +19,8 @@ from django.db.models import (
     UUIDField,
 )
 from django.db.models.deletion import CASCADE, RESTRICT, SET
-from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AbstractUser
 from polymorphic.models import PolymorphicModel
+
 
 # Create your models here.
 class User(AbstractUser):

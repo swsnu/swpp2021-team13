@@ -23,15 +23,10 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 from django.views.generic.detail import SingleObjectMixin
 
 from .models import (
-    Content,
-    MultipleChoiceProblem,
-    MultipleChoiceProblemChoice,
     Problem,
     ProblemSet,
     ProblemSetComment,
     Solved,
-    SubjectiveProblem,
-    SubjectiveProblemSolution,
     User,
     UserProfile,
     UserStatistics,
@@ -683,7 +678,7 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
             req_data = json.loads(request.body)
             title = req_data["title"]
             is_open = req_data["isOpen"]
-            # tags = req_data["tag"]
+            # tags = req_data["tag"]  # TODO
             difficulty = int(req_data["difficulty"])
             content = req_data["content"]
         except (KeyError, ValueError, JSONDecodeError) as e:
@@ -861,7 +856,9 @@ class ProblemSetCommentInfoView(LoginRequiredMixin, View):
 
         .. rubric:: Behavior
 
-        If a problem set with id ``ps_id`` exists and a comment to the problem set with id ``c_id`` exists, respond with ``200 (OK)`` and following data:
+        If a problem set with id ``ps_id`` exists and a comment to the problem
+        set with id ``c_id`` exists, respond with ``200 (OK)`` and following
+        data:
 
         .. code-block:: typescript
 
@@ -874,7 +871,8 @@ class ProblemSetCommentInfoView(LoginRequiredMixin, View):
              content: string;
            }
 
-        If either problem set or comment does not exist, respond with ``404 (Not Found)``.
+        If either problem set or comment does not exist, respond with ``404 (Not
+        Found)``.
         """
         if not ProblemSet.objects.filter(pk=ps_id).exists():
             return HttpResponseNotFound()
@@ -892,7 +890,8 @@ class ProblemSetCommentInfoView(LoginRequiredMixin, View):
 
         .. rubric:: How to use
 
-        Send a ``PUT`` request to ``/api/problem_set/:ps_id/comment/:c_id/`` with the following data:
+        Send a ``PUT`` request to ``/api/problem_set/:ps_id/comment/:c_id/``
+        with the following data:
 
         .. code-block:: typescript
 
@@ -946,9 +945,12 @@ class ProblemSetCommentInfoView(LoginRequiredMixin, View):
 
         .. rubric:: Behavior
 
-        If a problem set with id ``ps_id`` exists and a comment to the problem set with id ``c_id`` exists, delete the comment and respond with ``200 (OK)``.
+        If a problem set with id ``ps_id`` exists and a comment to the problem
+        set with id ``c_id`` exists, delete the comment and respond with ``200
+        (OK)``.
 
-        If either problem set or comment does not exist, respond with ``404 (Not Found)``.
+        If either problem set or comment does not exist, respond with ``404 (Not
+        Found)``.
         """
         if not ProblemSet.objects.filter(pk=ps_id).exists():
             return HttpResponseNotFound()
@@ -984,7 +986,8 @@ class ProblemInfoView(LoginRequiredMixin, View):
 
         .. rubric:: Behavior
 
-        If a problem with id ``p_id`` exists, respond with ``200 (OK)`` and following data:
+        If a problem with id ``p_id`` exists, respond with ``200 (OK)`` and
+        following data:
 
         .. code-block:: typescript
 
@@ -1019,7 +1022,8 @@ class ProblemInfoView(LoginRequiredMixin, View):
         ``solutions`` field of ``GetSubjectiveProblemResponse`` are available
         only to the author of the problem.
 
-        If a problem with id ``p_id`` does not exist, respond with ``404 (Not Found)``.
+        If a problem with id ``p_id`` does not exist, respond with ``404 (Not
+        Found)``.
         """
         try:
             problem = Problem.objects.get(pk=p_id)
@@ -1061,7 +1065,8 @@ class ProblemInfoView(LoginRequiredMixin, View):
 
         .. rubric:: Behavior
 
-        If a problem with id ``p_id`` exists and the request follows the constraints, do the following:
+        If a problem with id ``p_id`` exists and the request follows the
+        constraints, do the following:
 
         #. If ``problemNumber`` is set in the request, different from the
            current problem number, and a problem in the same problem set having
@@ -1071,9 +1076,11 @@ class ProblemInfoView(LoginRequiredMixin, View):
         #. Update the problem and respond with ``200 (OK)`` and
            ``GetProblemResponse`` of :meth:`ProblemInfoView.get`.
 
-        If a problem with id ``p_id`` does not exist, respond with ``404 (Not Found)``.
+        If a problem with id ``p_id`` does not exist, respond with ``404 (Not
+        Found)``.
 
-        If a problem with id ``p_id`` exists, but the request does not follow the constraints, respond with ``400 (Bad Request)``.
+        If a problem with id ``p_id`` exists, but the request does not follow
+        the constraints, respond with ``400 (Bad Request)``.
         """
         try:
             problem = Problem.objects.get(pk=p_id)
@@ -1118,9 +1125,11 @@ class ProblemInfoView(LoginRequiredMixin, View):
 
         .. rubric:: Behavior
 
-        If a problem with id ``p_id`` exists, delete the problem and respond with ``200 (OK)``.
+        If a problem with id ``p_id`` exists, delete the problem and respond
+        with ``200 (OK)``.
 
-        If a problem with id ``p_id`` does not exist, respond with ``404 (Not Found)``.
+        If a problem with id ``p_id`` does not exist, respond with ``404 (Not
+        Found)``.
         """
         try:
             problem = Problem.objects.get(pk=p_id)
@@ -1144,7 +1153,8 @@ def solve_problem(request: HttpRequest, p_id: int) -> HttpResponse:
 
     .. rubric:: How to use
 
-    Send a ``POST`` request to ``/api/problem/:p_id/solve/`` with the following data:
+    Send a ``POST`` request to ``/api/problem/:p_id/solve/`` with the following
+    data:
 
     .. code-block:: typescript
 
@@ -1173,9 +1183,12 @@ def solve_problem(request: HttpRequest, p_id: int) -> HttpResponse:
          correct: boolean;
        }
 
-    ``correct`` should be true if and only if the user solved the problem correctly.
+    ``correct`` should be true if and only if the user solved the problem
+    correctly.
 
-    If a problem with id ``p_id`` exists but the types of request and problem do not match (e.g. user tries to solve subjective question with a number array), respond with ``200 (OK)`` and following data:
+    If a problem with id ``p_id`` exists but the types of request and problem do
+    not match (e.g. user tries to solve subjective question with a number
+    array), respond with ``200 (OK)`` and following data:
 
     .. code-block:: typescript
 
@@ -1184,10 +1197,13 @@ def solve_problem(request: HttpRequest, p_id: int) -> HttpResponse:
          cause: 'INCORRECT_PROBLEM_TYPE';
        }
 
-    If a problem with id ``p_id`` does not exist, respond with ``404 (Not Found)``.
+    If a problem with id ``p_id`` does not exist, respond with ``404 (Not
+    Found)``.
 
-    If a problem with id ``p_id`` exists but the request does not follow the constraints, respond with ``400 (Bad Request)``.
+    If a problem with id ``p_id`` exists but the request does not follow the
+    constraints, respond with ``400 (Bad Request)``.
     """
+    return HttpResponse(status_code=http.HTTPStatus.NOT_IMPLEMENTED)
 
 
 @require_GET
@@ -1200,7 +1216,8 @@ def find_solvers(request: HttpRequest, ps_id: int) -> HttpResponse:
 
     .. rubric:: Behavior
 
-    If a problem set with id ``ps_id`` exists, respond with ``200 (OK)`` and the following data:
+    If a problem set with id ``ps_id`` exists, respond with ``200 (OK)`` and the
+    following data:
 
     .. code-block:: typescript
 
@@ -1213,10 +1230,13 @@ def find_solvers(request: HttpRequest, ps_id: int) -> HttpResponse:
          problems: (boolean | null)[];
        }
 
-    An entry of ``problems`` is null if and only if the user did not try that problem.
+    An entry of ``problems`` is null if and only if the user did not try that
+    problem.
 
-    If a problem set with id ``ps_id`` does not exist, respond with ``404 (Not Found)``.
+    If a problem set with id ``ps_id`` does not exist, respond with ``404 (Not
+    Found)``.
     """
+    return HttpResponse(status_code=http.HTTPStatus.NOT_IMPLEMENTED)
 
 
 class ProblemSetSolvedListView(LoginRequiredMixin, View):
@@ -1241,7 +1261,8 @@ def get_solver(request: HttpRequest, ps_id: int, u_id: int) -> HttpResponse:
 
     .. rubric:: Behavior
 
-    If a problem set with id ``ps_id`` exists and a user with id ``u_id`` exists, respond with ``200 (OK)`` and the following data:
+    If a problem set with id ``ps_id`` exists and a user with id ``u_id``
+    exists, respond with ``200 (OK)`` and the following data:
 
     .. code-block:: typescript
 
@@ -1252,10 +1273,13 @@ def get_solver(request: HttpRequest, ps_id: int, u_id: int) -> HttpResponse:
          problems: (boolean | null)[];
        }
 
-    An entry of ``problems`` is null if and only if the user did not try that problem.
+    An entry of ``problems`` is null if and only if the user did not try that
+    problem.
 
-    If either problem set or user does not exist, respond with ``404 (Not Found)``.
+    If either problem set or user does not exist, respond with ``404 (Not
+    Found)``.
     """
+    return HttpResponse(status_code=http.HTTPStatus.NOT_IMPLEMENTED)
 
 
 class ProblemSetSolvedView(LoginRequiredMixin, View):
