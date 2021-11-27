@@ -7,7 +7,7 @@ from json.decoder import JSONDecodeError
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin as LoginRequiredMixin_
-from django.core.exceptions import BadRequest, PermissionDenied
+from django.core.exceptions import BadRequest, ObjectDoesNotExist, PermissionDenied
 from django.db.models import Count, Max
 from django.db.models.expressions import F
 from django.http import (
@@ -1108,11 +1108,11 @@ class ProblemInfoView(LoginRequiredMixin, View):
                     problem_set_id=problem.problem_set.pk, number=problem_number
                 )
             except Problem.DoesNotExist:
-                return HttpResponse(status_code=http.HTTPStatus.CONFLICT)
+                return HttpResponse(status=http.HTTPStatus.CONFLICT)
             existing_problem.number = problem.number
             existing_problem.save()
         else:
-            problem_number = problem.number
+            pending_problem["problemNumber"] = problem.number
 
         ps_id = problem.problem_set.pk
         problem.delete()

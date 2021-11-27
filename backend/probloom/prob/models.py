@@ -345,6 +345,10 @@ def verify_problem_request(request: Mapping[str, str]):
         problem_number = request.get("problemNumber")
         if problem_number is not None:
             assert isinstance(problem_number, int), "problemNumber should be an integer"
+        assert problem_type in [
+            "multiple-choice",
+            "subjective",
+        ], 'problemType should be one of "multiple-choice" and "subjective"'
         if problem_type == "multiple-choice":
             assert isinstance(request["choices"], list), "choices should be an array"
             assert isinstance(request["solution"], list), "solution should be an array"
@@ -357,7 +361,7 @@ def verify_problem_request(request: Mapping[str, str]):
 
 
 def create_problem(
-    request: Mapping[str, str], creator_id: int, ps_id: int, p_id: Optional[int] = None
+    request: Mapping[str, Any], creator_id: int, ps_id: int, p_id: Optional[int] = None
 ):
     kwargs = {}
     if p_id is not None:
