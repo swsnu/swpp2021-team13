@@ -129,4 +129,30 @@ describe('User Reducer', () => {
       selectedUserStatistics: null,
     });
   });
+
+  it('update fails user introduction', () => {
+    let introduction = 'TEST_USER_PROFILE_INTRODUCTION_0';
+    const userProfile = {
+      userId: 42,
+      introduction,
+    };
+    const initialState = {
+      users: [],
+      selectedUser: null,
+      selectedUserProfile: null,
+      selectedUserStatistics: null,
+    };
+
+    introduction = 'TEST_USER_PROFILE_INTRODUCTION_1';
+    let state = userReducer(initialState, {
+      type: UPDATE_USER_INTRODUCTION,
+      newIntroduction: introduction,
+    });
+    expect(state).toEqual({
+      users: [],
+      selectedUser: null,
+      selectedUserProfile: null,
+      selectedUserStatistics: null,
+    });
+  });
 });
