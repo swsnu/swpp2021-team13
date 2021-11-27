@@ -96,21 +96,6 @@ class ProblemSetCreate extends Component<Props, State> {
     });
   };
 
-  addProblemImageHandler = (event) => {
-    // console.log('@@@@@@@files ' + event.target.files);
-    // console.log('@@@@@@@files[0] ' + event.target.files[0]);
-    // console.log('@@@@@@@filename ' + event.target.files[0].name);
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      // console.log('-------reader.result', reader.result);
-      this.setState({
-        // image: reader.result as string,
-      });
-    };
-    reader.readAsDataURL(file);
-  };
-
   removeProblemHandler = (index: number) => {
     const deletedProblems = this.state.problems.filter((problem) => {
       return problem.problemNumber !== index;
@@ -146,7 +131,6 @@ class ProblemSetCreate extends Component<Props, State> {
           label="Problem Content"
           placeholder="Content : Explain your problem set"
           onChange={(event) => {
-            console.log('************ index : ', index);
             let editProblem: any;
             if (currentProblem.problemType === 'multiple-choice') {
               let _currentProblem =
@@ -188,86 +172,72 @@ class ProblemSetCreate extends Component<Props, State> {
         />
       );
     };
-    const tabContentImage = (currentProblem, index: number) => (
-      <Form.Group>
-        <Button
-          id="problemset-problem-content-input-file-button"
-          as="label"
-          htmlFor="file"
-          type="button"
-          content="Upload problem image"
-        ></Button>
-        <input
-          id="file"
-          type="file"
-          accept="image/*"
-          hidden
-          onChange={(event) => {
-            console.log('************ index : ', index);
-            // console.log(
-            //   '************ event.target.files : ',
-            //   event.target.files
-            // );
+    let tabContentImage = (currentProblem, index: number) => {
+      return (
+        <>
+          <Input
+            id="problemset-problem-content-input-file-button"
+            type="file"
+            accept="image/*"
+            onChange={(event) => {
+              // console.log('************ index : ', index);
 
-            if (!event.target.files) {
-              return;
-            }
-            const file = event.target.files[0];
+              if (!event.target.files) {
+                return;
+              }
+              const file = event.target.files[0];
+              // console.log(event.target.files[0]);
 
-            // console.log('@@@@@@@ event.target.files ' + event.target.files);
-            // console.log('@@@@@@@filename ' + event.target.files[0].name);
-
-            const reader = new FileReader();
-
-            reader.onloadend = () => {
-              const editProblem: CreateProblemRequest = {
-                problemType: currentProblem.problemType,
-                problemSetID: currentProblem.problemSetID,
-                problemNumber: currentProblem.problemNumber,
-                content: reader.result as string,
-                choices: currentProblem.choices,
-                solutions: currentProblem.solutions,
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                const editProblem: CreateProblemRequest = {
+                  problemType: currentProblem.problemType,
+                  problemSetID: currentProblem.problemSetID,
+                  problemNumber: currentProblem.problemNumber,
+                  content: reader.result as string,
+                  choices: currentProblem.choices,
+                  solutions: currentProblem.solutions,
+                };
+                const newProblem: CreateProblemRequest[] = [];
+                this.state.problems.forEach((problem) => {
+                  if (problem.problemNumber === index) {
+                    newProblem.push(editProblem);
+                  } else {
+                    newProblem.push(problem);
+                  }
+                });
+                this.setState({
+                  ...this.state,
+                  problems: newProblem,
+                });
               };
-              const newProblem: CreateProblemRequest[] = [];
-              this.state.problems.forEach((problem) => {
-                // console.log('________', problem.problemNumber, index);
-                if (problem.problemNumber === index) {
-                  newProblem.push(editProblem);
-                } else {
-                  newProblem.push(problem);
-                }
-              });
-              this.setState({
-                ...this.state,
-                problems: newProblem,
-              });
-            };
+              reader.readAsDataURL(file);
+            }}
+          />
 
-            reader.readAsDataURL(file);
-            // let arr = this.state.problems.filter(
-            //   (problem) => problem.problemNumber === index
-            // );
-            // console.log('---------------', index, '------', arr[0]);
-          }}
-        />
-
-        <Image
-          id="problemset-problem-content-input-file-preview"
-          src={
-            this.state.problems.filter(
-              (problem) => problem.problemNumber === index
-            )[0].content
-          }
-          alt=""
-        />
-      </Form.Group>
-    );
+          <Image
+            id="problemset-problem-content-input-file-preview"
+            src={
+              this.state.problems.filter(
+                (problem) => problem.problemNumber === index
+              )[0].content
+            }
+            alt=""
+            size="huge"
+          />
+        </>
+      );
+    };
 
     const newProblems = this.state.problems.map(
       (currentProblem: CreateProblemRequest, index) => {
         return (
           <div className="NewProblem" key={index.toString()}>
-            <Divider />
+            <div>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              <Divider />
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            </div>
 
             <div className="ProblemContent">
               <Tab
@@ -281,11 +251,10 @@ class ProblemSetCreate extends Component<Props, State> {
                     ),
                   },
                   {
-                    menuItem: 'Make content in IMAGE',
+                    menuItem: `Make content in IMAGE`,
                     render: () => (
                       <Tab.Pane>
-                        {((): JSX.Element =>
-                          tabContentImage(currentProblem, index))()}
+                        {(() => tabContentImage(currentProblem, index))()}
                       </Tab.Pane>
                     ),
                   },
@@ -342,7 +311,7 @@ class ProblemSetCreate extends Component<Props, State> {
 
             {currentProblem.problemType === 'multiple-choice' && (
               <div>
-                <label>Answer choice</label>
+                <label>Choose the correct answer</label>
                 <div className="ProblemChoice1">
                   <label>choice 1</label>
                   <input
@@ -703,12 +672,51 @@ class ProblemSetCreate extends Component<Props, State> {
                 </div>
               </div>
             )}
+
             {currentProblem.problemType === 'subjective' && (
               <div>
                 <Form>
                   <Form.Field>
                     <label>Subjective problem answer</label>
-                    <input />
+                    <input
+                      id="subjective-problem-answer-input"
+                      placeholder="Write your answer here..."
+                      onChange={(event) => {
+                        const editAnswer = event.target.value;
+                        const newAnswer: string[] = [];
+                        let _currentProblem =
+                          currentProblem as CreateSubjectiveProblemRequest;
+                        _currentProblem.solutions.forEach((solution, index) => {
+                          if (index === 0) {
+                            newAnswer.push(editAnswer);
+                          } else {
+                            newAnswer.push(solution + '');
+                          }
+                        });
+
+                        const editProblem: CreateProblemRequest = {
+                          problemType: _currentProblem.problemType,
+                          problemSetID: _currentProblem.problemSetID,
+                          problemNumber: _currentProblem.problemNumber,
+                          content: _currentProblem.content,
+                          solutions: newAnswer,
+                        };
+
+                        const newProblem: CreateProblemRequest[] = [];
+                        this.state.problems.forEach((problem) => {
+                          if (problem.problemNumber === index) {
+                            newProblem.push(editProblem);
+                          } else {
+                            newProblem.push(problem);
+                          }
+                        });
+
+                        this.setState({
+                          ...this.state,
+                          problems: newProblem,
+                        });
+                      }}
+                    />
                   </Form.Field>
                 </Form>
               </div>
