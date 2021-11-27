@@ -1,6 +1,6 @@
 import { shallow } from 'enzyme';
 import MultipleChoiceProblemForm from './MultipleChoiceProblemForm';
-import { GetMultipleChoiceProblemResponse } from '../../store/reducers/problemReducerInterface';
+import { GetMultipleChoiceProblemResponse } from '../../store/actions/problemActionInterface';
 
 const multipleChoiceProblem : GetMultipleChoiceProblemResponse = {
   id: 1,

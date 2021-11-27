@@ -18,6 +18,7 @@ export const CREATE_PROBLEM = 'CREATE_PROBLEM';
 // Action for Problem
 export const GET_PROBLEM = 'GET_PROBLEM';
 export const UPDATE_PROBLEM = 'UPDATE_PROBLEM';
+export const DELETE_PROBLEM = 'DELETE_PROBLEM';
 
 // Action for Comment
 export const CREATE_COMMENT = 'CREATE_COMMENT';

@@ -1,6 +1,6 @@
 import { shallow } from 'enzyme';
 import SubjectiveProblemForm from './SubjectiveProblemForm';
-import { GetSubjectiveProblemResponse } from '../../store/reducers/problemReducerInterface';
+import { GetSubjectiveProblemResponse } from '../../store/actions/problemActionInterface';
 
 const subjectiveProblem : GetSubjectiveProblemResponse = {
   id: 1,

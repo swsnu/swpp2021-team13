@@ -1,5 +1,5 @@
 import Choice from './Choice'
-import { GetMultipleChoiceProblemResponse } from '../../store/reducers/problemReducerInterface'
+import { GetMultipleChoiceProblemResponse } from '../../store/actions/problemActionInterface'
 
 interface MultipleChoiceProblemFormProps {
   problem: GetMultipleChoiceProblemResponse;

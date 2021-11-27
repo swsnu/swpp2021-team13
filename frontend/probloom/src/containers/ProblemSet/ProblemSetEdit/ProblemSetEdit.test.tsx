@@ -5,7 +5,7 @@ import { ConnectedRouter } from 'connected-react-router';
 import { mount, shallow } from 'enzyme';
 import { Provider } from 'react-redux';
 import * as problemActions from '../../../store/actions/problemActions';
-import * as interfaces from '../../../store/reducers/problemReducerInterface';
+import * as interfaces from '../../../store/actions/problemActionInterface';
 import { ProblemSetState } from '../../../store/reducers/problemReducer';
 import { Comment, CommentState } from '../../../store/reducers/commentReducer';
 import ProblemSetEdit from './ProblemSetEdit';
@@ -109,7 +109,7 @@ const mockStore2 = getMockStore(
 
 describe('<ProblemSetEdit />', () => {
   let problemEdit1, problemEdit2;
-  let spyCreateProblem, spyGetProblem, spyUpdateProblem;
+  let spyCreateProblem, spyGetProblem, spyUpdateProblem, spyDeleteProblem;
 
   beforeEach(() => {
     problemEdit1 = (
@@ -139,13 +139,18 @@ describe('<ProblemSetEdit />', () => {
     spyGetProblem = jest
       .spyOn(problemActions, 'getProblem')
       .mockImplementation(() => {
-        return (dispatch) => {};
+        return (data) => {};
       });
     spyUpdateProblem = jest
       .spyOn(problemActions, 'updateProblem')
       .mockImplementation(() => {
         return (data) => {};
       });
+    spyDeleteProblem = jest
+      .spyOn(problemActions, 'deleteProblem')
+      .mockImplementation(() => {
+        return (data) => ();
+      })
   });
 
   afterEach(() => {
@@ -159,6 +164,19 @@ describe('<ProblemSetEdit />', () => {
     const saveButton = component
       .find('.ProblemSetEdit #problemsetedit-save');
     expect(saveButton.length).toBe(0);
+  });
+
+  it('create problem', () => {
+    const component = mount(problemEdit1);
+    const createMCPButton = component
+      .find('.ProblemSetEdit #problemsetedit-newmcp');
+    createMCPButton.simulate('click');
+    expect(spyCreateProblem).toHaveBeenCalledTimes(1);
+
+    const createSPButton = component
+      .find('.ProblemSetEdit #problemsetedit-newsp');
+    createSPButton.simulate('click');
+    expect(spyCreateProblem).toHaveBeenCalledTimes(2);
   });
 
   it('click problem number button', () => {
@@ -260,6 +278,17 @@ describe('<ProblemSetEdit />', () => {
     problemNumberButton.simulate('click');
     const saveButton = component
       .find('.ProblemSetEdit #problemsetedit-save');
+    saveButton.simulate('click');
+    expect(spyUpdateProblem).toHaveBeenCalled()
+  })
+
+  it('delete problem', () => {
+    const component = mount(problemEdit1);
+    const problemNumberButton = component
+      .find('.ProblemSetEdit #problemsetedit-p0');
+    problemNumberButton.simulate('click');
+    const saveButton = component
+      .find('.ProblemSetEdit #problemsetedit-delete');
     saveButton.simulate('click');
     expect(spyUpdateProblem).toHaveBeenCalled()
   })

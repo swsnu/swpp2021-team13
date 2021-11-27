@@ -1,13 +1,13 @@
-import { ProblemSetAction, updateProblem } from '../actions/problemActions';
+import { ProblemSetAction } from '../actions/problemActions';
 import * as actionTypes from '../actions/actionTypes';
 import { Reducer } from 'redux';
 import * as interfaces from './problemReducerInterface';
 
 export interface ProblemSetState {
-  problemSets: ProblemSetInterface[];
-  solvers: Solver[];
-  selectedProblemSet: interfaces.GetProblemSetResponse | null;
-  selectedProblem: interfaces.GetProblemResponse | null;
+  problemSets: interfaces.ProblemSetInterface[];
+  solvers: any[];
+  selectedProblemSet: interfaces.ProblemSetInterface | null;
+  selectedProblem: interfaces.ProblemInterface | null;
 }
 
 const initialState: ProblemSetState = {
@@ -96,6 +96,15 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
         updatedProblem['solutions'] = updatedSubjectiveProblem.solutions;
       }
       return { ...state, selectedProblem: updatedProblem }
+
+    case actionTypes.DELETE_PROBLEM:
+      const afterDeleteProblem = state.selectedProblemSet?.problems
+        .filter((id) => id != action.targetProblemID)
+      return {
+        ...state, 
+        selectedProblemSet: { ...state.selectedProblemSet, problems: afterDeleteProblem },
+        selectedProblem: null
+      }
 
     default:
       break;

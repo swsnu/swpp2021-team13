@@ -1,5 +1,5 @@
 import Solution from './Solution'
-import { GetSubjectiveProblemResponse } from '../../store/reducers/problemReducerInterface'
+import { GetSubjectiveProblemResponse } from '../../store/actions/problemActionInterface'
 
 interface SubjectiveProblemFormProps {
   problem: GetSubjectiveProblemResponse;
