@@ -1,6 +1,7 @@
 import * as actionTypes from '../actions/actionTypes';
 import problemReducer from './problemReducer';
 import * as interfaces from './problemReducerInterface';
+import * as a_interfaces from '../actions/problemActionInterface';
 
 describe('Problem Reducer', () => {
   it('should return default state', () => {
@@ -265,6 +266,89 @@ describe('Problem Reducer', () => {
       solvers: [],
       selectedProblemSet: null,
       selectedProblems: [],
+    });
+  });
+
+  it('should CREATE_PROBLEM', () => {
+    const stubProblemSet1 = {
+      id: 1,
+      title: 'title1',
+      createdTime: 'create_time1',
+      modifiedTime: 'modified_time1',
+      isOpen: false,
+      tag: [['math']],
+      difficulty: 1,
+      content: 'content1',
+      userID: 1,
+      username: 'creator1',
+      solverIDs: [],
+      recommendedNum: 0,
+      problems: [],
+    };
+    const stubProblemSet2 = {
+      id: 1,
+      title: 'title1',
+      createdTime: 'create_time1',
+      modifiedTime: 'modified_time1',
+      isOpen: false,
+      tag: [['math']],
+      difficulty: 1,
+      content: 'content1',
+      userID: 1,
+      username: 'creator1',
+      solverIDs: [],
+      recommendedNum: 0,
+      problems: [1],
+    };
+    const stubInitialState = {
+      problemSets: [stubProblemSet1],
+      solvers: [],
+      selectedProblemSet: stubProblemSet1,
+      selectedProblems: [],
+      selectedProblem: null,
+    };
+    let newState = problemReducer(stubInitialState, {
+      type: actionTypes.CREATE_PROBLEM,
+      newProblemID: 1,
+    });
+    expect(newState).toEqual({
+      problemSets: [stubProblemSet2],
+      solvers: [],
+      selectedProblemSet: null,
+      selectedProblems: [],
+      selectedProblem: null,
+    });
+  });
+
+  it('should GET_PROBLEM', () => {
+    const stubProblem: a_interfaces.GetMultipleChoiceProblemResponse = {
+      id: 1,
+      problemType: "multiple-choice",
+      problemSetID: 1,
+      problemNumber: 1,
+      creatorID: 1,
+      createdTime: "created_time",
+      content: "content",
+      solverIDs: [],
+      choices: []
+    }
+    const stubInitialState = {
+      problemSets: [],
+      solvers: [],
+      selectedProblemSet: null,
+      selectedProblems: [],
+      selectedProblem: null,
+    };
+    let newState = problemReducer(stubInitialState, {
+      type: actionTypes.GET_PROBLEM,
+      selectedProblem: stubProblem,
+    });
+    expect(newState).toEqual({
+      problemSets: [],
+      solvers: [],
+      selectedProblemSet: null,
+      selectedProblems: [],
+      selectedProblem: stubProblem
     });
   });
 });
