@@ -625,6 +625,8 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
 
         problem_number = req_data.get("problemNumber")
         last_number = problem_set.problems.aggregate(Max("number"))["number__max"]
+        if last_number is None:
+            last_number = 0
         if problem_number is None:
             req_data["problemNumber"] = last_number + 1
         elif problem_number > last_number:
