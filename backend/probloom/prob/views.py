@@ -1,15 +1,15 @@
 # from django.shortcuts import render
 import dataclasses
 import datetime
-import functools
+import http
 import json
 from json.decoder import JSONDecodeError
-from typing import List
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin as LoginRequiredMixin_
 from django.core.exceptions import BadRequest, PermissionDenied
-from django.db.models import Count
+from django.db.models import Count, Max
+from django.db.models.expressions import F
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -35,6 +35,8 @@ from .models import (
     User,
     UserProfile,
     UserStatistics,
+    create_problem,
+    verify_problem_request,
 )
 
 
@@ -506,40 +508,7 @@ class ProblemSetListView(LoginRequiredMixin, View):
         problems = req_data["problems"]
 
         for problem in problems:
-            problem_content = Content.objects.create(text=problem["content"])
-            if problem["problemType"] == "multiple-choice":
-                new_problem = MultipleChoiceProblem.objects.create(
-                    problem_set=new_problem_set,
-                    number=problem["problemNumber"],
-                    content=problem_content,
-                    creator_id=request.user.pk,
-                    solution="",
-                )
-                choices = problem["choices"]
-                is_solution_list = [False] * len(choices)
-                for solution_number in problem["solution"]:
-                    is_solution_list[solution_number - 1] = True
-                for i, (is_solution, choice_text) in enumerate(
-                    zip(is_solution_list, choices)
-                ):
-                    choice_content = Content.objects.create(text=choice_text)
-                    MultipleChoiceProblemChoice.objects.create(
-                        problem=new_problem,
-                        number=i + 1,
-                        is_solution=is_solution,
-                        content=choice_content,
-                    )
-            else:
-                new_problem = SubjectiveProblem.objects.create(
-                    problem_set=new_problem_set,
-                    number=problem["problemNumber"],
-                    content=problem_content,
-                    creator_id=request.user.pk,
-                )
-                for solution_text in problem["solutions"]:
-                    SubjectiveProblemSolution.objects.create(
-                        problem=new_problem, text=solution_text
-                    )
+            create_problem(problem, creator.pk, new_problem_set.pk)
 
         return JsonResponse(data=new_problem_set.info_dict())
 
@@ -633,7 +602,8 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
         #. Create a new problem. If ``problemType`` is ``'multiple-choice'``,
            :class:`MultipleChoiceProblem` will be used.  If ``problemType`` is
            ``subjective``, :class:`SubjectiveProblem` will be used.
-        #. Respond with ``201 (Created)`` and ``GetProblemResponse``.
+        #. Respond with ``201 (Created)`` and ``GetProblemResponse`` of
+           :meth:`ProblemInfoView.get`.
 
         If a problem set with id ``ps_id`` does not exist, respond with ``404
         (Not Found)``.
@@ -641,6 +611,33 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
         If a problem set with id ``ps_id`` exists but request data does not
         follow the constraints, respond with ``400 (Bad Request)``.
         """
+        try:
+            problem_set = ProblemSet.objects.get(id=ps_id)
+        except:
+            return HttpResponseNotFound()
+
+        if request.user.pk != problem_set.creator.user.pk:
+            raise PermissionDenied()
+
+        try:
+            req_data = json.loads(request.body)
+            verify_problem_request(req_data)
+        except JSONDecodeError as error:
+            raise BadRequest() from error
+
+        problem_number = req_data.get("problemNumber")
+        last_number = problem_set.problems.aggregate(Max("number"))["number__max"]
+        if problem_number is None:
+            req_data["problemNumber"] = last_number + 1
+        elif problem_number > last_number:
+            raise BadRequest()
+        else:
+            modified_problems = problem_set.problems.filter(number__gte=problem_number)
+            modified_problems.update(number=F("number") + 1)
+        new_problem = create_problem(req_data, request.user.pk, ps_id)
+
+        res = new_problem.info_dict()
+        return JsonResponse(res)
 
     def put(self, request: HttpRequest, ps_id, **kwargs):
         """Edit details of specific problem set.
@@ -798,11 +795,6 @@ class ProblemSetCommentListView(LoginRequiredMixin, View):
         """
         if not ProblemSet.objects.filter(pk=ps_id).exists():
             return HttpResponseNotFound()
-        """
-        comment_set = ProblemSetComment.objects.filter(
-            problem_set_id=ps_id
-        ).select_related("content")
-        """
         comment_set = ProblemSetComment.objects.filter(problem_set_id=ps_id)
 
         res = []
@@ -1059,6 +1051,7 @@ class ProblemInfoView(LoginRequiredMixin, View):
            interface UpdateMultipleChoiceProblemRequest extends UpdateProblemRequestBase {
              problemType: 'multiple-choice';
              choices: string[];
+             solution: number[];
            }
 
            interface UpdateSubjectiveProblemRequest extends UpdateProblemRequestBase {
@@ -1075,12 +1068,46 @@ class ProblemInfoView(LoginRequiredMixin, View):
            ``problemNumber`` as its number exists, set its problem number to the
            original problem number of the problem in the request (i.e. swap the
            problem numbers).
-        #. Update the problem and respond with ``200 (OK)``.
+        #. Update the problem and respond with ``200 (OK)`` and
+           ``GetProblemResponse`` of :meth:`ProblemInfoView.get`.
 
         If a problem with id ``p_id`` does not exist, respond with ``404 (Not Found)``.
 
         If a problem with id ``p_id`` exists, but the request does not follow the constraints, respond with ``400 (Bad Request)``.
         """
+        try:
+            problem = Problem.objects.get(pk=p_id)
+        except:
+            return HttpResponseNotFound()
+
+        if request.user.pk != problem.creator.pk:
+            raise PermissionDenied()
+
+        try:
+            pending_problem = json.loads(request.body)
+            verify_problem_request(pending_problem)
+        except (JSONDecodeError, KeyError) as error:
+            raise BadRequest() from error
+
+        problem_number = pending_problem.get("problemNumber")
+        if problem_number is not None and problem_number != problem.number:
+            try:
+                existing_problem = Problem.objects.get(
+                    problem_set_id=problem.problem_set.pk, number=problem_number
+                )
+            except Problem.DoesNotExist:
+                return HttpResponse(status_code=http.HTTPStatus.CONFLICT)
+            existing_problem.number = problem.number
+            existing_problem.save()
+        else:
+            problem_number = problem.number
+
+        ps_id = problem.problem_set.pk
+        problem.delete()
+        new_problem = create_problem(pending_problem, request.user.pk, ps_id, p_id)
+
+        res = new_problem.info_dict()
+        return JsonResponse(res)
 
     def delete(self, request: HttpRequest, p_id: int, **kwargs):
         """Delete a specific problem.
