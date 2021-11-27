@@ -487,8 +487,6 @@ class ProblemSetListView(LoginRequiredMixin, View):
             is_open = req_data["scope"] == "scope-public"
             tags_list = req_data["tag"]  # TODO
             assert isinstance(tags_list, list), "tag should be an array"
-            for i, tags in enumerate(tags_list):
-                assert isinstance(tags, list), f"tag[{i}] should be an array"
             difficulty = int(req_data["difficulty"])
         except (JSONDecodeError, KeyError, AssertionError, ValueError) as error:
             raise BadRequest() from error
