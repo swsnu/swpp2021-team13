@@ -1130,6 +1130,10 @@ class ProblemInfoView(LoginRequiredMixin, View):
         if request.user.pk != problem.creator.pk:
             raise PermissionDenied()
 
+        modified_problems = problem.problem_set.problems.filter(
+            number__gte=problem.number
+        )
+        modified_problems.update(number=F("number") - 1)
         problem.delete()
         return HttpResponse()
 
