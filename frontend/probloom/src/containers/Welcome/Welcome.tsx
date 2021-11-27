@@ -65,7 +65,7 @@ class Welcome extends Component<WelcomeProps, WelcomeState> {
   };
 
   onClickSignUpButton = () => {
-    this.props.history.push('/signup');
+    this.props.history.push('/signup/');
   };
 
   render() {

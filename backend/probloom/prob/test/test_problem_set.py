@@ -14,58 +14,63 @@ class ProblemSetTestCase(TestCase):
             email="test_email_2@test.test",
             password="test_password_2",
         )
-        user_stat_1 = UserStatistics.objects.create(lastActiveDays=1, user=user_1)
-        user_stat_2 = UserStatistics.objects.create(lastActiveDays=2, user=user_2)
-        problem_set_1 = ProblemSet.objects.create(
+        user_stat_1 = UserStatistics.objects.create(user=user_1)
+        user_stat_2 = UserStatistics.objects.create(user=user_2)
+        self.problem_set_1 = ProblemSet.objects.create(
+            pk=1,
             title="test_title_1",
             is_open=False,
-            tag="test_tag_1",
             difficulty=1,
-            content="test_content_1",
+            description="test_content_1",
             creator=user_stat_1,
         )
-        problem_set_1.recommender.add(user_stat_1, user_stat_2)
-        problem_set_2 = ProblemSet.objects.create(
+        self.problem_set_1.recommenders.add(user_stat_1, user_stat_2)
+        self.problem_set_2 = ProblemSet.objects.create(
+            pk=2,
             title="test_title_2",
             is_open=True,
-            tag="test_tag_2",
             difficulty=2,
-            content="test_content_2",
+            description="test_content_2",
             creator=user_stat_2,
         )
-        problem_set_2.recommender.add(user_stat_1)
+        self.problem_set_2.recommenders.add(user_stat_1)
 
     def test_problem_set_info(self):
         client1 = Client()
         client2 = Client()
 
-        response = client1.get("/api/problem/1/")
-        self.assertEqual(response.status_code, 401)
-        response = client1.delete("/api/problem/1/")
-        self.assertEqual(response.status_code, 401)
-
-        choice = ["1", "2", "3", "4"]
-        edit_problems = [
-            {
-                "problem_type": "choice",
-                "problem_statement": "state",
-                "solution": "sol",
-                "explanation": "exp",
-                "choice": choice,
-            }
-        ]
-        request = {
-            "title": "123",
-            "content": "123",
-            "scope": "scope-public",
-            "tag": "math",
-            "difficulty": "1",
-            "problems": edit_problems,
+        choices = ["1", "2", "3", "4"]
+        new_problem = {
+            "problemType": "multiple-choice",
+            "content": "state",
+            "choices": choices,
+            "solution": [3],
         }
-        response = client1.put(
-            "/api/problem/1/", request, content_type="application/json"
+
+        revised_problem_set = {
+            "title": "123",
+            "isOpen": True,
+            "tag": ["mathematics"],
+            "difficulty": "1",
+            "content": "123",
+        }
+
+        response = client1.get("/api/problem_set/1/")
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/api/signin/")
+        response = client1.delete("/api/problem_set/1/")
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/api/signin/")
+        response = client1.post(
+            "/api/problem_set/1/", new_problem, content_type="application/json"
         )
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/api/signin/")
+        response = client1.put(
+            "/api/problem_set/1/", revised_problem_set, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/api/signin/")
 
         # User Sign-in
         request_user1 = {
@@ -83,69 +88,98 @@ class ProblemSetTestCase(TestCase):
             "/api/signin/", request_user2, content_type="application/json"
         )
 
-        response = client1.get("/api/problem/3/")
+        response = client1.get("/api/problem_set/3/")
         self.assertEqual(response.status_code, 404)
-        response = client1.delete("/api/problem/3/")
+        response = client1.delete("/api/problem_set/3/")
+        self.assertEqual(response.status_code, 404)
+        response = client1.post(
+            "/api/problem_set/3/", new_problem, content_type="application/json"
+        )
         self.assertEqual(response.status_code, 404)
         response = client1.put(
-            "/api/problem/3/", request, content_type="application/json"
+            "/api/problem_set/3/", revised_problem_set, content_type="application/json"
         )
         self.assertEqual(response.status_code, 404)
 
-        response = client2.delete("/api/problem/1/")
+        response = client2.delete("/api/problem_set/1/")
+        self.assertEqual(response.status_code, 403)
+        response = client2.post(
+            "/api/problem_set/1/", new_problem, content_type="application/json"
+        )
         self.assertEqual(response.status_code, 403)
         response = client2.put(
-            "/api/problem/1/", request, content_type="application/json"
+            "/api/problem_set/1/", revised_problem_set, content_type="application/json"
         )
         self.assertEqual(response.status_code, 403)
 
-        response = client1.put(
-            "/api/problem/1/", request, content_type="application/json"
+        response = client1.post(
+            "/api/problem_set/1/", new_problem, content_type="application/json"
         )
         self.assertEqual(response.status_code, 200)
-        response = client1.get("/api/problem/1/")
-        self.assertEqual(response.status_code, 201)
+        response = client1.get("/api/problem_set/1/")
+        self.assertEqual(response.status_code, 200)
+        response_json = response.json()
+        self.assertEqual(len(response_json["problems"]), 1)
 
-        request = {"title": "123"}
-        response = client1.put(
-            "/api/problem/1/", request, content_type="application/json"
+        response = client1.post(
+            "/api/problem_set/1/", new_problem, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200)
+        response = client1.get("/api/problem_set/1/")
+        self.assertEqual(response.status_code, 200)
+        response_json = response.json()
+        self.assertEqual(len(response_json["problems"]), 2)
+
+        new_problem_with_number = dict(new_problem)
+        new_problem_with_number["problemNumber"] = 1339
+        response = client1.post(
+            "/api/problem_set/1/",
+            new_problem_with_number,
+            content_type="application/json",
         )
         self.assertEqual(response.status_code, 400)
 
-        response = client1.delete("/api/problem/1/")
+        new_problem_with_number["problemNumber"] = 1
+        response = client1.post(
+            "/api/problem_set/1/",
+            new_problem_with_number,
+            content_type="application/json",
+        )
         self.assertEqual(response.status_code, 200)
+        # Assert each problem number of problem set is unique
+        self.assertEqual(len(set(self.problem_set_1.problems.values_list("number"))), 3)
 
-    def test_problem_set_comment(self):
-        client1 = Client()
-
-        response = client1.get("/api/problem/1/comment/")
-        self.assertEqual(response.status_code, 401)
-
-        # User Sign-in
-        request_user1 = {
-            "id": "test_name_1",
-            "password": "test_password_1",
-        }
-        response = client1.post(
-            "/api/signin/", request_user1, content_type="application/json"
+        response = client1.put(
+            "/api/problem_set/1/", revised_problem_set, content_type="application/json"
         )
+        self.assertEqual(response.status_code, 200)
+        response = client1.get("/api/problem_set/1/")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('"title": "123"', response.content.decode())
 
-        response = client1.get("/api/problem/3/comment/")
-        self.assertEqual(response.status_code, 404)
+        bad_request = {"no": "way"}
 
-        # Create comment
-        request = {
-            "userID": 1,
-            "username": "test_name_1",
-            "problemSetID": 1,
-            "content": "123",
-        }
         response = client1.post(
-            "/api/comment/", request, content_type="application/json"
+            "/api/problem_set/1/", bad_request, content_type="application/json"
         )
+        self.assertEqual(response.status_code, 400)
 
-        res = []
-        response = client1.get("/api/problem/1/comment/")
-        self.assertEqual(response.status_code, 201)
-        res = response.json()
-        self.assertEqual(response.json(), res)
+        response = client1.put(
+            "/api/problem_set/1/", bad_request, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 400)
+
+        worse_request = "Lorem ipsum dolor sit amet, consectetur adipiscing elit,"
+
+        response = client1.post(
+            "/api/problem_set/1/", worse_request, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 400)
+
+        response = client1.put(
+            "/api/problem_set/1/", worse_request, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 400)
+
+        response = client1.delete("/api/problem_set/1/")
+        self.assertEqual(response.status_code, 200)

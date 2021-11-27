@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { returntypeof } from 'react-redux-typescript';
 import { RouteComponentProps } from 'react-router';
 import { NavLink } from 'react-router-dom';
-import { Button, Container, Form, Header, Input } from 'semantic-ui-react';
+import { Form, Input } from 'semantic-ui-react';
 import { tagOptions } from '../ProblemSetSearch/ProblemSetSearch';
 
 import * as actionCreators from '../../../store/actions/index';
@@ -603,17 +603,7 @@ const mapDispatchToProps = (dispatch: any) => {
       difficulty: string,
       problems: NewProblemSet[]
     ) => {
-      dispatch(
-        actionCreators.editProblemSet(
-          id,
-          title,
-          content,
-          scope,
-          tag,
-          difficulty,
-          problems
-        )
-      );
+      dispatch({});
     },
   };
 };

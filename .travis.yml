@@ -12,8 +12,11 @@ jobs:
           organization: swsnu
           token:
             secure: "mq5DOcKE05zxrKfH8maatDopeRCGIogiKX58MXaRfKWw7kiBkggI/jpCCwzAoTpsR70YoBLDWfpXvAqSX9cNcZb18fJ3umn/dx82/zcLJGZrTgXsMlXS+N0AOSO/FvLoklAferhyJK1hbSl/lHQ/muwOrxgjn1RI66HX7S6W+QqPPmiFOv6zS4xb+HeLYAgB0L+EM8z41ZizrgpvFUsGpk3f6VtozeGoeHXweMUSFnbBwIL5DNNVBD8baXQTAaibxn5MrW2L5/ddRNCvY2aRZsMm3a3H4ffut4ayfIThHnnBUFcmMenogOPzTDvFkWMNsX69SIP+rNLgTSb6wRyFDygvU1Yf23poFUQcFuyxGPnvgHkERAqbA7p7hZj5Ru8b0LyJoJQNhHvsSGPeSL3y3aTrswhkOEStyCiX4k9HPJ7uwQ4JMoHWp0TiC4h1Cm0WBtZEMar9EJGZHFTKXY6XEo17BU4Q3HlPiQbwk10ucQd1BnQw1tMnFSlbRT86BT4d40x2xgNxzMi4kRzlNWkwERjCNDbtM/d8OwH2psmuZR11tS5YT+7xc8ZxEPHwZcXN0pCLVs51lnRtWvEUJPgFk1qO+rNIFkzKMy1TX7IELvxx0mZXRd0s4Zv5vjsQH0choQUmVqGJuUdhzm2O8BXr69HcH7QPlRUwPQkFQ0U8fsY="
-      install:
+      before_install:
         - source ~/virtualenv/python3.8/bin/activate
+        - pip install poetry
+        - poetry --version
+      install:
         - pip install coveralls
         - yarn global add coveralls
         - gem install coveralls-lcov
@@ -24,10 +27,10 @@ jobs:
         - yarn test --coverage --watchAll=false
         - coveralls-lcov -v -n coverage/lcov.info > coverage.json  
         - cd ../../backend/probloom
-        - pip install -r requirements.txt
-        - pylint -E **/*.py --load-plugins pylint_django
-        - coverage run --source='.' manage.py test
-        - coverage xml
+        - poetry install
+        - poetry run pylint -E **/*.py --load-plugins pylint_django
+        - poetry run coverage run
+        - poetry run coverage xml
         - cd ../..
         - sonar-scanner
         - cd backend/probloom

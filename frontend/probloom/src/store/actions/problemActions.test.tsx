@@ -19,28 +19,32 @@ describe('Get Problem List', () => {
       {
         id: 1,
         title: 'title1',
-        created_time: 'create_time1',
-        is_open: false,
-        tag: 'math',
+        createdTime: 'create_time1',
+        modifiedTime: 'modified_time1',
+        isOpen: false,
+        tag: [['tag1'], ['tag2']],
         difficulty: 1,
         content: 'content1',
         userID: 1,
         username: 'creator1',
-        solved_num: 1,
-        recommended_num: 1,
+        solverIDs: [1],
+        recommendedNum: 1,
+        problems: [1],
       },
       {
         id: 2,
         title: 'title2',
-        created_time: 'create_time2',
-        is_open: false,
-        tag: 'math',
+        createdTime: 'create_time2',
+        modifiedTime: 'modified_time2',
+        isOpen: false,
+        tag: [['tag1'], ['tag2']],
         difficulty: 2,
         content: 'content2',
         userID: 2,
         username: 'creator2',
-        solved_num: 2,
-        recommended_num: 2,
+        solverIDs: [2],
+        recommendedNum: 2,
+        problems: [1],
       },
     ];
 
@@ -49,7 +53,7 @@ describe('Get Problem List', () => {
       data: stubProblems,
     }));
     await dispatch(getAllProblemSets());
-    expect(spy).toHaveBeenCalledWith('/api/problem/');
+    expect(spy).toHaveBeenCalledWith('/api/problem_set/');
     expect(store.getState().problemset.problemSets).toEqual(stubProblems);
   });
 
@@ -57,15 +61,17 @@ describe('Get Problem List', () => {
     const stubProblemSet = {
       id: 1,
       title: 'title1',
-      created_time: 'create_time1',
-      is_open: false,
-      tag: 'math',
+      createdTime: 'create_time1',
+      modifiedTime: 'modified_time1',
+      isOpen: false,
+      tag: [['tag1'], ['tag2']],
       difficulty: 1,
       content: 'content1',
       userID: 1,
       username: 'creator1',
-      solved_num: 1,
-      recommended_num: 1,
+      solverIDs: [1],
+      recommendedNum: 1,
+      problems: [1],
     };
     const stubNewProblemSet = {
       index: 4,
@@ -132,15 +138,17 @@ describe('Create & Edit ProblemSet', () => {
     const stubProblemSet = {
       id: 1,
       title: 'title1',
-      created_time: 'create_time1',
-      is_open: false,
-      tag: 'math',
+      createdTime: 'create_time1',
+      modifiedTime: 'modified_time1',
+      isOpen: false,
+      tag: [['tag1'], ['tag2']],
       difficulty: 1,
       content: 'content1',
       userID: 1,
       username: 'creator1',
-      solved_num: 1,
-      recommended_num: 1,
+      solverIDs: [1],
+      recommendedNum: 1,
+      problems: [1],
     };
     const stubNewProblemSet = {
       index: 4,
@@ -197,101 +205,6 @@ describe('Create & Edit ProblemSet', () => {
     expect(newState.problemset.problemSets[0]).toEqual(stubProblemSet);
     expect(spy).toHaveBeenCalledTimes(1);
   });
-
-  it('Test editProblemSet', async () => {
-    const stubProblemSet = {
-      id: 1,
-      title: 'title1',
-      created_time: 'create_time1',
-      is_open: false,
-      tag: 'math',
-      difficulty: 1,
-      content: 'content1',
-      userID: 1,
-      username: 'creator1',
-      solved_num: 1,
-      recommended_num: 1,
-    };
-    const stubNewProblemSet = {
-      index: 4,
-      problem_type: 'stub-type',
-      problem_statement: 'stub-statement',
-      choice: ['stub-choice1', 'stub-choice2', 'stub-choice3', 'stub-choice4'],
-      solution: 'stub-solution',
-      explanation: 'stub-explanation',
-    };
-    const stubProblemSetCreateState = {
-      title: 'stub-title',
-      content: 'stub-content',
-      scope: 'stub-scope',
-      tag: 'stub-tag',
-      difficulty: 'stub-difficulty',
-      problems: [stubNewProblemSet],
-      numberOfProblems: 1,
-    };
-
-    spy = jest.spyOn(axios, 'put').mockImplementation(async (_) => {
-      return {
-        status: 200,
-        data: stubProblemSetCreateState,
-      };
-    });
-
-    try {
-      await dispatch(
-        actionCreators.editProblemSet(
-          3,
-          'stub-title',
-          'stub-content',
-          'stub-scope',
-          'stub-tag',
-          'stub-difficulty',
-          [
-            {
-              index: 4,
-              problem_type: 'stub-type',
-              problem_statement: 'stub-statement',
-              choice: [
-                'stub-choice1',
-                'stub-choice2',
-                'stub-choice3',
-                'stub-choice4',
-              ],
-              solution: 'stub-solution',
-              explanation: 'stub-explanation',
-            },
-          ]
-        )
-      );
-    } catch (err) {}
-
-    const newState = store.getState();
-    expect(newState.problemset.problemSets[0]).toEqual(stubProblemSet);
-    expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenCalledWith('/api/problem/3/', {
-      content: 'stub-content',
-      difficulty: 'stub-difficulty',
-      id: 3,
-      problems: [
-        {
-          choice: [
-            'stub-choice1',
-            'stub-choice2',
-            'stub-choice3',
-            'stub-choice4',
-          ],
-          explanation: 'stub-explanation',
-          index: 4,
-          problem_statement: 'stub-statement',
-          problem_type: 'stub-type',
-          solution: 'stub-solution',
-        },
-      ],
-      scope: 'stub-scope',
-      tag: 'stub-tag',
-      title: 'stub-title',
-    });
-  });
 });
 
 describe('Delete ProblemSet', () => {
@@ -302,19 +215,53 @@ describe('Delete ProblemSet', () => {
     spy.mockClear();
   });
 
-  it('Test deleteProblemSet', async () => {
+  it('Test updateProblemSet', async () => {
     const stubProblemSet = {
       id: 1,
       title: 'title1',
-      created_time: 'create_time1',
-      is_open: false,
-      tag: 'math',
+      createdTime: 'create_time1',
+      modifiedTime: 'modified_time1',
+      isOpen: false,
+      tag: [['tag1'], ['tag2']],
       difficulty: 1,
       content: 'content1',
       userID: 1,
       username: 'creator1',
-      solved_num: 1,
-      recommended_num: 1,
+      solverIDs: [1],
+      recommendedNum: 1,
+      problems: [1],
+    };
+
+    spy = jest.spyOn(axios, 'put').mockImplementation(async () => {
+      return {
+        status: 200,
+        data: 0,
+      };
+    });
+
+    try {
+      dispatch(actionCreators.updateProblemSet(0));
+    } catch (err) {}
+    const newState = store.getState();
+    expect(newState.problemset.problemSets[0]).toEqual(stubProblemSet);
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('Test deleteProblemSet', async () => {
+    const stubProblemSet = {
+      id: 1,
+      title: 'title1',
+      createdTime: 'create_time1',
+      modifiedTime: 'modified_time1',
+      isOpen: false,
+      tag: [['tag1'], ['tag2']],
+      difficulty: 1,
+      content: 'content1',
+      userID: 1,
+      username: 'creator1',
+      solverIDs: [1],
+      recommendedNum: 1,
+      problems: [1],
     };
 
     spy = jest.spyOn(axios, 'delete').mockImplementation(async () => {
