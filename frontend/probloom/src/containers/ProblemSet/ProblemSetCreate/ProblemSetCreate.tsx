@@ -9,8 +9,19 @@ import {
   CreateSubjectiveProblemRequest,
   CreateProblemSetRequest,
 } from '../../../store/reducers/problemReducer';
-import { Button, Container, Form, Header, Input } from 'semantic-ui-react';
+import {
+  Button,
+  Container,
+  Divider,
+  Form,
+  Header,
+  Icon,
+  Image,
+  Input,
+  Tab,
+} from 'semantic-ui-react';
 import { tagOptions1, tagOptions2 } from '../ProblemSetSearch/ProblemSetSearch';
+import axios from 'axios';
 
 interface ProblemSetCreateProps {
   history: any;
@@ -29,6 +40,7 @@ interface DispatchFromProps {
   ) => void;
 }
 
+type ProblemSetCreateState = CreateProblemRequest & { image: string };
 type Props = ProblemSetCreateProps &
   typeof statePropTypes &
   typeof actionPropTypes;
@@ -60,7 +72,7 @@ class ProblemSetCreate extends Component<Props, State> {
     this.state = {
       title: '',
       scope: 'scope-private',
-      tag: [],
+      tag: ['tag-all', ''],
       difficulty: 1,
       content: '',
       problems: [],
@@ -68,19 +80,35 @@ class ProblemSetCreate extends Component<Props, State> {
   }
 
   addProblemHandler = (index: number) => {
-    let newProblem: CreateProblemRequest = {
+    let newProblem: ProblemSetCreateState = {
       problemType: 'multiple-choice',
       problemSetID: 0,
       problemNumber: index,
       content: 'problem here...',
       choices: ['', '', '', ''],
       solutions: [],
+      image: '',
     };
 
     this.setState({
       ...this.state,
       problems: [...this.state.problems, newProblem],
     });
+  };
+
+  addProblemImageHandler = (event) => {
+    // console.log('@@@@@@@files ' + event.target.files);
+    // console.log('@@@@@@@files[0] ' + event.target.files[0]);
+    // console.log('@@@@@@@filename ' + event.target.files[0].name);
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      // console.log('-------reader.result', reader.result);
+      this.setState({
+        // image: reader.result as string,
+      });
+    };
+    reader.readAsDataURL(file);
   };
 
   removeProblemHandler = (index: number) => {
@@ -111,12 +139,162 @@ class ProblemSetCreate extends Component<Props, State> {
   };
 
   render() {
+    const tabContentText = (currentProblem, index: number) => {
+      return (
+        <Form.TextArea
+          id="problemset-problem-content-input"
+          label="Problem Content"
+          placeholder="Content : Explain your problem set"
+          onChange={(event) => {
+            console.log('************ index : ', index);
+            let editProblem: any;
+            if (currentProblem.problemType === 'multiple-choice') {
+              let _currentProblem =
+                currentProblem as CreateMultipleChoiceProblemRequest;
+              editProblem = {
+                problemType: _currentProblem.problemType,
+                problemSetID: _currentProblem.problemSetID,
+                problemNumber: _currentProblem.problemNumber,
+                content: event.target.value,
+                choices: _currentProblem.choices,
+                solutions: currentProblem.solutions,
+              };
+            } else {
+              let _currentProblem =
+                currentProblem as CreateSubjectiveProblemRequest;
+              editProblem = {
+                problemType: 'subjective',
+                problemSetID: _currentProblem.problemSetID,
+                problemNumber: _currentProblem.problemNumber,
+                content: event.target.value,
+                solutions: _currentProblem.solutions,
+              };
+            }
+
+            const newProblem: CreateProblemRequest[] = [];
+            this.state.problems.forEach((problem) => {
+              if (problem.problemNumber === index) {
+                newProblem.push(editProblem);
+              } else {
+                newProblem.push(problem);
+              }
+            });
+
+            this.setState({
+              ...this.state,
+              problems: newProblem,
+            });
+          }}
+        />
+      );
+    };
+    const tabContentImage = (currentProblem, index: number) => (
+      <Form.Group>
+        <Button
+          id="problemset-problem-content-input-file-button"
+          as="label"
+          htmlFor="file"
+          type="button"
+          content="Upload problem image"
+        ></Button>
+        <input
+          id="file"
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={(event) => {
+            console.log('************ index : ', index);
+            // console.log(
+            //   '************ event.target.files : ',
+            //   event.target.files
+            // );
+
+            if (!event.target.files) {
+              return;
+            }
+            const file = event.target.files[0];
+
+            // console.log('@@@@@@@ event.target.files ' + event.target.files);
+            // console.log('@@@@@@@filename ' + event.target.files[0].name);
+
+            const reader = new FileReader();
+
+            reader.onloadend = () => {
+              const editProblem: CreateProblemRequest = {
+                problemType: currentProblem.problemType,
+                problemSetID: currentProblem.problemSetID,
+                problemNumber: currentProblem.problemNumber,
+                content: reader.result as string,
+                choices: currentProblem.choices,
+                solutions: currentProblem.solutions,
+              };
+              const newProblem: CreateProblemRequest[] = [];
+              this.state.problems.forEach((problem) => {
+                // console.log('________', problem.problemNumber, index);
+                if (problem.problemNumber === index) {
+                  newProblem.push(editProblem);
+                } else {
+                  newProblem.push(problem);
+                }
+              });
+              this.setState({
+                ...this.state,
+                problems: newProblem,
+              });
+            };
+
+            reader.readAsDataURL(file);
+            // let arr = this.state.problems.filter(
+            //   (problem) => problem.problemNumber === index
+            // );
+            // console.log('---------------', index, '------', arr[0]);
+          }}
+        />
+
+        <Image
+          id="problemset-problem-content-input-file-preview"
+          src={
+            this.state.problems.filter(
+              (problem) => problem.problemNumber === index
+            )[0].content
+          }
+          alt=""
+        />
+      </Form.Group>
+    );
+
     const newProblems = this.state.problems.map(
       (currentProblem: CreateProblemRequest, index) => {
         return (
           <div className="NewProblem" key={index.toString()}>
+            <Divider />
+
+            <div className="ProblemContent">
+              <Tab
+                panes={[
+                  {
+                    menuItem: `Make content in TEXT`,
+                    render: () => (
+                      <Tab.Pane>
+                        {(() => tabContentText(currentProblem, index))()}
+                      </Tab.Pane>
+                    ),
+                  },
+                  {
+                    menuItem: 'Make content in IMAGE',
+                    render: () => (
+                      <Tab.Pane>
+                        {((): JSX.Element =>
+                          tabContentImage(currentProblem, index))()}
+                      </Tab.Pane>
+                    ),
+                  },
+                ]}
+              />
+            </div>
+
             <Form.Dropdown
-              className="Type"
+              className="ProblemType"
               item
               options={typeOptions}
               label="Type"
@@ -161,53 +339,7 @@ class ProblemSetCreate extends Component<Props, State> {
                 });
               }}
             />
-            <div className="ProblemContent">
-              <label>Problem Content</label>
-              <textarea
-                id="problemset-problem-content-input"
-                rows={4}
-                placeholder={`${currentProblem.content}`}
-                onChange={(event) => {
-                  let editProblem: any;
-                  if (currentProblem.problemType === 'multiple-choice') {
-                    let _currentProblem =
-                      currentProblem as CreateMultipleChoiceProblemRequest;
-                    editProblem = {
-                      problemType: _currentProblem.problemType,
-                      problemSetID: _currentProblem.problemSetID,
-                      problemNumber: _currentProblem.problemNumber,
-                      content: event.target.value,
-                      choices: _currentProblem.choices,
-                      solutions: currentProblem.solutions,
-                    };
-                  } else {
-                    let _currentProblem =
-                      currentProblem as CreateSubjectiveProblemRequest;
-                    editProblem = {
-                      problemType: 'subjective',
-                      problemSetID: _currentProblem.problemSetID,
-                      problemNumber: _currentProblem.problemNumber,
-                      content: event.target.value,
-                      solutions: _currentProblem.solutions,
-                    };
-                  }
 
-                  const newProblem: CreateProblemRequest[] = [];
-                  this.state.problems.forEach((problem) => {
-                    if (problem.problemNumber === index) {
-                      newProblem.push(editProblem);
-                    } else {
-                      newProblem.push(problem);
-                    }
-                  });
-
-                  this.setState({
-                    ...this.state,
-                    problems: newProblem,
-                  });
-                }}
-              />
-            </div>
             {currentProblem.problemType === 'multiple-choice' && (
               <div>
                 <label>Answer choice</label>
@@ -582,12 +714,12 @@ class ProblemSetCreate extends Component<Props, State> {
               </div>
             )}
 
-            <button
+            <Button
               id="problemsetcreate-remove"
               onClick={() => this.removeProblemHandler(index)}
             >
               Remove problem
-            </button>
+            </Button>
           </div>
         );
       }
@@ -598,6 +730,7 @@ class ProblemSetCreate extends Component<Props, State> {
     // console.log('this.state.scope', this.state.scope);
     // console.log('this.state.tag', this.state.tag);
     // console.log('this.state.difficulty', this.state.difficulty);
+    // console.log('this.state.content', this.state.content);
     console.log('this.state.problems', this.state.problems);
     // ------------ Just for debugging messages -----------------
 
@@ -614,10 +747,11 @@ class ProblemSetCreate extends Component<Props, State> {
               Back
             </Button>
           </Header>
+          <Divider />
 
           <Form>
             <Form.Field className="Title">
-              <label>Title</label>
+              <label>Problem Set Title</label>
               <Input
                 id="input-title"
                 placeholder="Title"
@@ -627,15 +761,18 @@ class ProblemSetCreate extends Component<Props, State> {
                 }}
               />
             </Form.Field>
+
             <Form.TextArea
-              id="input-content"
-              label="Content"
+              id="input-content-text"
+              label="Problem Set Content"
               placeholder="Content : Explain your problem set"
               value={this.state.content}
+              cols={50}
               onChange={(event) => {
                 this.setState({ content: event.target.value });
               }}
             />
+
             <Form.Group>
               <Form.Dropdown
                 className="Scope"
@@ -651,9 +788,9 @@ class ProblemSetCreate extends Component<Props, State> {
               <Form.Dropdown
                 className="Tag1"
                 item
-                options={tagOptions1.slice(1)}
+                options={tagOptions1.slice(0)}
                 label="Tag1"
-                defaultValue="tag-humanities"
+                defaultValue="tag-all"
                 onChange={(_, { value }) => {
                   this.setState({ tag: [value as string, this.state.tag[1]] });
                 }}
@@ -662,9 +799,9 @@ class ProblemSetCreate extends Component<Props, State> {
               <Form.Dropdown
                 className="Tag2"
                 item
-                options={tagOptions2.slice(1)}
+                options={tagOptions2[this.state.tag[0]].slice(0)}
                 label="Tag2"
-                defaultValue="tag-philosophy"
+                defaultValue="tag-all"
                 onChange={(_, { value }) => {
                   this.setState({ tag: [this.state.tag[0], value as string] });
                 }}
@@ -684,6 +821,7 @@ class ProblemSetCreate extends Component<Props, State> {
 
             {newProblems}
 
+            <Divider />
             <Button
               secondary
               id="problemsetcreate-add"

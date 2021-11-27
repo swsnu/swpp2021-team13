@@ -505,7 +505,7 @@ class ProblemSetEdit extends Component<Props, State> {
           <Form.Dropdown
             className="Tag"
             item
-            options={tagOptions2.slice(1)}
+            options={tagOptions2['tag-science'].slice(1)}
             label="Tag"
             defaultValue="tag-philosophy"
             onChange={(_, { value }) => {
