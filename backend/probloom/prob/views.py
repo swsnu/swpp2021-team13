@@ -287,21 +287,26 @@ def get_user_statistics(request: HttpRequest, u_id: int) -> HttpResponse:
     .. code-block:: typescript
 
        interface GetUserStatisticsResponse {
-         lastActiveDays: number;
+         lastActiveDays: number | null;
        }
 
     ``lastActiveDays`` equals to the number of days since the user's last sign
-    in. If a user with id ``u_id`` does not exist, respond with ``404 (Not
-    Found)``.
+    in. If the user never signed in, ``lastActiveDays`` equals to ``null``.
+
+    If a user with id ``u_id`` does not exist, respond with ``404 (Not Found)``.
     """
     user_statistics = UserStatistics.objects.get(pk=u_id)
+    if user_statistics.last_login_date is None:
+        last_active_days = None
+    else:
+        last_active_days = (
+            datetime.date.today() - user_statistics.last_login_date
+        ).days
 
     return JsonResponse(
         {
-            "id": user_statistics.id,
-            "lastActiveDays": (
-                datetime.date.today() - user_statistics.last_login_date
-            ).days,
+            "id": user_statistics.pk,
+            "lastActiveDays": last_active_days,
         },
         safe=False,
     )
