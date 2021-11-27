@@ -1,5 +1,4 @@
 # from django.shortcuts import render
-import dataclasses
 import datetime
 import http
 import json
@@ -7,7 +6,7 @@ from json.decoder import JSONDecodeError
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin as LoginRequiredMixin_
-from django.core.exceptions import BadRequest, ObjectDoesNotExist, PermissionDenied
+from django.core.exceptions import BadRequest, PermissionDenied
 from django.db.models import Count, Max
 from django.db.models.expressions import F
 from django.http import (
@@ -119,17 +118,6 @@ class SignOutView(View):
             return HttpResponse(status=401)
 
 
-@dataclasses.dataclass
-class UserContextBase:
-    id: int
-    username: str
-    email: str
-
-    @classmethod
-    def from_model(cls, user: User):
-        return cls(id=user.pk, username=user.username, email=user.email)
-
-
 @require_GET
 def get_user(_: HttpRequest, u_id: int) -> HttpResponse:
     """Get a specific user.
@@ -145,7 +133,7 @@ def get_user(_: HttpRequest, u_id: int) -> HttpResponse:
 
     .. code-block:: typescript
 
-       interface GetCurrentUserResponse {
+       interface GetUserResponse {
          id: number;
          username: string;
          email: string;
@@ -175,15 +163,8 @@ def get_current_user(request: HttpRequest) -> HttpResponse:
 
     .. rubric:: Behavior
 
-    If a user was signed in, respond with ``200 (OK)`` and the following data:
-
-    .. code-block:: typescript
-
-       interface GetCurrentUserResponse {
-         id: number;
-         username: string;
-         email: string;
-       }
+    If a user was signed in, respond with ``200 (OK)`` and ``GetUserResponse``
+    from :func:`get_user`.
 
     If there is no signed in user, respond with ``404 (Not Found)``.
     """

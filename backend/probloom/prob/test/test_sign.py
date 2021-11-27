@@ -93,3 +93,26 @@ class SignTestCase(TestCase):
         response = client.post("/api/signin/", request, content_type="application/json")
         response = client.get("/api/signout/")
         self.assertEqual(response.status_code, 204)
+
+    def test_get_user(self):
+        client = Client()
+        response = client.get(f"/api/user/{self.user_1.pk}/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '"username": "John"')
+
+        response = client.get("/api/user/100/")
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_current_user(self):
+        client = Client()
+        response = client.get("/api/user/current/")
+        self.assertEqual(response.status_code, 404)
+
+        request = {
+            "id": "John",
+            "password": "123",
+        }
+        client.post("/api/signin/", request, content_type="application/json")
+        response = client.get("/api/user/current/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '"username": "John"')
