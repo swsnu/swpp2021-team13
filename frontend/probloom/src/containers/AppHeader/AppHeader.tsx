@@ -19,8 +19,8 @@ const ProfileDropdown = ({ user, onSignOut }: ProfileDropdownProps) => {
     <Menu.Menu position="right">
       <Dropdown pointing item text={user.username}>
         <Dropdown.Menu>
-          <Dropdown.Item>
-            <NavLink to={`/user/${user.id}/summary`}>View Profile</NavLink>
+          <Dropdown.Item as={NavLink} to={`/user/${user.id}/summary`}>
+            View Profile
           </Dropdown.Item>
           <Dropdown.Item onClick={async () => onSignOut(user)}>
             Sign Out
