@@ -4,36 +4,39 @@ from prob.models import User, UserStatistics, ProblemSet
 
 
 class ProblemSetTestCase(TestCase):
-    def setUp(self):
-        user_1 = User.objects.create_user(
+    @classmethod
+    def setUpTestData(cls):
+        cls.user_1 = User.objects.create_user(
             username="test_name_1",
             email="test_email_1@test.test",
             password="test_password_1",
         )
-        user_2 = User.objects.create_user(
+        cls.user_2 = User.objects.create_user(
             username="test_name_2",
             email="test_email_2@test.test",
             password="test_password_2",
         )
-        user_stat_1 = UserStatistics.objects.create(user=user_1)
-        user_stat_2 = UserStatistics.objects.create(user=user_2)
-        problem_set_1 = ProblemSet.objects.create(
+        cls.user_stat_1 = UserStatistics.objects.create(user=cls.user_1)
+        cls.user_stat_2 = UserStatistics.objects.create(user=cls.user_2)
+        cls.problem_set_1 = ProblemSet.objects.create(
             title="test_title_1",
             is_open=False,
             difficulty=1,
             description="test_content_1",
-            creator=user_stat_1,
+            creator=cls.user_stat_1,
         )
-        problem_set_1.recommenders.add(user_stat_1, user_stat_2)
-        problem_set_2 = ProblemSet.objects.create(
+        cls.problem_set_1.recommenders.add(cls.user_stat_1, cls.user_stat_2)
+        cls.problem_set_2 = ProblemSet.objects.create(
             title="test_title_2",
             is_open=True,
             difficulty=2,
             description="test_content_2",
-            creator=user_stat_2,
+            creator=cls.user_stat_2,
         )
-        problem_set_2.recommenders.add(user_stat_1)
-        # Solved.objects.create(solver=user_stat_1, problem=problem_set_1, result=True)
+        cls.problem_set_2.recommenders.add(cls.user_stat_1)
+        # Solved.objects.create(
+        #     solver=cls.user_stat_1, problem=cls.problem_set_1, result=True
+        # )
 
     def test_problems_get(self):
         client = Client()

@@ -3,11 +3,12 @@ from prob.models import User, UserStatistics, ProblemSet
 
 
 class UserStatisticsTestCase(TestCase):
-    def setUp(self):
-        self.user = User.objects.create_user(
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user(
             username="USER", email="USER@asd.com", password="123"
         )
-        user_stat = UserStatistics.objects.create(user=self.user)
+        user_stat = UserStatistics.objects.create(user=cls.user)
         ProblemSet.objects.create(
             title="TITLE",
             is_open=False,
