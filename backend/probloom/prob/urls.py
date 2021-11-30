@@ -30,7 +30,5 @@ urlpatterns = [
     path("problem/<int:p_id>/solve/", views.solve_problem),
     path("problem_set/<int:ps_id>/solvers/", views.find_solvers),
     path("problem_set/<int:ps_id>/solvers/<int:u_id>/", views.get_solver),
-    path("solved/<int:u_id>/<int:p_id>/", views.ProblemSetSolvedView.as_view()),
-    path("solved/<int:p_id>/", views.ProblemSetSolvedListView.as_view()),
     path("token/", views.token, name="token"),
 ]

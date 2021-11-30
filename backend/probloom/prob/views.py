@@ -1282,18 +1282,6 @@ def find_solvers(request: HttpRequest, ps_id: int) -> HttpResponse:
     return JsonResponse(res, safe=False)
 
 
-class ProblemSetSolvedListView(LoginRequiredMixin, View):
-    def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
-        try:
-            solver = User.objects.get(id=kwargs["p_id"])
-            solver_stat = UserStatistics.objects.get(user=solver)
-        except (User.DoesNotExist, UserStatistics.DoesNotExist):
-            return HttpResponseNotFound()
-
-        probs = Solved.objects.filter(solver=solver_stat)
-        return JsonResponse(data=[prob.to_dict() for prob in probs], safe=False)
-
-
 @login_required
 @require_GET
 def get_solver(request: HttpRequest, ps_id: int, u_id: int) -> HttpResponse:
@@ -1349,49 +1337,6 @@ def get_solver(request: HttpRequest, ps_id: int, u_id: int) -> HttpResponse:
     }
 
     return JsonResponse(res)
-
-
-class ProblemSetSolvedView(LoginRequiredMixin, View):
-
-    login_url = "/api/signin/"
-    redirect_field_name = None
-
-    def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
-        try:
-            solver = User.objects.get(id=kwargs["u_id"])
-            solver_stat = UserStatistics.objects.get(user=solver)
-            problem = ProblemSet.objects.get(id=kwargs["p_id"])
-            res = Solved.objects.get(solver=solver_stat, problem=problem)
-        except (
-            User.DoesNotExist,
-            UserStatistics.DoesNotExist,
-            ProblemSet.DoesNotExist,
-        ):
-            return HttpResponseNotFound()
-
-        return JsonResponse(data={"result": res.result})
-
-    def post(self, request: HttpRequest, **kwargs) -> HttpResponse:
-        try:
-            req_data = json.loads(request.body.decode())
-            result = req_data["result"]
-        except (JSONDecodeError, KeyError) as error:
-            raise BadRequest() from error
-
-        try:
-            solver = User.objects.get(id=kwargs["u_id"])
-            solver_stat = UserStatistics.objects.get(user=solver)
-            problem = ProblemSet.objects.get(id=kwargs["p_id"])
-        except (
-            User.DoesNotExist,
-            UserStatistics.DoesNotExist,
-            ProblemSet.DoesNotExist,
-        ):
-            return HttpResponseNotFound()
-
-        res = Solved(solver=solver_stat, problem=problem, result=result)
-        res.save()
-        return JsonResponse(data=res.to_dict())
 
 
 @ensure_csrf_cookie
