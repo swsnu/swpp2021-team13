@@ -24,10 +24,12 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 from django.views.generic.detail import SingleObjectMixin
 
 from .models import (
+    MultipleChoiceProblem,
     Problem,
     ProblemSet,
     ProblemSetComment,
     Solved,
+    SubjectiveProblem,
     User,
     UserProfile,
     UserStatistics,
@@ -1159,7 +1161,7 @@ class ProblemInfoView(LoginRequiredMixin, View):
 
 
 @require_POST
-def solve_problem(_: HttpRequest, p_id: int) -> HttpResponse:
+def solve_problem(request: HttpRequest, p_id: int) -> HttpResponse:
     """Post a solution to a specific problem.
 
     .. rubric:: How to use
@@ -1190,8 +1192,7 @@ def solve_problem(_: HttpRequest, p_id: int) -> HttpResponse:
     .. code-block:: typescript
 
        interface SolveProblemResponseSuccess {
-         result: 'SUCCESS';
-         correct: boolean;
+         result: boolean;
        }
 
     ``correct`` should be true if and only if the user solved the problem
@@ -1214,7 +1215,47 @@ def solve_problem(_: HttpRequest, p_id: int) -> HttpResponse:
     If a problem with id ``p_id`` exists but the request does not follow the
     constraints, respond with ``400 (Bad Request)``.
     """
-    return HttpResponse(status_code=http.HTTPStatus.NOT_IMPLEMENTED)
+    try:
+        problem = Problem.objects.get(pk=p_id)
+    except:
+        return HttpResponseNotFound()
+
+    try:
+        pending_solution = json.loads(request.body)["solution"]
+    except (JSONDecodeError, KeyError) as error:
+        raise BadRequest() from error
+
+    if isinstance(pending_solution, list):  # Multiple-choice problem
+        pending_answer = set(pending_solution)
+        try:
+            assert all(
+                map(lambda x: isinstance(x, int), pending_answer)
+            ), "entries of solution should be an integer"
+            assert len(pending_solution) == len(
+                pending_answer
+            ), "entries of solution should be unique"
+        except AssertionError as error:
+            raise BadRequest() from error
+        if not isinstance(problem, MultipleChoiceProblem):
+            return JsonResponse(
+                {"result": "FAILURE", "cause": "INCORRECT_PROBLEM_TYPE"}
+            )
+        answer = problem.choices.filter(is_solution=True).values_list("number")
+        answer = set(map(lambda x: x[0], answer))
+        result = pending_answer == answer
+    elif isinstance(pending_solution, str):  # Subjective problem
+        if not isinstance(problem, SubjectiveProblem):
+            return JsonResponse(
+                {"result": "FAILURE", "cause": "INCORRECT_PROBLEM_TYPE"}
+            )
+        result = problem.solutions.filter(text=pending_solution).exists()
+    else:
+        raise BadRequest("solution should be an array or a string")
+
+    solved = Solved.objects.get_or_create(solver_id=request.user.pk, problem_id=p_id)[0]
+    if solved.result is False:
+        solved.result = result
+    return JsonResponse({"result": result})
 
 
 @login_required
