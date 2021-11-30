@@ -9,21 +9,30 @@ from prob.models import (
 )
 
 
-class ProblemSetListTestCase(TestCase):
+class SolvedTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.turing = User.objects.create_user(
+            pk=1,
             username="turing",
             email="turing@example.com",
             password="turing_password",
         )
         cls.meitner = User.objects.create_user(
+            pk=2,
             username="meitner",
             email="meitner@example.com",
             password="meitner_password",
         )
+        cls.ritchie = User.objects.create_user(
+            pk=3,
+            username="ritchie",
+            email="ritchie@example.com",
+            password="ritchie_password",
+        )
         cls.turing_stat = UserStatistics.objects.create(user=cls.turing)
         cls.meitner_stat = UserStatistics.objects.create(user=cls.meitner)
+        cls.ritchie_stat = UserStatistics.objects.create(user=cls.ritchie)
 
         cls.problem_set1 = ProblemSet.objects.create(
             pk=1,
@@ -78,13 +87,13 @@ class ProblemSetListTestCase(TestCase):
             solver_id=cls.turing.pk, problem=cls.problem1_2, result=True
         )
         Solved.objects.create(
-            solver_id=cls.turing.pk, problem=cls.problem1_1, result=True
+            solver_id=cls.meitner.pk, problem=cls.problem1_1, result=True
         )
         Solved.objects.create(
-            solver_id=cls.turing.pk, problem=cls.problem1_2, result=False
+            solver_id=cls.meitner.pk, problem=cls.problem1_2, result=False
         )
         Solved.objects.create(
-            solver_id=cls.meitner.pk, problem=cls.problem1_1, result=False
+            solver_id=cls.turing.pk, problem=cls.problem2_1, result=False
         )
 
     def test_problems_get(self):
@@ -99,3 +108,49 @@ class ProblemSetListTestCase(TestCase):
         self.assertEqual(res_json[0]["solvedNum"], 1)
         self.assertEqual(res_json[1]["id"], 2)
         self.assertEqual(res_json[1]["solvedNum"], 0)
+
+    def test_find_solvers(self):
+        client = Client()
+
+        client.login(username="turing", password="turing_password")
+
+        find_by_solver = lambda res_json, username: next(
+            entry for entry in res_json if entry["username"] == username
+        )
+
+        res = client.get("/api/problem_set/1/solvers/")
+        res_json = res.json()
+        res_turing = find_by_solver(res_json, "turing")
+        self.assertEqual(res_turing["problems"], [True, True])
+        self.assertEqual(res_turing["result"], True)
+        res_meitner = find_by_solver(res_json, "meitner")
+        self.assertEqual(res_meitner["problems"], [True, False])
+        self.assertEqual(res_meitner["result"], False)
+
+        res = client.get("/api/problem_set/2/solvers/")
+        res_json = res.json()
+        res_turing = find_by_solver(res_json, "turing")
+        self.assertEqual(res_turing["problems"], [False, None])
+        self.assertEqual(res_turing["result"], False)
+        self.assertContains(res, '"username": "turing"')
+        self.assertNotContains(res, '"username": "meitner"')
+
+    def test_get_solver(self):
+        client = Client()
+
+        client.login(username="turing", password="turing_password")
+
+        res = client.get("/api/problem_set/1/solvers/1/")
+        res_json = res.json()
+        self.assertEqual(res_json["problems"], [True, True])
+        self.assertEqual(res_json["result"], True)
+
+        res = client.get("/api/problem_set/1/solvers/2/")
+        res_json = res.json()
+        self.assertEqual(res_json["problems"], [True, False])
+        self.assertEqual(res_json["result"], False)
+
+        res = client.get("/api/problem_set/1/solvers/3/")
+        res_json = res.json()
+        self.assertEqual(res_json["problems"], [None, None])
+        self.assertEqual(res_json["result"], False)

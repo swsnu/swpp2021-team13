@@ -5,6 +5,7 @@ import json
 from json.decoder import JSONDecodeError
 
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required as login_required_
 from django.contrib.auth.mixins import LoginRequiredMixin as LoginRequiredMixin_
 from django.core.exceptions import BadRequest, PermissionDenied
 from django.db.models.aggregates import Count, Max
@@ -38,6 +39,9 @@ from .models import (
 class LoginRequiredMixin(LoginRequiredMixin_):
     login_url = "/api/signin/"
     redirect_field_name = None
+
+
+login_required = login_required_(redirect_field_name=None, login_url="/api/signin/")
 
 
 # Create your views here.
@@ -1213,6 +1217,7 @@ def solve_problem(request: HttpRequest, p_id: int) -> HttpResponse:
     return HttpResponse(status_code=http.HTTPStatus.NOT_IMPLEMENTED)
 
 
+@login_required
 @require_GET
 def find_solvers(request: HttpRequest, ps_id: int) -> HttpResponse:
     """Get progresses of users who tried a specific problem set.
@@ -1243,7 +1248,38 @@ def find_solvers(request: HttpRequest, ps_id: int) -> HttpResponse:
     If a problem set with id ``ps_id`` does not exist, respond with ``404 (Not
     Found)``.
     """
-    return HttpResponse(status_code=http.HTTPStatus.NOT_IMPLEMENTED)
+    try:
+        num_problems = ProblemSet.objects.get(id=ps_id).problems.count()
+    except ProblemSet.DoesNotExist:
+        return HttpResponseNotFound()
+
+    solved_query = (
+        Solved.objects.prefetch_related("solver__user")
+        .filter(problem__problem_set=ps_id)
+        .annotate(number=F("problem__number"))
+        .order_by("solver", "number")
+    )
+
+    res = []
+    last_user = 0
+    res_entry = {}
+    for record in solved_query:
+        if record.solver.user.pk != last_user:
+            if last_user != 0:
+                res_entry["result"] = all(res_entry["problems"])
+                res.append(res_entry)
+            last_user = record.solver.user.pk
+            res_entry = {
+                "userID": record.solver.user.pk,
+                "username": record.solver.user.username,
+                "result": False,
+                "problems": [None] * num_problems,
+            }
+        res_entry["problems"][record.number - 1] = record.result
+    res_entry["result"] = all(res_entry["problems"])
+    res.append(res_entry)
+
+    return JsonResponse(res, safe=False)
 
 
 class ProblemSetSolvedListView(LoginRequiredMixin, View):
@@ -1286,7 +1322,32 @@ def get_solver(request: HttpRequest, ps_id: int, u_id: int) -> HttpResponse:
     If either problem set or user does not exist, respond with ``404 (Not
     Found)``.
     """
-    return HttpResponse(status_code=http.HTTPStatus.NOT_IMPLEMENTED)
+    try:
+        num_problems = ProblemSet.objects.get(id=ps_id).problems.count()
+        user = User.objects.get(pk=u_id)
+    except (ProblemSet.DoesNotExist, User.DoesNotExist):
+        return HttpResponseNotFound()
+
+    solved_query = (
+        Solved.objects.prefetch_related("solver__user")
+        .filter(problem__problem_set=ps_id, solver_id=u_id)
+        .annotate(number=F("problem__number"))
+        .order_by("number")
+        .values("number", "result")
+    )
+
+    problems = [None] * num_problems
+    for record in solved_query:
+        problems[record["number"] - 1] = record["result"]
+
+    res = {
+        "userID": user.pk,
+        "username": user.username,
+        "result": all(problems),
+        "problems": problems,
+    }
+
+    return JsonResponse(res)
 
 
 class ProblemSetSolvedView(LoginRequiredMixin, View):
