@@ -345,9 +345,6 @@ class ProblemSetListView(LoginRequiredMixin, View):
              ]
            }
         """
-        # You should subquery number of problems here.
-        # If you put this query inside solved_query directly,
-        # the value of Count("problem_set") in solved_query becomes incorrect.
         num_problems_query = ProblemSet.objects.values(
             "id", num_problems=Count("problems")
         ).filter(id=OuterRef("problem_set"))
