@@ -1,4 +1,7 @@
+import http
+
 from django.test import TestCase, Client
+
 from prob.models import (
     Content,
     MultipleChoiceProblem,
@@ -10,6 +13,8 @@ from prob.models import (
 
 
 class SolvedTestCase(TestCase):
+    not_pk = 1339  # This number should not match any of the IDs
+
     @classmethod
     def setUpTestData(cls):
         cls.turing = User.objects.create_user(
@@ -96,61 +101,84 @@ class SolvedTestCase(TestCase):
             solver_id=cls.turing.pk, problem=cls.problem2_1, result=False
         )
 
-    def test_problems_get(self):
-        client = Client()
+    def setUp(self):
+        self.client = Client()
+        self.client.login(username="turing", password="turing_password")
 
-        client.login(username="turing", password="turing_password")
+    def tearDown(self):
+        self.client.logout()
 
-        res = client.get("/api/problem_set/")
-        self.assertEqual(res.status_code, 200)
-        res_json = res.json()
-        self.assertEqual(res_json[0]["id"], 1)
-        self.assertEqual(res_json[0]["solvedNum"], 1)
-        self.assertEqual(res_json[1]["id"], 2)
-        self.assertEqual(res_json[1]["solvedNum"], 0)
+    def test_problem_set_list_get(self):
+        response = self.client.get("/api/problem_set/")
+        self.assertEqual(response.status_code, http.HTTPStatus.OK)
+        response_json = response.json()
+        self.assertEqual(response_json[0]["id"], 1)
+        self.assertEqual(response_json[0]["solvedNum"], 1)
+        self.assertEqual(response_json[1]["id"], 2)
+        self.assertEqual(response_json[1]["solvedNum"], 0)
+
+    def test_login_required(self):
+        paths = [
+            "/api/problem_set/1/solvers/",
+            "/api/problem_set/1/solvers/1/",
+        ]
+
+        self.client.logout()
+        for path in paths:
+            with self.subTest(path=path):
+                response = self.client.get(path)
+                self.assertEqual(response.status_code, http.HTTPStatus.FOUND)
+                self.assertEqual(response.headers["Location"], "/api/signin/")
+
+    def test_not_found(self):
+        paths = [
+            f"/api/problem_set/{self.not_pk}/solvers/",
+            f"/api/problem_set/{self.not_pk}/solvers/1/",
+            f"/api/problem_set/1/solvers/{self.not_pk}/",
+        ]
+
+        for path in paths:
+            with self.subTest(path=path):
+                response = self.client.get(path)
+                self.assertEqual(response.status_code, http.HTTPStatus.NOT_FOUND)
 
     def test_find_solvers(self):
-        client = Client()
-
-        client.login(username="turing", password="turing_password")
-
         find_by_solver = lambda res_json, username: next(
             entry for entry in res_json if entry["username"] == username
         )
 
-        res = client.get("/api/problem_set/1/solvers/")
-        res_json = res.json()
-        res_turing = find_by_solver(res_json, "turing")
-        self.assertEqual(res_turing["problems"], [True, True])
-        self.assertEqual(res_turing["result"], True)
-        res_meitner = find_by_solver(res_json, "meitner")
-        self.assertEqual(res_meitner["problems"], [True, False])
-        self.assertEqual(res_meitner["result"], False)
+        response = self.client.get("/api/problem_set/1/solvers/")
+        self.assertEqual(response.status_code, http.HTTPStatus.OK)
+        response_json = response.json()
+        response_turing = find_by_solver(response_json, "turing")
+        self.assertEqual(response_turing["problems"], [True, True])
+        self.assertEqual(response_turing["result"], True)
+        response_meitner = find_by_solver(response_json, "meitner")
+        self.assertEqual(response_meitner["problems"], [True, False])
+        self.assertEqual(response_meitner["result"], False)
 
-        res = client.get("/api/problem_set/2/solvers/")
-        res_json = res.json()
-        res_turing = find_by_solver(res_json, "turing")
-        self.assertEqual(res_turing["problems"], [False, None])
-        self.assertEqual(res_turing["result"], False)
-        self.assertContains(res, '"username": "turing"')
-        self.assertNotContains(res, '"username": "meitner"')
+        response = self.client.get("/api/problem_set/2/solvers/")
+        self.assertEqual(response.status_code, http.HTTPStatus.OK)
+        response_json = response.json()
+        response_turing = find_by_solver(response_json, "turing")
+        self.assertEqual(response_turing["problems"], [False, None])
+        self.assertEqual(response_turing["result"], False)
+        self.assertContains(response, '"username": "turing"')
+        self.assertNotContains(response, '"username": "meitner"')
 
     def test_get_solver(self):
-        client = Client()
+        test_cases = [
+            {"userID": 1, "result": True, "problems": [True, True]},
+            {"userID": 2, "result": False, "problems": [True, False]},
+            {"userID": 3, "result": False, "problems": [None, None]},
+        ]
 
-        client.login(username="turing", password="turing_password")
-
-        res = client.get("/api/problem_set/1/solvers/1/")
-        res_json = res.json()
-        self.assertEqual(res_json["problems"], [True, True])
-        self.assertEqual(res_json["result"], True)
-
-        res = client.get("/api/problem_set/1/solvers/2/")
-        res_json = res.json()
-        self.assertEqual(res_json["problems"], [True, False])
-        self.assertEqual(res_json["result"], False)
-
-        res = client.get("/api/problem_set/1/solvers/3/")
-        res_json = res.json()
-        self.assertEqual(res_json["problems"], [None, None])
-        self.assertEqual(res_json["result"], False)
+        for test_case in test_cases:
+            with self.subTest(userID=test_case["userID"]):
+                response = self.client.get(
+                    f"/api/problem_set/1/solvers/{test_case['userID']}/"
+                )
+                self.assertEqual(response.status_code, http.HTTPStatus.OK)
+                response_json = response.json()
+                self.assertEqual(response_json["problems"], test_case["problems"])
+                self.assertEqual(response_json["result"], test_case["result"])

@@ -1294,6 +1294,7 @@ class ProblemSetSolvedListView(LoginRequiredMixin, View):
         return JsonResponse(data=[prob.to_dict() for prob in probs], safe=False)
 
 
+@login_required
 @require_GET
 def get_solver(request: HttpRequest, ps_id: int, u_id: int) -> HttpResponse:
     """Get progress of a user for a specific problem set.
