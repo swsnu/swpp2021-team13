@@ -9,8 +9,8 @@ from django.contrib.auth.decorators import login_required as login_required_
 from django.contrib.auth.mixins import LoginRequiredMixin as LoginRequiredMixin_
 from django.core.exceptions import BadRequest, PermissionDenied
 from django.db.models.aggregates import Count, Max
-from django.db.models.functions import Coalesce
 from django.db.models.expressions import F, OuterRef, Subquery, Value
+from django.db.models.functions import Coalesce
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -1159,7 +1159,7 @@ class ProblemInfoView(LoginRequiredMixin, View):
 
 
 @require_POST
-def solve_problem(request: HttpRequest, p_id: int) -> HttpResponse:
+def solve_problem(_: HttpRequest, p_id: int) -> HttpResponse:
     """Post a solution to a specific problem.
 
     .. rubric:: How to use
@@ -1219,7 +1219,7 @@ def solve_problem(request: HttpRequest, p_id: int) -> HttpResponse:
 
 @login_required
 @require_GET
-def find_solvers(request: HttpRequest, ps_id: int) -> HttpResponse:
+def find_solvers(_: HttpRequest, ps_id: int) -> HttpResponse:
     """Get progresses of users who tried a specific problem set.
 
     .. rubric:: How to use
@@ -1284,7 +1284,7 @@ def find_solvers(request: HttpRequest, ps_id: int) -> HttpResponse:
 
 @login_required
 @require_GET
-def get_solver(request: HttpRequest, ps_id: int, u_id: int) -> HttpResponse:
+def get_solver(_: HttpRequest, ps_id: int, u_id: int) -> HttpResponse:
     """Get progress of a user for a specific problem set.
 
     .. rubric:: How to use
