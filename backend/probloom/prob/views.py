@@ -7,8 +7,9 @@ from json.decoder import JSONDecodeError
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin as LoginRequiredMixin_
 from django.core.exceptions import BadRequest, PermissionDenied
-from django.db.models import Count, Max
-from django.db.models.expressions import F
+from django.db.models.aggregates import Count, Max
+from django.db.models.functions import Coalesce
+from django.db.models.expressions import F, OuterRef, Subquery, Value
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -344,6 +345,25 @@ class ProblemSetListView(LoginRequiredMixin, View):
              ]
            }
         """
+        # You should subquery number of problems here.
+        # If you put this query inside solved_query directly,
+        # the value of Count("problem_set") in solved_query becomes incorrect.
+        num_problems_query = ProblemSet.objects.values(
+            "id", num_problems=Count("problems")
+        ).filter(id=OuterRef("problem_set"))
+        solved_query = (
+            Solved.objects.filter(result__exact=True)
+            .values("solver", problem_set=F("problem__problem_set"))
+            .annotate(
+                unsolved_problems=(
+                    Subquery(num_problems_query.values("num_problems"))
+                    - Count("problem_set")
+                )
+            )
+            .filter(unsolved_problems__lte=0)
+            .values("problem_set", solvedNum=Count("solver", distinct=True))
+            .filter(problem_set=OuterRef("pk"))
+        )
         res = (
             ProblemSet.objects.select_related("creator__user")
             .values(
@@ -357,6 +377,9 @@ class ProblemSetListView(LoginRequiredMixin, View):
                 "description",
                 "creator_id",
                 "creator__user__username",
+                solvedNum=Coalesce(
+                    Subquery(solved_query.values("solvedNum")), Value(0)
+                ),
                 recommendedNum=Count("recommenders"),
             )
             .all()
@@ -374,6 +397,7 @@ class ProblemSetListView(LoginRequiredMixin, View):
                     "content": value["description"],
                     "userID": value["creator_id"],
                     "username": value["creator__user__username"],
+                    "solvedNum": value["solvedNum"],
                     "recommendedNum": value["recommendedNum"],
                 },
                 res,

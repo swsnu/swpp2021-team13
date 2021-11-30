@@ -34,9 +34,6 @@ class ProblemSetTestCase(TestCase):
             creator=cls.user_stat_2,
         )
         cls.problem_set_2.recommenders.add(cls.user_stat_1)
-        # Solved.objects.create(
-        #     solver=cls.user_stat_1, problem=cls.problem_set_1, result=True
-        # )
 
     def test_problems_get(self):
         client = Client()
