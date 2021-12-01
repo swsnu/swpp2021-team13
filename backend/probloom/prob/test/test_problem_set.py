@@ -144,23 +144,26 @@ class ProblemSetTestCase(TestCase):
 
     def test_bad_request(self):
         request_methods = [self.client.post, self.client.put]
-        bad_request = {"no": "way"}
-        worse_request = "Lorem ipsum dolor sit amet, consectetur adipiscing elit,"
-        bad_requests = [bad_request, worse_request]
+        bad_requests = [
+            {"no": "way"},
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
+        ]
 
         # User Sign-in
         self.client.post(
             "/api/signin/", self.request_user1, content_type="application/json"
         )
 
-        for request_method, bad_request in zip(request_methods, bad_requests):
-            with self.subTest(method=request_method.__name__, data=bad_request):
-                response = request_method(
-                    path="/api/problem_set/1/",
-                    data=bad_request,
-                    content_type="application/json",
-                )
-                self.assertEqual(response.status_code, 400)
+        for request_method in request_methods:
+            with self.subTest(method=request_method.__name__):
+                for bad_request in bad_requests:
+                    with self.subTest(request=bad_request):
+                        response = request_method(
+                            path="/api/problem_set/1/",
+                            data=bad_request,
+                            content_type="application/json",
+                        )
+                        self.assertEqual(response.status_code, 400)
 
     def test_problem_set_info(self):
         response = self.client.post(
