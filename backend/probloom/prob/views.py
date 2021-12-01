@@ -1160,6 +1160,7 @@ class ProblemInfoView(LoginRequiredMixin, View):
         return HttpResponse()
 
 
+@login_required
 @require_POST
 def solve_problem(request: HttpRequest, p_id: int) -> HttpResponse:
     """Post a solution to a specific problem.
@@ -1255,6 +1256,7 @@ def solve_problem(request: HttpRequest, p_id: int) -> HttpResponse:
     solved = Solved.objects.get_or_create(solver_id=request.user.pk, problem_id=p_id)[0]
     if solved.result is False:
         solved.result = result
+        solved.save()
     return JsonResponse({"result": result})
 
 
