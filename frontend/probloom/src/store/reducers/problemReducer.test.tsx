@@ -351,4 +351,151 @@ describe('Problem Reducer', () => {
       selectedProblem: stubProblem
     });
   });
+
+  it('should UPDATE_PROBLEM', () => {
+    const stubProblem1: a_interfaces.GetMultipleChoiceProblemResponse = {
+      id: 1,
+      problemType: "multiple-choice",
+      problemSetID: 1,
+      problemNumber: 1,
+      creatorID: 1,
+      createdTime: "created_time",
+      content: "content",
+      solverIDs: [],
+      choices: ['choice']
+    }
+    const stubProblem2: a_interfaces.GetMultipleChoiceProblemResponse = {
+      id: 1,
+      problemType: "multiple-choice",
+      problemSetID: 1,
+      problemNumber: 1,
+      creatorID: 1,
+      createdTime: "created_time",
+      content: "modified",
+      solverIDs: [],
+      choices: ['modified']
+    }
+    const stubProblemReq: a_interfaces.UpdateMultipleChoiceProblemRequest = {
+      problemType: "multiple-choice",
+      problemNumber: 1,
+      content: "modified",
+      choices: ['modified']
+    }
+    const stubInitialState = {
+      problemSets: [],
+      solvers: [],
+      selectedProblemSet: null,
+      selectedProblems: [],
+      selectedProblem: stubProblem1,
+    };
+    let newState = problemReducer(stubInitialState, {
+      type: actionTypes.UPDATE_PROBLEM,
+      selectedProblem: stubProblemReq,
+    });
+    expect(newState).toEqual({
+      problemSets: [],
+      solvers: [],
+      selectedProblemSet: null,
+      selectedProblems: [],
+      selectedProblem: stubProblem2
+    });
+
+    const stubProblem3: a_interfaces.GetSubjectiveProblemResponse = {
+      id: 1,
+      problemType: "subjective",
+      problemSetID: 1,
+      problemNumber: 1,
+      creatorID: 1,
+      createdTime: "created_time",
+      content: "content",
+      solverIDs: [],
+      solutions: ['solution']
+    }
+    const stubProblem4: a_interfaces.GetSubjectiveProblemResponse = {
+      id: 1,
+      problemType: "subjective",
+      problemSetID: 1,
+      problemNumber: 1,
+      creatorID: 1,
+      createdTime: "created_time",
+      content: "modified",
+      solverIDs: [],
+      solutions: ['modified']
+    }
+    const stubProblemReq2: a_interfaces.UpdateSubjectiveProblemRequest = {
+      problemType: "subjective",
+      problemNumber: 1,
+      content: "modified",
+      solutions: ['modified']
+    }
+    const stubInitialState2 = {
+      problemSets: [],
+      solvers: [],
+      selectedProblemSet: null,
+      selectedProblems: [],
+      selectedProblem: stubProblem3,
+    };
+    let newState2 = problemReducer(stubInitialState2, {
+      type: actionTypes.UPDATE_PROBLEM,
+      selectedProblem: stubProblemReq2,
+    });
+    expect(newState2).toEqual({
+      problemSets: [],
+      solvers: [],
+      selectedProblemSet: null,
+      selectedProblems: [],
+      selectedProblem: stubProblem4
+    });
+  });
+
+  it('should DELETE_PROBLEM', () => {
+    const stubProblemSet1 = {
+      id: 1,
+      title: 'title1',
+      createdTime: 'create_time1',
+      modifiedTime: 'modified_time1',
+      isOpen: false,
+      tag: [['math']],
+      difficulty: 1,
+      content: 'content1',
+      userID: 1,
+      username: 'creator1',
+      solverIDs: [],
+      recommendedNum: 0,
+      problems: [1],
+    };
+    const stubProblemSet2 = {
+      id: 1,
+      title: 'title1',
+      createdTime: 'create_time1',
+      modifiedTime: 'modified_time1',
+      isOpen: false,
+      tag: [['math']],
+      difficulty: 1,
+      content: 'content1',
+      userID: 1,
+      username: 'creator1',
+      solverIDs: [],
+      recommendedNum: 0,
+      problems: [],
+    };
+    const stubInitialState = {
+      problemSets: [stubProblemSet1],
+      solvers: [],
+      selectedProblemSet: stubProblemSet1,
+      selectedProblems: [],
+      selectedProblem: null,
+    };
+    let newState = problemReducer(stubInitialState, {
+      type: actionTypes.DELETE_PROBLEM,
+      targetProblemID: 1,
+    });
+    expect(newState).toEqual({
+      problemSets: [stubProblemSet2],
+      solvers: [],
+      selectedProblemSet: null,
+      selectedProblems: [],
+      selectedProblem: null,
+    });
+  });
 });

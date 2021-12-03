@@ -7,7 +7,6 @@ export interface ProblemSetState {
   problemSets: interfaces.ProblemSetInterface[];
   solvers: interfaces.Solver[];
   selectedProblemSet: interfaces.ProblemSetInterface | null;
-  selectedProblems: interfaces.ProblemSetInterface[];
   selectedProblem: any;
 }
 
@@ -15,7 +14,6 @@ const initialState: ProblemSetState = {
   problemSets: [],
   solvers: [],
   selectedProblemSet: null,
-  selectedProblems: [],
   selectedProblem: null,
 };
 
