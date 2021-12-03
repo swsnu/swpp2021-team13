@@ -7,7 +7,7 @@ export interface ProblemSetState {
   problemSets: interfaces.ProblemSetInterface[];
   solvers: interfaces.Solver[];
   selectedProblemSet: interfaces.ProblemSetInterface | null;
-  selectedProblem: any;
+  selectedProblem: interfaces.ProblemType | null;
 }
 
 const initialState: ProblemSetState = {
@@ -61,20 +61,7 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
       return { ...state, selectedProblem: action.selectedProblem }
 
     case actionTypes.UPDATE_PROBLEM:
-      const updatedProblem = {
-        ...state.selectedProblem,
-        problemType: action.selectedProblem.problemType,
-        problemNumber: action.selectedProblem.problemNumber,
-        content: action.selectedProblem.content
-      }
-      if (updatedProblem.problemType === 'multiple-choice') {
-        const updatedMultipleChoiceProblem : any = action.selectedProblem;
-        updatedProblem['choices'] = updatedMultipleChoiceProblem.choices;
-      } else if (updatedProblem.problemType === 'subjective') {
-        const updatedSubjectiveProblem : any = action.selectedProblem;
-        updatedProblem['solutions'] = updatedSubjectiveProblem.solutions;
-      }
-      return { ...state, selectedProblem: updatedProblem }
+      return { ...state, selectedProblem: action.selectedProblem }
 
     case actionTypes.DELETE_PROBLEM:
       if (state.selectedProblemSet == null) break;

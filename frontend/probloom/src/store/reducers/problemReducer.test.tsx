@@ -437,7 +437,7 @@ describe('Problem Reducer', () => {
     };
     let newState2 = problemReducer(stubInitialState2, {
       type: actionTypes.UPDATE_PROBLEM,
-      selectedProblem: stubProblemReq2,
+      selectedProblem: stubProblem4,
     });
     expect(newState2).toEqual({
       problemSets: [],

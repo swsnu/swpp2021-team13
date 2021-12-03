@@ -14,6 +14,10 @@ export interface ProblemSetInterface {
   problems: number[];
 }
 
+export type ProblemType =
+  | MultipleChoiceProblemInterface
+  | SubjectiveProblemInterface;
+
 export interface ProblemInterface {
   id: number;
   problemType: string;
@@ -23,6 +27,17 @@ export interface ProblemInterface {
   createdTime: string;
   content: string;
   solverIDs: number[];
+}
+
+export interface MultipleChoiceProblemInterface extends ProblemInterface {
+  problemType: 'multiple-choice'
+  choices: string[];
+  solution?: number[];
+}
+
+export interface SubjectiveProblemInterface extends ProblemInterface {
+  problemType: 'subjective';
+  solutions?: string[];
 }
 
 // to modify
