@@ -48,10 +48,8 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
 
     case actionTypes.CREATE_PROBLEM:
       if (state.selectedProblemSet == null) break;
-      const afterCreateProblem = [
-        ...state.selectedProblemSet.problems,
-        action.newProblemID
-      ];
+      const afterCreateProblem = state.selectedProblemSet.problems
+      afterCreateProblem.push(action.newProblemID);
       return { ...state, selectedProblemSet: {
         ...state.selectedProblemSet,
         problems: afterCreateProblem
@@ -60,13 +58,10 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
     case actionTypes.GET_PROBLEM:
       return { ...state, selectedProblem: action.selectedProblem }
 
-    case actionTypes.UPDATE_PROBLEM:
-      return { ...state, selectedProblem: action.selectedProblem }
-
     case actionTypes.DELETE_PROBLEM:
       if (state.selectedProblemSet == null) break;
-      const afterDeleteProblem = state.selectedProblemSet.problems
-        .filter((id) => id != action.targetProblemID)
+      const afterDeleteProblem = state.selectedProblemSet.problems;
+      afterDeleteProblem.splice(afterDeleteProblem.indexOf(action.targetProblemID), 1);
       return {
         ...state, 
         selectedProblemSet: { ...state.selectedProblemSet, problems: afterDeleteProblem },

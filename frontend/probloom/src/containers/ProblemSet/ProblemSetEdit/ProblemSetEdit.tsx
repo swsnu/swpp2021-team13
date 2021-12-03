@@ -200,7 +200,7 @@ const mapDispatchToProps = (dispatch: any) => {
       dispatch(actionCreators.updateProblem(id, problem)); 
     },
     onDeleteProblem: (id: number) => {
-      dispatch(actionCreators.deleteProblemSet(id));
+      dispatch(actionCreators.deleteProblem(id));
     }
   };
 };

@@ -228,28 +228,16 @@ export const getProblem: (
   };
 };
 
-export interface UpdateProblemAction {
-  type: typeof actionTypes.UPDATE_PROBLEM;
-  selectedProblem: a_interfaces.GetProblemResponse;
-}
-
-export const updateProblem_: (problemData) => UpdateProblemAction = (
-  problemData
-) => ({
-  type: actionTypes.UPDATE_PROBLEM,
-  selectedProblem: problemData
-});
-
 export const updateProblem: (
   id: number,
   problemData: a_interfaces.UpdateProblemRequest
-) => ThunkAction<void, RootState, null, UpdateProblemAction> = (
+) => ThunkAction<void, RootState, null, GetProblemAction> = (
   id: number,
   problemData: a_interfaces.UpdateProblemRequest
 ) => {
   return async (dispatch: AppDispatch) => {
     const { data } = await axios.put(`/api/problem/${id}/`, problemData);
-    dispatch(updateProblem_(data));
+    dispatch(getProblem_(data));
   };
 };
 
@@ -283,5 +271,4 @@ export type ProblemSetAction =
   | DeleteProblemSetAction
   | CreateProblemAction
   | GetProblemAction
-  | UpdateProblemAction
   | DeleteProblemAction;

@@ -83,7 +83,7 @@ const ProblemSetStateTest2: ProblemSetState = {
 
 const comment1: Comment = {
   id: 1,
-  date: '2020-10-10',
+  createdTime: '2020-10-10',
   content: 'comment',
   userID: 1,
   username: 'user1',
@@ -149,7 +149,7 @@ describe('<ProblemSetEdit />', () => {
     spyDeleteProblem = jest
       .spyOn(problemActions, 'deleteProblem')
       .mockImplementation(() => {
-        return (data) => ();
+        return (data) => {};
       })
   });
 
@@ -167,13 +167,14 @@ describe('<ProblemSetEdit />', () => {
   });
 
   it('create problem', () => {
-    const component = mount(problemEdit1);
-    const createMCPButton = component
+    const component1 = mount(problemEdit1);
+    const createMCPButton = component1
       .find('.ProblemSetEdit #problemsetedit-newmcp');
     createMCPButton.simulate('click');
     expect(spyCreateProblem).toHaveBeenCalledTimes(1);
 
-    const createSPButton = component
+    const component2 = mount(problemEdit2);
+    const createSPButton = component2
       .find('.ProblemSetEdit #problemsetedit-newsp');
     createSPButton.simulate('click');
     expect(spyCreateProblem).toHaveBeenCalledTimes(2);
@@ -290,6 +291,6 @@ describe('<ProblemSetEdit />', () => {
     const saveButton = component
       .find('.ProblemSetEdit #problemsetedit-delete');
     saveButton.simulate('click');
-    expect(spyUpdateProblem).toHaveBeenCalled()
+    expect(spyDeleteProblem).toHaveBeenCalled()
   })
 });
