@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getAllProblemSets } from '.';
 import { ProblemSet } from '../reducers/problemReducer';
 import store, { AppDispatch } from '../store';
-import * as actionCreators from './problemActions';
+import * as actionCreators from './problemSetActions';
 
 const dispatch = store.dispatch as AppDispatch;
 

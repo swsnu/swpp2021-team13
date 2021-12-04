@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from 'react-redux';
 import { Button, Form, Grid, Header, Input, Segment } from 'semantic-ui-react';
 
 import './SignUp.css';
-import * as actionCreators from '../../store/actions/index';
+import * as actionCreators from '../../store/actions';
 import { AppDispatch, RootState } from '../../store/store';
 import { SignUpRequest } from '../../store/actions/userActions';
 

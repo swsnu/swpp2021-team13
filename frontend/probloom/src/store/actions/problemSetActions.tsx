@@ -2,7 +2,8 @@ import axios from 'axios';
 import { ThunkAction } from 'redux-thunk';
 import { push } from 'connected-react-router';
 
-import { ProblemSet, Solver, NewProblemSet } from '../reducers/problemReducer';
+import * as r_interfaces from '../reducers/problemReducerInterface'
+import * as a_interfaces from './problemActionInterface';
 import { AppDispatch, RootState } from '../store';
 import * as actionTypes from './actionTypes';
 
@@ -11,11 +12,11 @@ axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 
 export interface GetAllProblemSetsAction {
   type: typeof actionTypes.GET_ALL_PROBLEMSETS;
-  problemSets: ProblemSet[];
+  problemSets: r_interfaces.ProblemSetInterface[];
 }
 
 export const getAllProblemSets_: (
-  problemSets: ProblemSet[]
+  problemSets: r_interfaces.ProblemSetInterface[]
 ) => GetAllProblemSetsAction = (problemSets) => ({
   type: actionTypes.GET_ALL_PROBLEMSETS,
   problemSets: problemSets,
@@ -28,7 +29,7 @@ export const getAllProblemSets: () => ThunkAction<
   GetAllProblemSetsAction
 > = () => {
   return async (dispatch: AppDispatch) => {
-    const { data }: { data: ProblemSet[] } = await axios.get(
+    const { data }: { data: r_interfaces.ProblemSetInterface[] } = await axios.get(
       `/api/problem_set/`
     );
     dispatch(getAllProblemSets_(data));
@@ -37,7 +38,7 @@ export const getAllProblemSets: () => ThunkAction<
 
 export interface GetProblemSetAction {
   type: typeof actionTypes.GET_PROBLEMSET;
-  pset: ProblemSet;
+  pset: r_interfaces.ProblemSetInterface;
 }
 
 export const getProblemSet_: (problemSet) => GetProblemSetAction = (
@@ -60,10 +61,10 @@ export const getProblemSet: (
 
 export interface GetAllSolversAction {
   type: typeof actionTypes.GET_ALL_SOLVER_OF_PROBLEMSET;
-  solvers: Solver[];
+  solvers: r_interfaces.Solver[];
 }
 
-export const getAllSolvers_: (solvers: Solver[]) => GetAllSolversAction = (
+export const getAllSolvers_: (solvers: r_interfaces.Solver[]) => GetAllSolversAction = (
   solvers
 ) => ({
   type: actionTypes.GET_ALL_SOLVER_OF_PROBLEMSET,
@@ -92,12 +93,12 @@ export const getAllSolvers: (
 
 export interface CreateProblemSetAction {
   type: typeof actionTypes.CREATE_PROBLEM_SET;
-  problemSet: ProblemSet;
+  problemSet: r_interfaces.ProblemSetInterface;
 }
 
 export const createProblemSet_: (
-  problemSet: ProblemSet
-) => CreateProblemSetAction = (problemSet: ProblemSet) => ({
+  problemSet: r_interfaces.ProblemSetInterface
+) => CreateProblemSetAction = (problemSet: r_interfaces.ProblemSetInterface) => ({
   type: actionTypes.CREATE_PROBLEM_SET,
   problemSet: problemSet,
 });
@@ -108,17 +109,17 @@ export const createProblemSet: (
   scope: string,
   tag: string,
   difficulty: string,
-  problems: NewProblemSet[]
+  problems: r_interfaces.NewProblemSet[]
 ) => ThunkAction<void, RootState, null, CreateProblemSetAction> = (
   title: string,
   content: string,
   scope: string,
   tag: string,
   difficulty: string,
-  problems: NewProblemSet[]
+  problems: r_interfaces.NewProblemSet[]
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data }: { data: ProblemSet } = await axios.post(`/api/problem/`, {
+    const { data }: { data: r_interfaces.ProblemSetInterface } = await axios.post(`/api/problem/`, {
       title: title,
       content: content,
       scope: scope,
@@ -132,11 +133,11 @@ export const createProblemSet: (
 };
 export interface UpdateProblemSetAction {
   type: typeof actionTypes.UPDATE_PROBLEMSET;
-  pset: ProblemSet;
+  pset: r_interfaces.ProblemSetInterface;
 }
 
 export const updateProblemSet_: (
-  problemSet: ProblemSet
+  problemSet: r_interfaces.ProblemSetInterface
 ) => UpdateProblemSetAction = (problemSet) => ({
   type: actionTypes.UPDATE_PROBLEMSET,
   pset: problemSet,
@@ -148,7 +149,7 @@ export const updateProblemSet: (
   problemSet
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data }: { data: ProblemSet } = await axios.put(
+    const { data }: { data: r_interfaces.ProblemSetInterface } = await axios.put(
       `/api/problem_set/${problemSet.id}/`,
       problemSet
     );
@@ -162,7 +163,7 @@ export interface DeleteProblemSetAction {
 }
 
 export const deleteProblemSet_: (
-  problemSet: ProblemSet
+  problemSet: r_interfaces.ProblemSetInterface
 ) => DeleteProblemSetAction = (problemSet) => ({
   type: actionTypes.DELETE_PROBLEMSET,
   targetID: problemSet.id,
@@ -174,10 +175,90 @@ export const deleteProblemSet: (
   problemSetID
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data }: { data: ProblemSet } = await axios.delete(
+    const { data }: { data: r_interfaces.ProblemSetInterface } = await axios.delete(
       `/api/problem_set/${problemSetID}/`
     );
     dispatch(deleteProblemSet_(data));
+  };
+};
+
+export interface CreateProblemAction {
+  type: typeof actionTypes.CREATE_PROBLEM;
+  newProblemID: number;
+}
+
+export const createProblem_: (id) => CreateProblemAction = (id) => ({
+  type: actionTypes.CREATE_PROBLEM,
+  newProblemID: id
+});
+
+export const createProblem: (
+  ps_id: number,
+  problemData: a_interfaces.CreateProblemRequest
+) => ThunkAction<void, RootState, null, CreateProblemAction> = (
+  ps_id: number,
+  problemData: a_interfaces.CreateProblemRequest
+) => {
+  return async (dispatch: AppDispatch) => {
+    const { data } = await axios.post(`/api/problem_set/${ps_id}/`, problemData);
+    dispatch(createProblem_(data.id));
+  };
+};
+
+export interface GetProblemAction {
+  type: typeof actionTypes.GET_PROBLEM;
+  selectedProblem: a_interfaces.GetProblemResponse;
+}
+
+export const getProblem_: (problemData) => GetProblemAction = (
+  problemData
+) => ({
+  type: actionTypes.GET_PROBLEM,
+  selectedProblem: problemData
+});
+
+export const getProblem: ( 
+  id: number,
+) => ThunkAction<void, RootState, null, GetProblemAction> = (
+  id: number,
+) => {
+  return async (dispatch: AppDispatch) => {
+    const { data } = await axios.get(`/api/problem/${id}/`);
+    dispatch(getProblem_(data));
+  };
+};
+
+export const updateProblem: (
+  id: number,
+  problemData: a_interfaces.UpdateProblemRequest
+) => ThunkAction<void, RootState, null, GetProblemAction> = (
+  id: number,
+  problemData: a_interfaces.UpdateProblemRequest
+) => {
+  return async (dispatch: AppDispatch) => {
+    const { data } = await axios.put(`/api/problem/${id}/`, problemData);
+    dispatch(getProblem_(data));
+  };
+};
+
+export interface DeleteProblemAction {
+  type: typeof actionTypes.DELETE_PROBLEM;
+  targetProblemID: number;
+}
+
+export const deleteProblem_: (id) => DeleteProblemAction = (id) => ({
+  type: actionTypes.DELETE_PROBLEM,
+  targetProblemID: id
+});
+
+export const deleteProblem: ( 
+  id: number,
+) => ThunkAction<void, RootState, null, GetProblemAction> = (
+  id: number,
+) => {
+  return async (dispatch: AppDispatch) => {
+    const { data } = await axios.delete(`/api/problem/${id}/`);
+    dispatch(getProblem_(id));
   };
 };
 
@@ -187,4 +268,7 @@ export type ProblemSetAction =
   | GetAllSolversAction
   | CreateProblemSetAction
   | UpdateProblemSetAction
-  | DeleteProblemSetAction;
+  | DeleteProblemSetAction
+  | CreateProblemAction
+  | GetProblemAction
+  | DeleteProblemAction;

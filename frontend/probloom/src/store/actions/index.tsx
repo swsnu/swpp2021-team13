@@ -13,8 +13,12 @@ export {
   getAllSolvers,
   createProblemSet,
   deleteProblemSet,
+  createProblem,
+  getProblem,
+  updateProblem,
+  deleteProblem,
   updateProblemSet,
-} from './problemActions';
+} from './problemSetActions';
 
 export {
   getCommentsOfProblemSet,

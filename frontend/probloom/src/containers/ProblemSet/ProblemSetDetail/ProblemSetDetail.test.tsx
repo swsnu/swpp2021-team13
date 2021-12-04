@@ -4,7 +4,7 @@ import { Route, Switch } from 'react-router-dom';
 import { ConnectedRouter } from 'connected-react-router';
 import { mount } from 'enzyme';
 import { Provider } from 'react-redux';
-import * as problemActions from '../../../store/actions/problemActions';
+import * as problemActions from '../../../store/actions/problemSetActions';
 import * as commentActions from '../../../store/actions/commentActions';
 import {
   Solver,

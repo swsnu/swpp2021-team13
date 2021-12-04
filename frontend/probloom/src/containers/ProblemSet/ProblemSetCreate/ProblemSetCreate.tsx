@@ -2,7 +2,7 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 import { returntypeof } from 'react-redux-typescript';
 
-import * as actionCreators from '../../../store/actions/index';
+import * as actionCreators from '../../../store/actions';
 import {
   NewProblemSet,
   ProblemSetCreateState,

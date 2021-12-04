@@ -11,7 +11,7 @@ import {
   Input,
   Segment,
 } from 'semantic-ui-react';
-import * as actionCreators from '../../store/actions/index';
+import * as actionCreators from '../../store/actions';
 import { SignInRequest } from '../../store/actions/userActions';
 import { AppDispatch, RootState } from '../../store/store';
 
