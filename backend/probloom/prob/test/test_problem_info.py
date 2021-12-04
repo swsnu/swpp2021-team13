@@ -1,7 +1,10 @@
 import http
+from typing import Callable, Mapping, NamedTuple
 
-from django.test import TestCase, Client
-from prob.models import User, UserStatistics, ProblemSet, Problem, create_problem
+from django.http.response import HttpResponse
+from django.test import Client, TestCase
+
+from prob.models import ProblemSet, User, UserStatistics, create_problem
 
 
 class ProblemInfoTestCase(TestCase):
@@ -52,98 +55,108 @@ class ProblemInfoTestCase(TestCase):
         "solution": [2],
     }
 
-    def setUp(self):
-        self.turing = User.objects.create_user(
+    @classmethod
+    def setUpTestData(cls):
+        cls.turing = User.objects.create_user(
             username="turing",
             email="turing@example.com",
             password="turing_password",
         )
-        self.meitner = User.objects.create_user(
+        cls.meitner = User.objects.create_user(
             username="meitner",
             email="meitner@example.com",
             password="meitner_password",
         )
-        self.turing_stat = UserStatistics.objects.create(user=self.turing)
-        self.meitner_stat = UserStatistics.objects.create(user=self.meitner)
-        self.turing_problem_set = ProblemSet.objects.create(
+        cls.turing_stat = UserStatistics.objects.create(user=cls.turing)
+        cls.meitner_stat = UserStatistics.objects.create(user=cls.meitner)
+        cls.turing_problem_set = ProblemSet.objects.create(
             pk=1,
             title="Turing Test",
             is_open=False,
             difficulty=1,
             description="This is a problem set.",
-            creator_id=self.turing.pk,
+            creator_id=cls.turing.pk,
         )
-        self.turing_problem_set.recommenders.add(self.turing_stat, self.meitner_stat)
+        cls.turing_problem_set.recommenders.add(cls.turing_stat, cls.meitner_stat)
 
-        create_problem(self.problem1, self.turing.pk, self.turing_problem_set.pk, 1)
-        create_problem(self.problem2, self.turing.pk, self.turing_problem_set.pk, 2)
+        create_problem(cls.problem1, cls.turing.pk, cls.turing_problem_set.pk, 1)
+        create_problem(cls.problem2, cls.turing.pk, cls.turing_problem_set.pk, 2)
 
+    def setUp(self):
         self.client = Client()
 
     def tearDown(self):
         self.client.logout()
-        Problem.objects.all().delete()
-        ProblemSet.objects.all().delete()
-        User.objects.all().delete()
+
+    class RequestData(NamedTuple):
+        method: Callable[..., HttpResponse]
+        kwargs: Mapping = {}
 
     def test_login_required(self):
-        response = self.client.get("/api/problem/1/")
-        self.assertEqual(response.status_code, http.HTTPStatus.FOUND)
-        self.assertEqual(response.headers["Location"], "/api/signin/")
+        requests = [
+            self.RequestData(self.client.get),
+            self.RequestData(
+                self.client.put,
+                {"data": self.revised_problem1, "content_type": "application/json"},
+            ),
+            self.RequestData(self.client.delete),
+        ]
 
-        response = self.client.put(
-            "/api/problem/1/", self.revised_problem1, content_type="application/json"
-        )
-        self.assertEqual(response.status_code, http.HTTPStatus.FOUND)
-        self.assertEqual(response.headers["Location"], "/api/signin/")
-
-        response = self.client.delete("/api/problem/1/")
-        self.assertEqual(response.status_code, http.HTTPStatus.FOUND)
-        self.assertEqual(response.headers["Location"], "/api/signin/")
+        for request in requests:
+            with self.subTest(method=request.method.__name__):
+                response = request.method(path="/api/problem/1/", **request.kwargs)
+                self.assertEqual(response.status_code, http.HTTPStatus.FOUND)
+                self.assertEqual(response.headers["Location"], "/api/signin/")
 
     def test_not_found(self):
+        requests = [
+            self.RequestData(self.client.get),
+            self.RequestData(
+                self.client.put,
+                {"data": self.revised_problem1, "content_type": "application/json"},
+            ),
+            self.RequestData(self.client.delete),
+        ]
+
         self.client.login(username="turing", password="turing_password")
 
-        response = self.client.get(f"/api/problem/{self.not_pk}/")
-        self.assertEqual(response.status_code, http.HTTPStatus.NOT_FOUND)
-
-        response = self.client.put(
-            f"/api/problem/{self.not_pk}/",
-            self.revised_problem1,
-            content_type="application/json",
-        )
-        self.assertEqual(response.status_code, http.HTTPStatus.NOT_FOUND)
-
-        response = self.client.delete(f"/api/problem/{self.not_pk}/")
-        self.assertEqual(response.status_code, http.HTTPStatus.NOT_FOUND)
+        for request in requests:
+            with self.subTest(method=request.method.__name__):
+                response = request.method(
+                    path=f"/api/problem/{self.not_pk}/", **request.kwargs
+                )
+                self.assertEqual(response.status_code, http.HTTPStatus.NOT_FOUND)
 
     def test_forbidden(self):
+        requests = [
+            self.RequestData(
+                self.client.put,
+                {"data": self.revised_problem1, "content_type": "application/json"},
+            ),
+            self.RequestData(self.client.delete),
+        ]
+
         self.client.login(username="meitner", password="meitner_password")
 
-        response = self.client.put(
-            "/api/problem/1/", self.revised_problem1, content_type="application/json"
-        )
-        self.assertEqual(response.status_code, http.HTTPStatus.FORBIDDEN)
-
-        response = self.client.delete("/api/problem/1/")
-        self.assertEqual(response.status_code, http.HTTPStatus.FORBIDDEN)
+        for request in requests:
+            with self.subTest(method=request.method.__name__):
+                response = request.method(path="/api/problem/1/", **request.kwargs)
+                self.assertEqual(response.status_code, http.HTTPStatus.FORBIDDEN)
 
     def test_bad_request(self):
+        bad_requests = [
+            {"surprise": "no"},
+            '{"this request data": "is not even a json"',
+        ]
+
         self.client.login(username="turing", password="turing_password")
 
-        bad_request = {
-            "surprise": "no",
-        }
-        response = self.client.put(
-            "/api/problem/1/", bad_request, content_type="application/json"
-        )
-        self.assertEqual(response.status_code, http.HTTPStatus.BAD_REQUEST)
-
-        worse_request = '{"this request data": "is not even a json"'
-        response = self.client.put(
-            "/api/problem/1/", worse_request, content_type="application/json"
-        )
-        self.assertEqual(response.status_code, http.HTTPStatus.BAD_REQUEST)
+        for bad_request in bad_requests:
+            with self.subTest(request=bad_request):
+                response = self.client.put(
+                    "/api/problem/1/", bad_request, content_type="application/json"
+                )
+                self.assertEqual(response.status_code, http.HTTPStatus.BAD_REQUEST)
 
     def test_get(self):
         self.client.login(username="turing", password="turing_password")
@@ -181,11 +194,6 @@ class ProblemInfoTestCase(TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, http.HTTPStatus.OK)
-        response_json = response.json()
-        self.assertEqual(
-            response_json["choices"],
-            ["Ruring", "Suring", "Turing", "Uuring", "Vuring", "Wuring"],
-        )
         response = self.client.get("/api/problem/1/")
         response_json = response.json()
         self.assertEqual(
@@ -199,9 +207,6 @@ class ProblemInfoTestCase(TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, http.HTTPStatus.OK)
-        response_json = response.json()
-        self.assertEqual(response_json["problemType"], "subjective")
-        self.assertEqual(response_json["solutions"], ["Turing"])
         response = self.client.get("/api/problem/1/")
         response_json = response.json()
         self.assertEqual(response_json["problemType"], "subjective")
@@ -217,6 +222,9 @@ class ProblemInfoTestCase(TestCase):
             self.turing_problem_set.problems.order_by("number").values("id", "number"),
             [{"id": 2, "number": 1}, {"id": 1, "number": 2}],
         )
+
+    def test_put_conflict(self):
+        self.client.login(username="turing", password="turing_password")
 
         revised_problem1_with_wrong_number = dict(self.revised_problem1_with_number)
         revised_problem1_with_wrong_number["problemNumber"] = 1000

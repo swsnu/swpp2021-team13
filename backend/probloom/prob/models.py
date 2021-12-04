@@ -61,6 +61,9 @@ class UserProfile(Model):
             "introduction": str(self.introduction),
         }
 
+    def __str__(self) -> str:
+        return str(self.user)
+
 
 class UserStatistics(Model):
     """User statistics model.
@@ -84,6 +87,9 @@ class UserStatistics(Model):
     )
     created_time = DateTimeField(auto_now_add=True)
     last_login_date = DateField(blank=True, null=True)
+
+    def __str__(self) -> str:
+        return str(self.user)
 
 
 def get_sentinel_user_statistics():
