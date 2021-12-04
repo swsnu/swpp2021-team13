@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getAllProblemSets } from '.';
-import { ProblemSet } from '../reducers/problemReducer';
+import { ProblemSetInterface } from '../reducers/problemReducerInterface';
 import store, { AppDispatch } from '../store';
 import * as actionCreators from './problemSetActions';
 
@@ -15,7 +15,7 @@ describe('Get Problem List', () => {
   });
 
   test('getProblems fetches problems correctly', async () => {
-    const stubProblems: ProblemSet[] = [
+    const stubProblems: ProblemSetInterface[] = [
       {
         id: 1,
         title: 'title1',

@@ -6,7 +6,7 @@ import * as actionCreators from '../../../store/actions';
 import {
   NewProblemSet,
   ProblemSetCreateState,
-} from '../../../store/reducers/problemReducer';
+} from '../../../store/reducers/problemReducerInterface';
 import { Button, Container, Form, Header, Input } from 'semantic-ui-react';
 import { tagOptions } from '../ProblemSetSearch/ProblemSetSearch';
 

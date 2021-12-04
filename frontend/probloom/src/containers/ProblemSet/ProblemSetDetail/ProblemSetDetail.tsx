@@ -11,7 +11,7 @@ import {
 } from 'semantic-ui-react';
 import ProblemSetView from '../../../components/ProblemSet/ProblemSetDetail/ProblemSetView';
 import CommentComponent from '../../../components/ProblemSet/ProblemSetDetail/CommentComponent';
-import { Solver } from '../../../store/reducers/problemReducer';
+import { Solver } from '../../../store/reducers/problemReducerInterface';
 import { Comment as CommentData } from '../../../store/reducers/commentReducer';
 import { AppDispatch, RootState } from '../../../store/store';
 import NotFound from '../../../components/NotFound/NotFound';
