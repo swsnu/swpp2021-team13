@@ -16,7 +16,7 @@ urlpatterns = [
         views.ProblemSetInfoView.as_view(),
         name="problem_set_info",
     ),
-    path("problem_set/<int:ps_id>/recommend/", views.update_problem_set_recommendation),
+    path("problem_set/<int:ps_id>/recommend/", views.ProblemSetRecommendView.as_view()),
     path(
         "problem_set/<int:ps_id>/comment/",
         views.ProblemSetCommentListView.as_view(),

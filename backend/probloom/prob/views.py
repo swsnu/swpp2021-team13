@@ -736,47 +736,75 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
         problem_set.delete()
         return HttpResponse()
 
+class ProblemSetRecommendView(LoginRequiredMixin, View):
+    """Detail view methods related to recommendation."""
 
-@require_http_methods(["PUT"])
-def update_problem_set_recommendation(request: HttpRequest, ps_id: int) -> HttpResponse:
-    """Update recommendation status of a specific problem set.
+    def get(self, request: HttpRequest, ps_id: int) -> HttpResponse:
+        """Get whether the current user is a recommender of a specific problem set.
 
-    .. rubric:: How to use
+        .. rubric:: How to use
 
-    Send a ``PUT`` request to ``/api/problem_set/:ps_id/recommend/`` with the
-    following data:
+        Send a ``GET`` request to ``/api/problem_set/:ps_id/recommend/``.
 
-    .. code-block:: typescript
+        .. rubric:: Behavior
 
-       interface UpdateProblemSetRecommendationRequest {
-         recommend: boolean;
-       }
+        If a problem set with id ``ps_id`` exists , respond with ``200 (OK)`` and 
+        boolean data
 
-    .. rubric:: Behavior
+        If a problem set with id ``ps_id`` does not exist, respond with ``404 (Not
+        Found)``
+        """
+        try:
+            problem_set = ProblemSet.objects.get(id=ps_id)
+        except:
+            return HttpResponseNotFound()
 
-    If a problem set with id ``ps_id`` exists and request data is valid, set
-    current user's recommendation status to ``recommend`` and respond with ``204
-    (No Content)``.
-
-    If a problem set with id ``ps_id`` does not exist, respond with ``404 (Not
-    Found)``
-
-    If a problem set with id ``ps_id`` exists but request data is invalid,
-    respond with ``400 (Bad Request)``.
-    """
-    try:
-        problem_set = ProblemSet.objects.get(id=ps_id)
-    except:
-        return HttpResponseNotFound()
-
-    try:
-        req_data = json.loads(request.body)
-        recommend = req_data["recommend"]
-    except (KeyError, ValueError, JSONDecodeError) as e:
-        return HttpResponseBadRequest()
+        
+        user = User.objects.get(pk=request.user.pk)
+        res = {"is_recommender": problem_set.recommenders.filter(user=user).exists()}
     
-    User.objects.get(pk=request.user.pk).statistics.recommended_problem_sets.add(problem_set)
-    return HttpResponse(status=204)
+        return JsonResponse(res, safe=False)
+
+
+    def put(self, request: HttpRequest, ps_id) -> HttpResponse:
+        """Update recommendation status of a specific problem set.
+
+        .. rubric:: How to use
+
+        Send a ``PUT`` request to ``/api/problem_set/:ps_id/recommend/`` with the
+        following data:
+
+        .. code-block:: typescript
+
+           interface UpdateProblemSetRecommendationRequest {
+             recommend: boolean;
+           }
+
+        .. rubric:: Behavior
+
+        If a problem set with id ``ps_id`` exists and request data is valid, set
+        current user's recommendation status to ``recommend`` and respond with ``204
+        (No Content)``.
+
+        If a problem set with id ``ps_id`` does not exist, respond with ``404 (Not
+        Found)``
+
+        If a problem set with id ``ps_id`` exists but request data is invalid,
+        respond with ``400 (Bad Request)``.
+        """
+        try:
+            problem_set = ProblemSet.objects.get(id=ps_id)
+        except:
+            return HttpResponseNotFound()
+
+        try:
+            req_data = json.loads(request.body)
+            recommend = req_data["recommend"]
+        except (KeyError, ValueError, JSONDecodeError) as e:
+            return HttpResponseBadRequest()
+    
+        User.objects.get(pk=request.user.pk).statistics.recommended_problem_sets.add(problem_set)
+        return HttpResponse(status=204)
 
 
 class ProblemSetCommentListView(LoginRequiredMixin, View):

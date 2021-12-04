@@ -20,7 +20,7 @@ class RecommendTestCase(TestCase):
             creator=cls.user_stat_1,
         )
 
-    def test_recommend(self):
+    def test_update_recommend(self):
         client = Client()
 
         # User sign in
@@ -44,3 +44,18 @@ class RecommendTestCase(TestCase):
         }
         response = client.put("/api/problem_set/1/recommend/", request_success, content_type="application/json")
         self.assertEqual(response.status_code, 204)
+    
+    def test_get_is_recommender(self):
+        client = Client()
+
+        # User sign in
+        request = {
+            "id": "John",
+            "password": "123",
+        }
+        response = client.post("/api/signin/", request, content_type="application/json")
+        
+        response = client.get("/api/problem_set/2/recommend/")
+        self.assertEqual(response.status_code, 404)
+        response = client.get("/api/problem_set/1/recommend/")
+        self.assertEqual(response.status_code, 200)
