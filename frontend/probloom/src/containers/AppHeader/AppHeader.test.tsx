@@ -59,8 +59,6 @@ describe('<AppHeader />', () => {
       </Provider>
     );
 
-    console.log(component.debug());
-
     const wrapper = component.find('ProfileDropdown');
     expect(wrapper.length).toBe(1);
 

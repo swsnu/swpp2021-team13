@@ -8,7 +8,6 @@ describe('<ProblemSetView />', () => {
     const component = shallow(
       <ProblemSetView
         isCreator={false}
-        isSolver={false}
         scope={false}
         createdTime={'1'}
         modifiedTime={'1'}
@@ -22,7 +21,6 @@ describe('<ProblemSetView />', () => {
     const component = shallow(
       <ProblemSetView
         isCreator={true}
-        isSolver={true}
         scope={true}
         createdTime={'1'}
         modifiedTime={'2'}
