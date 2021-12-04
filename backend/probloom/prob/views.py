@@ -1,15 +1,16 @@
 # from django.shortcuts import render
-import dataclasses
 import datetime
 import http
 import json
 from json.decoder import JSONDecodeError
 
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required as login_required_
 from django.contrib.auth.mixins import LoginRequiredMixin as LoginRequiredMixin_
-from django.core.exceptions import BadRequest, ObjectDoesNotExist, PermissionDenied
-from django.db.models import Count, Max
-from django.db.models.expressions import F
+from django.core.exceptions import BadRequest, PermissionDenied
+from django.db.models.aggregates import Count, Max
+from django.db.models.expressions import F, OuterRef, Subquery, Value
+from django.db.models.functions import Coalesce
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -23,10 +24,12 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 from django.views.generic.detail import SingleObjectMixin
 
 from .models import (
+    MultipleChoiceProblem,
     Problem,
     ProblemSet,
     ProblemSetComment,
     Solved,
+    SubjectiveProblem,
     User,
     UserProfile,
     UserStatistics,
@@ -38,6 +41,9 @@ from .models import (
 class LoginRequiredMixin(LoginRequiredMixin_):
     login_url = "/api/signin/"
     redirect_field_name = None
+
+
+login_required = login_required_(redirect_field_name=None, login_url="/api/signin/")
 
 
 # Create your views here.
@@ -119,17 +125,6 @@ class SignOutView(View):
             return HttpResponse(status=401)
 
 
-@dataclasses.dataclass
-class UserContextBase:
-    id: int
-    username: str
-    email: str
-
-    @classmethod
-    def from_model(cls, user: User):
-        return cls(id=user.pk, username=user.username, email=user.email)
-
-
 @require_GET
 def get_user(_: HttpRequest, u_id: int) -> HttpResponse:
     """Get a specific user.
@@ -145,7 +140,7 @@ def get_user(_: HttpRequest, u_id: int) -> HttpResponse:
 
     .. code-block:: typescript
 
-       interface GetCurrentUserResponse {
+       interface GetUserResponse {
          id: number;
          username: string;
          email: string;
@@ -175,15 +170,8 @@ def get_current_user(request: HttpRequest) -> HttpResponse:
 
     .. rubric:: Behavior
 
-    If a user was signed in, respond with ``200 (OK)`` and the following data:
-
-    .. code-block:: typescript
-
-       interface GetCurrentUserResponse {
-         id: number;
-         username: string;
-         email: string;
-       }
+    If a user was signed in, respond with ``200 (OK)`` and ``GetUserResponse``
+    from :func:`get_user`.
 
     If there is no signed in user, respond with ``404 (Not Found)``.
     """
@@ -363,6 +351,22 @@ class ProblemSetListView(LoginRequiredMixin, View):
              ]
            }
         """
+        num_problems_query = ProblemSet.objects.values(
+            "id", num_problems=Count("problems")
+        ).filter(id=OuterRef("problem_set"))
+        solved_query = (
+            Solved.objects.filter(result__exact=True)
+            .values("solver", problem_set=F("problem__problem_set"))
+            .annotate(
+                unsolved_problems=(
+                    Subquery(num_problems_query.values("num_problems"))
+                    - Count("problem_set")
+                )
+            )
+            .filter(unsolved_problems__lte=0)
+            .values("problem_set", solvedNum=Count("solver", distinct=True))
+            .filter(problem_set=OuterRef("pk"))
+        )
         res = (
             ProblemSet.objects.select_related("creator__user")
             .values(
@@ -376,6 +380,9 @@ class ProblemSetListView(LoginRequiredMixin, View):
                 "description",
                 "creator_id",
                 "creator__user__username",
+                solvedNum=Coalesce(
+                    Subquery(solved_query.values("solvedNum")), Value(0)
+                ),
                 recommendedNum=Count("recommenders"),
             )
             .all()
@@ -393,6 +400,7 @@ class ProblemSetListView(LoginRequiredMixin, View):
                     "content": value["description"],
                     "userID": value["creator_id"],
                     "username": value["creator__user__username"],
+                    "solvedNum": value["solvedNum"],
                     "recommendedNum": value["recommendedNum"],
                 },
                 res,
@@ -1152,6 +1160,7 @@ class ProblemInfoView(LoginRequiredMixin, View):
         return HttpResponse()
 
 
+@login_required
 @require_POST
 def solve_problem(request: HttpRequest, p_id: int) -> HttpResponse:
     """Post a solution to a specific problem.
@@ -1184,8 +1193,7 @@ def solve_problem(request: HttpRequest, p_id: int) -> HttpResponse:
     .. code-block:: typescript
 
        interface SolveProblemResponseSuccess {
-         result: 'SUCCESS';
-         correct: boolean;
+         result: boolean;
        }
 
     ``correct`` should be true if and only if the user solved the problem
@@ -1208,11 +1216,53 @@ def solve_problem(request: HttpRequest, p_id: int) -> HttpResponse:
     If a problem with id ``p_id`` exists but the request does not follow the
     constraints, respond with ``400 (Bad Request)``.
     """
-    return HttpResponse(status_code=http.HTTPStatus.NOT_IMPLEMENTED)
+    try:
+        problem = Problem.objects.get(pk=p_id)
+    except:
+        return HttpResponseNotFound()
+
+    try:
+        pending_solution = json.loads(request.body)["solution"]
+    except (JSONDecodeError, KeyError) as error:
+        raise BadRequest() from error
+
+    if isinstance(pending_solution, list):  # Multiple-choice problem
+        pending_answer = set(pending_solution)
+        try:
+            assert all(
+                map(lambda x: isinstance(x, int), pending_answer)
+            ), "entries of solution should be an integer"
+            assert len(pending_solution) == len(
+                pending_answer
+            ), "entries of solution should be unique"
+        except AssertionError as error:
+            raise BadRequest() from error
+        if not isinstance(problem, MultipleChoiceProblem):
+            return JsonResponse(
+                {"result": "FAILURE", "cause": "INCORRECT_PROBLEM_TYPE"}
+            )
+        answer = problem.choices.filter(is_solution=True).values_list("number")
+        answer = set(map(lambda x: x[0], answer))
+        result = pending_answer == answer
+    elif isinstance(pending_solution, str):  # Subjective problem
+        if not isinstance(problem, SubjectiveProblem):
+            return JsonResponse(
+                {"result": "FAILURE", "cause": "INCORRECT_PROBLEM_TYPE"}
+            )
+        result = problem.solutions.filter(text=pending_solution).exists()
+    else:
+        raise BadRequest("solution should be an array or a string")
+
+    solved = Solved.objects.get_or_create(solver_id=request.user.pk, problem_id=p_id)[0]
+    if solved.result is False:
+        solved.result = result
+        solved.save()
+    return JsonResponse({"result": result})
 
 
+@login_required
 @require_GET
-def find_solvers(request: HttpRequest, ps_id: int) -> HttpResponse:
+def find_solvers(_: HttpRequest, ps_id: int) -> HttpResponse:
     """Get progresses of users who tried a specific problem set.
 
     .. rubric:: How to use
@@ -1241,23 +1291,43 @@ def find_solvers(request: HttpRequest, ps_id: int) -> HttpResponse:
     If a problem set with id ``ps_id`` does not exist, respond with ``404 (Not
     Found)``.
     """
-    return HttpResponse(status_code=http.HTTPStatus.NOT_IMPLEMENTED)
+    try:
+        num_problems = ProblemSet.objects.get(id=ps_id).problems.count()
+    except ProblemSet.DoesNotExist:
+        return HttpResponseNotFound()
+
+    solved_query = (
+        Solved.objects.prefetch_related("solver__user")
+        .filter(problem__problem_set=ps_id)
+        .annotate(number=F("problem__number"))
+        .order_by("solver", "number")
+    )
+
+    res = []
+    last_user = 0
+    res_entry = {}
+    for record in solved_query:
+        if record.solver.user.pk != last_user:
+            if last_user != 0:
+                res_entry["result"] = all(res_entry["problems"])
+                res.append(res_entry)
+            last_user = record.solver.user.pk
+            res_entry = {
+                "userID": record.solver.user.pk,
+                "username": record.solver.user.username,
+                "result": False,
+                "problems": [None] * num_problems,
+            }
+        res_entry["problems"][record.number - 1] = record.result
+    res_entry["result"] = all(res_entry["problems"])
+    res.append(res_entry)
+
+    return JsonResponse(res, safe=False)
 
 
-class ProblemSetSolvedListView(LoginRequiredMixin, View):
-    def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
-        try:
-            solver = User.objects.get(id=kwargs["p_id"])
-            solver_stat = UserStatistics.objects.get(user=solver)
-        except (User.DoesNotExist, UserStatistics.DoesNotExist):
-            return HttpResponseNotFound()
-
-        probs = Solved.objects.filter(solver=solver_stat)
-        return JsonResponse(data=[prob.to_dict() for prob in probs], safe=False)
-
-
+@login_required
 @require_GET
-def get_solver(request: HttpRequest, ps_id: int, u_id: int) -> HttpResponse:
+def get_solver(_: HttpRequest, ps_id: int, u_id: int) -> HttpResponse:
     """Get progress of a user for a specific problem set.
 
     .. rubric:: How to use
@@ -1284,50 +1354,32 @@ def get_solver(request: HttpRequest, ps_id: int, u_id: int) -> HttpResponse:
     If either problem set or user does not exist, respond with ``404 (Not
     Found)``.
     """
-    return HttpResponse(status_code=http.HTTPStatus.NOT_IMPLEMENTED)
+    try:
+        num_problems = ProblemSet.objects.get(id=ps_id).problems.count()
+        user = User.objects.get(pk=u_id)
+    except (ProblemSet.DoesNotExist, User.DoesNotExist):
+        return HttpResponseNotFound()
 
+    solved_query = (
+        Solved.objects.prefetch_related("solver__user")
+        .filter(problem__problem_set=ps_id, solver_id=u_id)
+        .annotate(number=F("problem__number"))
+        .order_by("number")
+        .values("number", "result")
+    )
 
-class ProblemSetSolvedView(LoginRequiredMixin, View):
+    problems = [None] * num_problems
+    for record in solved_query:
+        problems[record["number"] - 1] = record["result"]
 
-    login_url = "/api/signin/"
-    redirect_field_name = None
+    res = {
+        "userID": user.pk,
+        "username": user.username,
+        "result": all(problems),
+        "problems": problems,
+    }
 
-    def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
-        try:
-            solver = User.objects.get(id=kwargs["u_id"])
-            solver_stat = UserStatistics.objects.get(user=solver)
-            problem = ProblemSet.objects.get(id=kwargs["p_id"])
-            res = Solved.objects.get(solver=solver_stat, problem=problem)
-        except (
-            User.DoesNotExist,
-            UserStatistics.DoesNotExist,
-            ProblemSet.DoesNotExist,
-        ):
-            return HttpResponseNotFound()
-
-        return JsonResponse(data={"result": res.result})
-
-    def post(self, request: HttpRequest, **kwargs) -> HttpResponse:
-        try:
-            req_data = json.loads(request.body.decode())
-            result = req_data["result"]
-        except (JSONDecodeError, KeyError) as error:
-            raise BadRequest() from error
-
-        try:
-            solver = User.objects.get(id=kwargs["u_id"])
-            solver_stat = UserStatistics.objects.get(user=solver)
-            problem = ProblemSet.objects.get(id=kwargs["p_id"])
-        except (
-            User.DoesNotExist,
-            UserStatistics.DoesNotExist,
-            ProblemSet.DoesNotExist,
-        ):
-            return HttpResponseNotFound()
-
-        res = Solved(solver=solver_stat, problem=problem, result=result)
-        res.save()
-        return JsonResponse(data=res.to_dict())
+    return JsonResponse(res)
 
 
 @ensure_csrf_cookie

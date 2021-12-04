@@ -1,4 +1,5 @@
 from django.urls import path
+
 from . import views
 
 urlpatterns = [
@@ -28,7 +29,7 @@ urlpatterns = [
     ),
     path("problem/<int:p_id>/", views.ProblemInfoView.as_view()),
     path("problem/<int:p_id>/solve/", views.solve_problem),
-    path("solved/<int:u_id>/<int:p_id>/", views.ProblemSetSolvedView.as_view()),
-    path("solved/<int:p_id>/", views.ProblemSetSolvedListView.as_view()),
+    path("problem_set/<int:ps_id>/solvers/", views.find_solvers),
+    path("problem_set/<int:ps_id>/solvers/<int:u_id>/", views.get_solver),
     path("token/", views.token, name="token"),
 ]

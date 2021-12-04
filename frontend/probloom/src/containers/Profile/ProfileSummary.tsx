@@ -1,7 +1,11 @@
 import { Component } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
+import { Button, Container, Form, Header, Icon, Segment } from 'semantic-ui-react';
+
 import { getUserProfile, updateUserIntroduction } from '../../store/actions';
 import { AppDispatch, RootState } from '../../store/store';
+
+import './ProfileSummary.css';
 
 export interface ProfileSummaryProps extends PropsFromRedux {
   userId: number;
@@ -55,66 +59,78 @@ class ProfileSummary extends Component<
   }
 
   renderIntroduction(introduction: string) {
+    const modifyIntroductionButton = (
+      <Button primary onClick={() => this.onClickModifyIntroductionButton()}>
+        Edit Introduction
+      </Button>
+    )
     return (
-      <div>
+      <Segment>
         <p>{introduction}</p>
-        <button onClick={() => this.onClickModifyIntroductionButton()}>
-          Edit Introduction
-        </button>
-      </div>
+        {modifyIntroductionButton}
+      </Segment>
     );
   }
 
   renderIntroductionPlaceholder() {
+    const modifyIntroductionButton = (
+      <Button primary onClick={() => this.onClickModifyIntroductionButton()}>
+        Write an Introduction
+      </Button>
+    )
     return (
-      <div>
-        <p>This user does not have an introduction.</p>
-        <button onClick={() => this.onClickModifyIntroductionButton()}>
-          Write an Introduction
-        </button>
-      </div>
+      <Segment placeholder>
+        <Header icon>
+          <Icon name='user' />
+          This user does not have an introduction.
+        </Header>
+        {modifyIntroductionButton}
+      </Segment>
     );
   }
 
   renderIntroductionEditor() {
     return (
-      <form onSubmit={(event) => event.preventDefault()}>
-        <textarea
-          cols={30}
-          rows={10}
+      <Form>
+        <Form.TextArea
           placeholder="Tell us about yourself..."
           value={this.state.pendingIntroduction}
           onChange={(event) =>
             this.setState({ pendingIntroduction: event.target.value })
           }
         />
-        <button
+        <Button
+          primary
           type="submit"
           disabled={this.state.pendingIntroduction === ''}
           onClick={() => this.onClickConfirmIntroductionButton()}
         >
           Confirm
-        </button>
-        <button onClick={() => this.onClickCancelIntroductionButton()}>
+        </Button>
+        <Button onClick={() => this.onClickCancelIntroductionButton()}>
           Cancel
-        </button>
-      </form>
+        </Button>
+      </Form>
     );
   }
 
   render() {
     const introduction =
-      this.props.selectedUserProfile?.introduction ?? 'test-introduction';
+      this.props.selectedUserProfile?.introduction ?? '';
     const hasIntroduction = introduction !== '';
     if (this.state.editing) {
-      return <div>{this.renderIntroductionEditor()}</div>;
+      return (
+        <Container className="profile-summary__introduction">
+          {this.renderIntroductionEditor()}
+        </Container>
+      )
     }
     return (
-      <div>
+      <Container className="profile-summary__introduction">
         {hasIntroduction
           ? this.renderIntroduction(introduction)
           : this.renderIntroductionPlaceholder()}
-      </div>
+      </Container>
     );
   }
 }
