@@ -764,6 +764,19 @@ def update_problem_set_recommendation(request: HttpRequest, ps_id: int) -> HttpR
     If a problem set with id ``ps_id`` exists but request data is invalid,
     respond with ``400 (Bad Request)``.
     """
+    try:
+        problem_set = ProblemSet.objects.get(id=ps_id)
+    except:
+        return HttpResponseNotFound()
+
+    try:
+        req_data = json.loads(request.body)
+        recommend = req_data["recommend"]
+    except (KeyError, ValueError, JSONDecodeError) as e:
+        return HttpResponseBadRequest()
+    
+    User.objects.get(pk=request.user.pk).statistics.recommended_problem_sets.add(problem_set)
+    return HttpResponse(status=204)
 
 
 class ProblemSetCommentListView(LoginRequiredMixin, View):
