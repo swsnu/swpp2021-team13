@@ -1,15 +1,15 @@
 # from django.shortcuts import render
 import dataclasses
 import datetime
-import functools
+import http
 import json
 from json.decoder import JSONDecodeError
-from typing import List
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin as LoginRequiredMixin_
-from django.core.exceptions import BadRequest, PermissionDenied
-from django.db.models import Count
+from django.core.exceptions import BadRequest, ObjectDoesNotExist, PermissionDenied
+from django.db.models import Count, Max
+from django.db.models.expressions import F
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -17,63 +17,27 @@ from django.http import (
     JsonResponse,
 )
 from django.http.request import HttpRequest
-from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_GET as require_GET_
-from django.views.decorators.http import require_http_methods as require_http_methods_
-from django.views.decorators.http import require_POST as require_POST_
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.generic.detail import SingleObjectMixin
 
 from .models import (
-    Content,
-    MultipleChoiceProblem,
-    MultipleChoiceProblemChoice,
     Problem,
     ProblemSet,
     ProblemSetComment,
     Solved,
-    SubjectiveProblem,
-    SubjectiveProblemSolution,
     User,
     UserProfile,
     UserStatistics,
+    create_problem,
+    verify_problem_request,
 )
 
 
 class LoginRequiredMixin(LoginRequiredMixin_):
     login_url = "/api/signin/"
     redirect_field_name = None
-
-
-@functools.wraps(require_GET_)
-def require_GET(f):
-    @functools.wraps(f)
-    def wrapped_f(*args, **kwargs):
-        return require_GET_(f)(*args, **kwargs)
-
-    return wrapped_f
-
-
-@functools.wraps(require_http_methods_)
-def require_http_methods(request_method_list: List[str]):
-    def wrapper(f):
-        @functools.wraps(f)
-        def wrapped_f(*args, **kwargs):
-            return require_http_methods_(request_method_list)(f)(*args, **kwargs)
-
-        return wrapped_f
-
-    return wrapper
-
-
-@functools.wraps(require_POST_)
-def require_POST(f):
-    @functools.wraps(f)
-    def wrapped_f(*args, **kwargs):
-        return require_POST_(f)(*args, **kwargs)
-
-    return wrapped_f
 
 
 # Create your views here.
@@ -323,27 +287,26 @@ def get_user_statistics(request: HttpRequest, u_id: int) -> HttpResponse:
     .. code-block:: typescript
 
        interface GetUserStatisticsResponse {
-         lastActiveDays: number;
+         lastActiveDays: number | null;
        }
 
     ``lastActiveDays`` equals to the number of days since the user's last sign
-    in. If a user with id ``u_id`` does not exist, respond with ``404 (Not
-    Found)``.
+    in. If the user never signed in, ``lastActiveDays`` equals to ``null``.
+
+    If a user with id ``u_id`` does not exist, respond with ``404 (Not Found)``.
     """
     user_statistics = UserStatistics.objects.get(pk=u_id)
-    # created_problem_sets = user_statistics.created_problem_sets.all()
-
-    # created_problem_sets_list = []
-    # for created_problem_set in created_problem_sets:
-    #     created_problem_sets_list.append(created_problem_set.info_dict())
+    if user_statistics.last_login_date is None:
+        last_active_days = None
+    else:
+        last_active_days = (
+            datetime.date.today() - user_statistics.last_login_date
+        ).days
 
     return JsonResponse(
         {
-            "id": user_statistics.id,
-            "lastActiveDays": (
-                datetime.date.today() - user_statistics.last_login_date
-            ).days,
-            # "createdProblems": created_problem_sets_list,
+            "id": user_statistics.pk,
+            "lastActiveDays": last_active_days,
         },
         safe=False,
     )
@@ -522,9 +485,10 @@ class ProblemSetListView(LoginRequiredMixin, View):
             title = req_data["title"]
             description = req_data["content"]
             is_open = req_data["scope"] == "scope-public"
-            tag = req_data["tag"]  # TODO
+            tags_list = req_data["tag"]  # TODO
+            assert isinstance(tags_list, list), "tag should be an array"
             difficulty = int(req_data["difficulty"])
-        except (JSONDecodeError, KeyError, ValueError) as error:
+        except (JSONDecodeError, KeyError, AssertionError, ValueError) as error:
             raise BadRequest() from error
 
         creator = request.user.statistics
@@ -542,40 +506,7 @@ class ProblemSetListView(LoginRequiredMixin, View):
         problems = req_data["problems"]
 
         for problem in problems:
-            problem_content = Content.objects.create(text=problem["content"])
-            if problem["problemType"] == "multiple-choice":
-                new_problem = MultipleChoiceProblem.objects.create(
-                    problem_set=new_problem_set,
-                    number=problem["problemNumber"],
-                    content=problem_content,
-                    creator_id=request.user.pk,
-                    solution="",
-                )
-                choices = problem["choices"]
-                is_solution_list = [False] * len(choices)
-                for solution_number in problem["solution"]:
-                    is_solution_list[solution_number - 1] = True
-                for i, (is_solution, choice_text) in enumerate(
-                    zip(is_solution_list, choices)
-                ):
-                    choice_content = Content.objects.create(text=choice_text)
-                    MultipleChoiceProblemChoice.objects.create(
-                        problem=new_problem,
-                        number=i + 1,
-                        is_solution=is_solution,
-                        content=choice_content,
-                    )
-            else:
-                new_problem = SubjectiveProblem.objects.create(
-                    problem_set=new_problem_set,
-                    number=problem["problemNumber"],
-                    content=problem_content,
-                    creator_id=request.user.pk,
-                )
-                for solution_text in problem["solutions"]:
-                    SubjectiveProblemSolution.objects.create(
-                        problem=new_problem, text=solution_text
-                    )
+            create_problem(problem, creator.pk, new_problem_set.pk)
 
         return JsonResponse(data=new_problem_set.info_dict())
 
@@ -624,7 +555,7 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
         res = problem_set.info_dict()
         problems_list = problem_set.problems.order_by("number").values("id").all()
         res["problems"] = list(map(lambda entry: entry["id"], problems_list))
-        return JsonResponse(res, safe=False)
+        return JsonResponse(res)
 
     def post(self, request: HttpRequest, ps_id: int, **kwargs):
         """Create a new problem in the problem set.
@@ -669,7 +600,8 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
         #. Create a new problem. If ``problemType`` is ``'multiple-choice'``,
            :class:`MultipleChoiceProblem` will be used.  If ``problemType`` is
            ``subjective``, :class:`SubjectiveProblem` will be used.
-        #. Respond with ``201 (Created)`` and ``GetProblemResponse``.
+        #. Respond with ``201 (Created)`` and ``GetProblemResponse`` of
+           :meth:`ProblemInfoView.get`.
 
         If a problem set with id ``ps_id`` does not exist, respond with ``404
         (Not Found)``.
@@ -677,6 +609,35 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
         If a problem set with id ``ps_id`` exists but request data does not
         follow the constraints, respond with ``400 (Bad Request)``.
         """
+        try:
+            problem_set = ProblemSet.objects.get(id=ps_id)
+        except:
+            return HttpResponseNotFound()
+
+        if request.user.pk != problem_set.creator.user.pk:
+            raise PermissionDenied()
+
+        try:
+            req_data = json.loads(request.body)
+            verify_problem_request(req_data)
+        except JSONDecodeError as error:
+            raise BadRequest() from error
+
+        problem_number = req_data.get("problemNumber")
+        last_number = problem_set.problems.aggregate(Max("number"))["number__max"]
+        if last_number is None:
+            last_number = 0
+        if problem_number is None:
+            req_data["problemNumber"] = last_number + 1
+        elif problem_number > last_number:
+            raise BadRequest()
+        else:
+            modified_problems = problem_set.problems.filter(number__gte=problem_number)
+            modified_problems.update(number=F("number") + 1)
+        new_problem = create_problem(req_data, request.user.pk, ps_id)
+
+        res = new_problem.info_dict()
+        return JsonResponse(res)
 
     def put(self, request: HttpRequest, ps_id, **kwargs):
         """Edit details of specific problem set.
@@ -722,7 +683,7 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
             req_data = json.loads(request.body)
             title = req_data["title"]
             is_open = req_data["isOpen"]
-            # tags = req_data["tag"]
+            # tags = req_data["tag"]  # TODO
             difficulty = int(req_data["difficulty"])
             content = req_data["content"]
         except (KeyError, ValueError, JSONDecodeError) as e:
@@ -762,7 +723,6 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
         if request.user.pk != problem_set.creator.user.pk:
             raise PermissionDenied()
 
-        # res = problem_set.info_dict()
         for problem in problem_set.problems.all():
             problem.delete()
         problem_set.delete()
@@ -835,11 +795,6 @@ class ProblemSetCommentListView(LoginRequiredMixin, View):
         """
         if not ProblemSet.objects.filter(pk=ps_id).exists():
             return HttpResponseNotFound()
-        """
-        comment_set = ProblemSetComment.objects.filter(
-            problem_set_id=ps_id
-        ).select_related("content")
-        """
         comment_set = ProblemSetComment.objects.filter(problem_set_id=ps_id)
 
         res = []
@@ -906,7 +861,9 @@ class ProblemSetCommentInfoView(LoginRequiredMixin, View):
 
         .. rubric:: Behavior
 
-        If a problem set with id ``ps_id`` exists and a comment to the problem set with id ``c_id`` exists, respond with ``200 (OK)`` and following data:
+        If a problem set with id ``ps_id`` exists and a comment to the problem
+        set with id ``c_id`` exists, respond with ``200 (OK)`` and following
+        data:
 
         .. code-block:: typescript
 
@@ -919,7 +876,8 @@ class ProblemSetCommentInfoView(LoginRequiredMixin, View):
              content: string;
            }
 
-        If either problem set or comment does not exist, respond with ``404 (Not Found)``.
+        If either problem set or comment does not exist, respond with ``404 (Not
+        Found)``.
         """
         if not ProblemSet.objects.filter(pk=ps_id).exists():
             return HttpResponseNotFound()
@@ -937,7 +895,8 @@ class ProblemSetCommentInfoView(LoginRequiredMixin, View):
 
         .. rubric:: How to use
 
-        Send a ``PUT`` request to ``/api/problem_set/:ps_id/comment/:c_id/`` with the following data:
+        Send a ``PUT`` request to ``/api/problem_set/:ps_id/comment/:c_id/``
+        with the following data:
 
         .. code-block:: typescript
 
@@ -991,9 +950,12 @@ class ProblemSetCommentInfoView(LoginRequiredMixin, View):
 
         .. rubric:: Behavior
 
-        If a problem set with id ``ps_id`` exists and a comment to the problem set with id ``c_id`` exists, delete the comment and respond with ``200 (OK)``.
+        If a problem set with id ``ps_id`` exists and a comment to the problem
+        set with id ``c_id`` exists, delete the comment and respond with ``200
+        (OK)``.
 
-        If either problem set or comment does not exist, respond with ``404 (Not Found)``.
+        If either problem set or comment does not exist, respond with ``404 (Not
+        Found)``.
         """
         if not ProblemSet.objects.filter(pk=ps_id).exists():
             return HttpResponseNotFound()
@@ -1029,7 +991,8 @@ class ProblemInfoView(LoginRequiredMixin, View):
 
         .. rubric:: Behavior
 
-        If a problem with id ``p_id`` exists, respond with ``200 (OK)`` and following data:
+        If a problem with id ``p_id`` exists, respond with ``200 (OK)`` and
+        following data:
 
         .. code-block:: typescript
 
@@ -1064,7 +1027,8 @@ class ProblemInfoView(LoginRequiredMixin, View):
         ``solutions`` field of ``GetSubjectiveProblemResponse`` are available
         only to the author of the problem.
 
-        If a problem with id ``p_id`` does not exist, respond with ``404 (Not Found)``.
+        If a problem with id ``p_id`` does not exist, respond with ``404 (Not
+        Found)``.
         """
         try:
             problem = Problem.objects.get(pk=p_id)
@@ -1096,6 +1060,7 @@ class ProblemInfoView(LoginRequiredMixin, View):
            interface UpdateMultipleChoiceProblemRequest extends UpdateProblemRequestBase {
              problemType: 'multiple-choice';
              choices: string[];
+             solution: number[];
            }
 
            interface UpdateSubjectiveProblemRequest extends UpdateProblemRequestBase {
@@ -1105,19 +1070,56 @@ class ProblemInfoView(LoginRequiredMixin, View):
 
         .. rubric:: Behavior
 
-        If a problem with id ``p_id`` exists and the request follows the constraints, do the following:
+        If a problem with id ``p_id`` exists and the request follows the
+        constraints, do the following:
 
         #. If ``problemNumber`` is set in the request, different from the
            current problem number, and a problem in the same problem set having
            ``problemNumber`` as its number exists, set its problem number to the
            original problem number of the problem in the request (i.e. swap the
            problem numbers).
-        #. Update the problem and respond with ``200 (OK)``.
+        #. Update the problem and respond with ``200 (OK)`` and
+           ``GetProblemResponse`` of :meth:`ProblemInfoView.get`.
 
-        If a problem with id ``p_id`` does not exist, respond with ``404 (Not Found)``.
+        If a problem with id ``p_id`` does not exist, respond with ``404 (Not
+        Found)``.
 
-        If a problem with id ``p_id`` exists, but the request does not follow the constraints, respond with ``400 (Bad Request)``.
+        If a problem with id ``p_id`` exists, but the request does not follow
+        the constraints, respond with ``400 (Bad Request)``.
         """
+        try:
+            problem = Problem.objects.get(pk=p_id)
+        except:
+            return HttpResponseNotFound()
+
+        if request.user.pk != problem.creator.pk:
+            raise PermissionDenied()
+
+        try:
+            pending_problem = json.loads(request.body)
+            verify_problem_request(pending_problem)
+        except (JSONDecodeError, KeyError) as error:
+            raise BadRequest() from error
+
+        problem_number = pending_problem.get("problemNumber")
+        if problem_number is not None and problem_number != problem.number:
+            try:
+                existing_problem = Problem.objects.get(
+                    problem_set_id=problem.problem_set.pk, number=problem_number
+                )
+            except Problem.DoesNotExist:
+                return HttpResponse(status=http.HTTPStatus.CONFLICT)
+            existing_problem.number = problem.number
+            existing_problem.save()
+        else:
+            pending_problem["problemNumber"] = problem.number
+
+        ps_id = problem.problem_set.pk
+        problem.delete()
+        new_problem = create_problem(pending_problem, request.user.pk, ps_id, p_id)
+
+        res = new_problem.info_dict()
+        return JsonResponse(res)
 
     def delete(self, request: HttpRequest, p_id: int, **kwargs):
         """Delete a specific problem.
@@ -1128,19 +1130,24 @@ class ProblemInfoView(LoginRequiredMixin, View):
 
         .. rubric:: Behavior
 
-        If a problem with id ``p_id`` exists, delete the problem and respond with ``200 (OK)``.
+        If a problem with id ``p_id`` exists, delete the problem and respond
+        with ``200 (OK)``.
 
-        If a problem with id ``p_id`` does not exist, respond with ``404 (Not Found)``.
+        If a problem with id ``p_id`` does not exist, respond with ``404 (Not
+        Found)``.
         """
         try:
             problem = Problem.objects.get(pk=p_id)
         except:
-            return HttpResponse(status=404)
+            return HttpResponseNotFound()
 
         if request.user.pk != problem.creator.pk:
             raise PermissionDenied()
 
-        # res = problem.info_dict()
+        modified_problems = problem.problem_set.problems.filter(
+            number__gte=problem.number
+        )
+        modified_problems.update(number=F("number") - 1)
         problem.delete()
         return HttpResponse()
 
@@ -1151,7 +1158,8 @@ def solve_problem(request: HttpRequest, p_id: int) -> HttpResponse:
 
     .. rubric:: How to use
 
-    Send a ``POST`` request to ``/api/problem/:p_id/solve/`` with the following data:
+    Send a ``POST`` request to ``/api/problem/:p_id/solve/`` with the following
+    data:
 
     .. code-block:: typescript
 
@@ -1180,9 +1188,12 @@ def solve_problem(request: HttpRequest, p_id: int) -> HttpResponse:
          correct: boolean;
        }
 
-    ``correct`` should be true if and only if the user solved the problem correctly.
+    ``correct`` should be true if and only if the user solved the problem
+    correctly.
 
-    If a problem with id ``p_id`` exists but the types of request and problem do not match (e.g. user tries to solve subjective question with a number array), respond with ``200 (OK)`` and following data:
+    If a problem with id ``p_id`` exists but the types of request and problem do
+    not match (e.g. user tries to solve subjective question with a number
+    array), respond with ``200 (OK)`` and following data:
 
     .. code-block:: typescript
 
@@ -1191,10 +1202,13 @@ def solve_problem(request: HttpRequest, p_id: int) -> HttpResponse:
          cause: 'INCORRECT_PROBLEM_TYPE';
        }
 
-    If a problem with id ``p_id`` does not exist, respond with ``404 (Not Found)``.
+    If a problem with id ``p_id`` does not exist, respond with ``404 (Not
+    Found)``.
 
-    If a problem with id ``p_id`` exists but the request does not follow the constraints, respond with ``400 (Bad Request)``.
+    If a problem with id ``p_id`` exists but the request does not follow the
+    constraints, respond with ``400 (Bad Request)``.
     """
+    return HttpResponse(status_code=http.HTTPStatus.NOT_IMPLEMENTED)
 
 
 @require_GET
@@ -1207,7 +1221,8 @@ def find_solvers(request: HttpRequest, ps_id: int) -> HttpResponse:
 
     .. rubric:: Behavior
 
-    If a problem set with id ``ps_id`` exists, respond with ``200 (OK)`` and the following data:
+    If a problem set with id ``ps_id`` exists, respond with ``200 (OK)`` and the
+    following data:
 
     .. code-block:: typescript
 
@@ -1220,10 +1235,13 @@ def find_solvers(request: HttpRequest, ps_id: int) -> HttpResponse:
          problems: (boolean | null)[];
        }
 
-    An entry of ``problems`` is null if and only if the user did not try that problem.
+    An entry of ``problems`` is null if and only if the user did not try that
+    problem.
 
-    If a problem set with id ``ps_id`` does not exist, respond with ``404 (Not Found)``.
+    If a problem set with id ``ps_id`` does not exist, respond with ``404 (Not
+    Found)``.
     """
+    return HttpResponse(status_code=http.HTTPStatus.NOT_IMPLEMENTED)
 
 
 class ProblemSetSolvedListView(LoginRequiredMixin, View):
@@ -1248,7 +1266,8 @@ def get_solver(request: HttpRequest, ps_id: int, u_id: int) -> HttpResponse:
 
     .. rubric:: Behavior
 
-    If a problem set with id ``ps_id`` exists and a user with id ``u_id`` exists, respond with ``200 (OK)`` and the following data:
+    If a problem set with id ``ps_id`` exists and a user with id ``u_id``
+    exists, respond with ``200 (OK)`` and the following data:
 
     .. code-block:: typescript
 
@@ -1259,10 +1278,13 @@ def get_solver(request: HttpRequest, ps_id: int, u_id: int) -> HttpResponse:
          problems: (boolean | null)[];
        }
 
-    An entry of ``problems`` is null if and only if the user did not try that problem.
+    An entry of ``problems`` is null if and only if the user did not try that
+    problem.
 
-    If either problem set or user does not exist, respond with ``404 (Not Found)``.
+    If either problem set or user does not exist, respond with ``404 (Not
+    Found)``.
     """
+    return HttpResponse(status_code=http.HTTPStatus.NOT_IMPLEMENTED)
 
 
 class ProblemSetSolvedView(LoginRequiredMixin, View):

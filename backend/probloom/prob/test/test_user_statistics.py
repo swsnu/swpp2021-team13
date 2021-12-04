@@ -4,16 +4,15 @@ from prob.models import User, UserStatistics, ProblemSet
 
 class UserStatisticsTestCase(TestCase):
     def setUp(self):
-        user = User.objects.create_user(
+        self.user = User.objects.create_user(
             username="USER", email="USER@asd.com", password="123"
         )
-        user_stat = UserStatistics.objects.create(lastActiveDays=1, user=user)
+        user_stat = UserStatistics.objects.create(user=self.user)
         ProblemSet.objects.create(
             title="TITLE",
             is_open=False,
-            tag="TAG",
             difficulty=1,
-            content="CONTENT",
+            description="CONTENT",
             creator=user_stat,
         )
 
@@ -22,10 +21,17 @@ class UserStatisticsTestCase(TestCase):
 
     def test_get_user_id(self):
         client = Client()
-        res = []
-        response = client.get("/api/user/1/statistics/")
-        res = response.json()
+        response = client.get(f"/api/user/{self.user.pk}/statistics/")
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("1", response.content.decode())
-        self.assertEqual(res, response.json())
+        self.assertContains(response, '"lastActiveDays": null')
+
+        response = client.post(
+            "/api/signin/",
+            {"id": "USER", "password": "123"},
+            content_type="application/json",
+        )
+        response = client.get(f"/api/user/{self.user.pk}/statistics/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '"lastActiveDays": 0')
