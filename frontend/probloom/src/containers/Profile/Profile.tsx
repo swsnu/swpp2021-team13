@@ -1,4 +1,4 @@
-import { RouteComponentProps, withRouter } from 'react-router';
+import { Redirect, RouteComponentProps, withRouter } from 'react-router';
 
 import './Profile.css';
 import NotFound from '../../components/NotFound/NotFound';
@@ -39,6 +39,10 @@ class Profile extends Component<
   };
 
   render() {
+    if (this.props.selectedUser === null) {
+      return <Redirect to="/" />;
+    }
+
     const userId = parseInt(this.props.match.params.id, 10);
     if (isNaN(userId)) {
       console.warn(`"${this.props.match.params.id}" is not a valid user id`);
@@ -62,9 +66,7 @@ class Profile extends Component<
       <Container text>
         <Header as="h2">
           {this.props.selectedUser?.username}
-          <Header.Subheader>
-            {this.props.selectedUser?.email}
-          </Header.Subheader>
+          <Header.Subheader>{this.props.selectedUser?.email}</Header.Subheader>
         </Header>
         <Tab
           panes={panes}
