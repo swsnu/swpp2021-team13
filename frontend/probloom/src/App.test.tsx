@@ -2,7 +2,10 @@ import { render, screen } from '@testing-library/react';
 import App from './App';
 import { Provider } from 'react-redux';
 import { getMockStoreWithRouter } from './mocks';
-import { history } from './store/store';
+import store, { history } from './store/store';
+import { signInSuccess } from './store/actions/userActions';
+import { User } from './store/reducers/userReducer';
+import axios from 'axios';
 
 jest.mock('./containers/Profile/Profile', () => ({
   __esModule: true,
@@ -20,15 +23,30 @@ jest.mock('./components/NotFound/NotFound', () => ({
   default: () => <h1>TEST_NOT_FOUND</h1>,
 }));
 
+const stubUser: User = {
+  id: 1,
+  username: 'turing',
+  email: 'turing@example.com',
+  logged_in: true,
+};
+
 describe('<App />', () => {
   describe('when routing', () => {
     let app: JSX.Element;
+    let spyGet: jest.SpyInstance;
+
     beforeEach(() => {
       app = (
-        <Provider store={getMockStoreWithRouter()}>
+        <Provider store={store}>
           <App history={history} />
         </Provider>
       );
+      store.dispatch(signInSuccess(stubUser));
+      spyGet = jest.spyOn(axios, 'get').mockResolvedValue(stubUser);
+    });
+
+    afterEach(() => {
+      spyGet.mockClear();
     });
 
     it('routes to not found page', () => {
