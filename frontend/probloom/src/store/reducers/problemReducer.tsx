@@ -47,21 +47,27 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
       return { ...state, problemSets: remainProblemSet };
 
     case actionTypes.CREATE_PROBLEM:
-      if (state.selectedProblemSet == null) break;
-      const afterCreateProblem = state.selectedProblemSet.problems
-      afterCreateProblem.push(action.newProblemID);
+      if (state.selectedProblemSet === null) {
+        break;
+      }
+      const afterCreateProblem = state.selectedProblemSet.problems;
+      afterCreateProblem.push(action.newProblem.id);
       return { ...state, selectedProblemSet: {
         ...state.selectedProblemSet,
         problems: afterCreateProblem
-      }}
+        },
+        selectedProblem: action.newProblem,
+      }
     
     case actionTypes.GET_PROBLEM:
       return { ...state, selectedProblem: action.selectedProblem }
 
     case actionTypes.DELETE_PROBLEM:
-      if (state.selectedProblemSet == null) break;
-      const afterDeleteProblem = state.selectedProblemSet.problems;
-      afterDeleteProblem.splice(afterDeleteProblem.indexOf(action.targetProblemID), 1);
+      if (state.selectedProblemSet === null) {
+        break;
+      }
+      const afterDeleteProblem = state.selectedProblemSet.problems
+        .filter((problemID) => problemID !== action.targetProblemID);
       return {
         ...state, 
         selectedProblemSet: { ...state.selectedProblemSet, problems: afterDeleteProblem },

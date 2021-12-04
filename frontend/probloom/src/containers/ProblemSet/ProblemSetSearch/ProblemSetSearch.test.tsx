@@ -124,7 +124,6 @@ describe('<ProblemSetSearch />', () => {
     expect(wrapper.length).toBe(1);
     expect(spyGet).toBeCalledTimes(1);
     const wrapper2 = component.find('.ProblemSetSearchResult');
-    console.log(wrapper2.debug());
     expect(wrapper2.length).toBe(6);
   });
 

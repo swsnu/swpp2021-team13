@@ -125,10 +125,10 @@ class ProblemSetSearch extends Component<
             return b.createdTime.localeCompare(a.createdTime);
         }
       })
-      .map((prob) => {
+      .map((prob, index) => {
         return (
           <ProblemSetSearchResult
-            key={prob.id}
+            key={index}
             title={prob.title}
             date={prob.createdTime}
             creator={prob.username}

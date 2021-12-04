@@ -184,12 +184,14 @@ export const deleteProblemSet: (
 
 export interface CreateProblemAction {
   type: typeof actionTypes.CREATE_PROBLEM;
-  newProblemID: number;
+  newProblem: a_interfaces.GetProblemResponse;
 }
 
-export const createProblem_: (id) => CreateProblemAction = (id) => ({
+export const createProblem_: (newProblem) => CreateProblemAction = (
+  newProblem
+) => ({
   type: actionTypes.CREATE_PROBLEM,
-  newProblemID: id
+  newProblem: newProblem,
 });
 
 export const createProblem: (
@@ -201,7 +203,7 @@ export const createProblem: (
 ) => {
   return async (dispatch: AppDispatch) => {
     const { data } = await axios.post(`/api/problem_set/${ps_id}/`, problemData);
-    dispatch(createProblem_(data.id));
+    dispatch(createProblem_(data));
   };
 };
 
@@ -210,11 +212,11 @@ export interface GetProblemAction {
   selectedProblem: a_interfaces.GetProblemResponse;
 }
 
-export const getProblem_: (problemData) => GetProblemAction = (
-  problemData
+export const getProblem_: (problem) => GetProblemAction = (
+  problem
 ) => ({
   type: actionTypes.GET_PROBLEM,
-  selectedProblem: problemData
+  selectedProblem: problem
 });
 
 export const getProblem: ( 
@@ -230,13 +232,13 @@ export const getProblem: (
 
 export const updateProblem: (
   id: number,
-  problemData: a_interfaces.UpdateProblemRequest
+  updatedProblem: a_interfaces.UpdateProblemRequest
 ) => ThunkAction<void, RootState, null, GetProblemAction> = (
   id: number,
-  problemData: a_interfaces.UpdateProblemRequest
+  updatedProblem: a_interfaces.UpdateProblemRequest
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data } = await axios.put(`/api/problem/${id}/`, problemData);
+    const { data } = await axios.put(`/api/problem/${id}/`, updatedProblem);
     dispatch(getProblem_(data));
   };
 };
@@ -258,7 +260,7 @@ export const deleteProblem: (
 ) => {
   return async (dispatch: AppDispatch) => {
     const { data } = await axios.delete(`/api/problem/${id}/`);
-    dispatch(getProblem_(id));
+    dispatch(deleteProblem_(id));
   };
 };
 
