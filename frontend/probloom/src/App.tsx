@@ -29,7 +29,6 @@ class App extends Component<AppProps> {
   render() {
     if (this.props.selectedUser === null) {
       this.props.handleNoUser();
-      return null;
     }
     return (
       <div className="App" style={{ paddingTop: '4rem' }}>
