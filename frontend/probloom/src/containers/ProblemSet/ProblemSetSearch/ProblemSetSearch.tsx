@@ -113,7 +113,7 @@ class ProblemSetSearch extends Component<
         (prob) =>
           prob.userID === this.props.user?.id || this.state.creator !== 'own'
       )
-      .filter((prob) => this.state.tag === 'all') //|| prob.tag === this.state.tag)
+//      .filter((prob) => this.state.tag === 'all') //|| prob.tag === this.state.tag)
       .sort((a, b) => {
         switch (this.state.sort) {
           case 'solved':

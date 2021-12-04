@@ -58,7 +58,7 @@ class ProblemSetEdit extends Component<Props, State> {
       problemSetID: Number(this.props.match.params.id),
       content: 'new problem',
     }
-    if (type === 'multiple-choice') {
+    if (type === "multiple-choice") {
       const newMultipleChoiceProblem : interfaces.CreateMultipleChoiceProblemRequest= {
         ...newProblem, problemType: "multiple-choice", choices: []
       }
@@ -66,13 +66,13 @@ class ProblemSetEdit extends Component<Props, State> {
         Number(this.props.match.params.id), 
         newMultipleChoiceProblem
       );
-    } else if (type === 'subjective') {
-      const newMultipleChoiceProblem : interfaces.CreateSubjectiveProblemRequest= {
+    } else {
+      const newSubjectiveProblem : interfaces.CreateSubjectiveProblemRequest= {
         ...newProblem, problemType: "subjective", solutions: []
       }
       this.props.onCreateProblem(
         Number(this.props.match.params.id), 
-        newMultipleChoiceProblem
+        newSubjectiveProblem
       );
     }
   }
@@ -112,7 +112,7 @@ class ProblemSetEdit extends Component<Props, State> {
     if (updateProblem.problemType === 'multiple-choice') {
       updateProblem['choices'] = currentProblem.choices;
       updateProblem['solution'] = currentProblem.solution;
-    } else if (updateProblem.problemType === 'subjective') {
+    } else {
       updateProblem['solutions'] = currentProblem.solutions;
     }
     this.props.onUpdateProblem(

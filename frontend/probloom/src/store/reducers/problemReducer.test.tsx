@@ -122,7 +122,7 @@ describe('Problem Reducer', () => {
       problemSets: [],
       solvers: [stubSolver],
       selectedProblemSet: null,
-      selectedProblems: [],
+      selectedProblem: null,
     });
   });
 
@@ -167,7 +167,7 @@ describe('Problem Reducer', () => {
       problemSets: [stubProblemSet],
       solvers: [],
       selectedProblemSet: null,
-      selectedProblems: [],
+      selectedProblem: null,
     });
     const newStateTrue = problemReducer(stubInitialState, {
       type: actionTypes.CREATE_PROBLEM_SET,
@@ -177,7 +177,7 @@ describe('Problem Reducer', () => {
       problemSets: [stubProblemSetTrue],
       solvers: [],
       selectedProblemSet: null,
-      selectedProblems: [],
+      selectedProblem: null,
     });
   });
 
@@ -212,7 +212,7 @@ describe('Problem Reducer', () => {
       problemSets: [],
       solvers: [],
       selectedProblemSet: stubProblemSet,
-      selectedProblems: [],
+      selectedProblem: null,
     });
   });
 
@@ -247,7 +247,7 @@ describe('Problem Reducer', () => {
       problemSets: [stubProblemSet1, stubProblemSet2],
       solvers: [],
       selectedProblemSet: null,
-      selectedProblems: [],
+      selectedProblem: null,
     };
     let newState = problemReducer(stubInitialState, {
       type: actionTypes.DELETE_PROBLEMSET,
@@ -257,7 +257,7 @@ describe('Problem Reducer', () => {
       problemSets: [stubProblemSet2],
       solvers: [],
       selectedProblemSet: null,
-      selectedProblems: [],
+      selectedProblem: null,
     });
     newState = problemReducer(stubInitialState, {
       type: actionTypes.DELETE_PROBLEMSET,
