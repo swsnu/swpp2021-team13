@@ -27,7 +27,6 @@ describe('<ProblemSetView />', () => {
         createdTime={'1'}
         modifiedTime={'2'}
         onClickSolveProblemButton={() => {}}
-        onClickExplanationButton={() => {}}
         onClickBackButton={() => {}}
         onClickEditProblemButton={() => {}}
         onClickEditProblemSetButton={() => {}}
@@ -38,8 +37,6 @@ describe('<ProblemSetView />', () => {
     expect(wrapper.length).toBe(1);
     const solveButton = component.find('.solveButton');
     solveButton.simulate('click');
-    const explanationButton = component.find('.explanationButton');
-    explanationButton.simulate('click');
     const backButton = component.find('.backButton');
     backButton.simulate('click');
     const editProblemButton = component.find('.editProblemButton');

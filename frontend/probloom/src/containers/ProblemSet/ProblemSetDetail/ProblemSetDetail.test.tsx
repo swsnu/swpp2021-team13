@@ -8,9 +8,9 @@ import * as problemActions from '../../../store/actions/problemSetActions';
 import * as commentActions from '../../../store/actions/commentActions';
 import {
   Solver,
-  ProblemSet,
-  ProblemSetState,
-} from '../../../store/reducers/problemReducer';
+  ProblemSetInterface,
+} from '../../../store/reducers/problemReducerInterface';
+import { ProblemSetState } from '../../../store/reducers/problemReducer';
 import { Comment, CommentState } from '../../../store/reducers/commentReducer';
 import ProblemSetDetail from './ProblemSetDetail';
 import { history } from '../../../store/store';
@@ -45,7 +45,7 @@ const solver1: Solver = {
   result: true,
 };
 
-const problemSet1: ProblemSet = {
+const problemSet1: ProblemSetInterface = {
   id: 1,
   title: 'title1',
   createdTime: '2021-01-01',
@@ -65,7 +65,7 @@ const ProblemSetStateTest: ProblemSetState = {
   problemSets: [problemSet1],
   solvers: [solver1],
   selectedProblemSet: problemSet1,
-  selectedProblems: [],
+  selectedProblem: null,
 };
 
 const comment1: Comment = {
@@ -170,7 +170,7 @@ describe('<ProblemSetDetail />', () => {
       problemSets: [problemSet1],
       solvers: [solver1],
       selectedProblemSet: null,
-      selectedProblems: [],
+      selectedProblem: null,
     };
     const mockStore = getMockStore(
       UserStateTest,
@@ -254,7 +254,7 @@ describe('<ProblemSetDetail />', () => {
   });
 
   it('other cases: is_open===true and difficulty is not defined', () => {
-    const problemSet1: ProblemSet = {
+    const problemSet1: ProblemSetInterface = {
       id: 1,
       title: 'title1',
       createdTime: '2021-01-01',
@@ -273,7 +273,7 @@ describe('<ProblemSetDetail />', () => {
       problemSets: [problemSet1],
       solvers: [solver1],
       selectedProblemSet: problemSet1,
-      selectedProblems: [],
+      selectedProblem: null,
     };
     const mockStore = getMockStore(
       UserStateTest,
@@ -324,13 +324,6 @@ describe('<ProblemSetDetail />', () => {
   it('click solve problem set button', () => {
     const component = mount(problemSetDetail);
     const wrapper = component.find('button.solveButton');
-    wrapper.simulate('click');
-    history.push('/');
-  });
-
-  it('click explanation problem set button', () => {
-    const component = mount(problemSetDetail);
-    const wrapper = component.find('button.explanationButton');
     wrapper.simulate('click');
     history.push('/');
   });

@@ -139,12 +139,6 @@ class ProblemSetDetail extends Component<
     );
   };
 
-  onClickExplanationButton = () => {
-    this.props.history.push(
-      '/problem/' + this.props.match.params.id + '/explanation/'
-    );
-  };
-
   onClickEditCommentButton = (comment: CommentData) => {
     this.setState({
       isCommentEdit: !this.state.isCommentEdit,
@@ -254,7 +248,6 @@ class ProblemSetDetail extends Component<
                 this.onClickDeleteProblemButton()
               }
               onClickSolveProblemButton={() => this.onClickSolveProblemButton()}
-              onClickExplanationButton={() => this.onClickExplanationButton()}
             />
             <Comment.Group className="Comment">
               <Header as="h3" dividing>

@@ -38,15 +38,6 @@ const ProblemSetView = (props) => {
             >
               Solve Problems
             </Button>
-            {(props.isCreator || props.isSolver) && (
-              <Button
-                secondary
-                className="explanationButton"
-                onClick={() => props.onClickExplanationButton()}
-              >
-                Explanations
-              </Button>
-            )}
           </Grid.Column>
           <Grid.Column textAlign="right">
             {props.isCreator && (
