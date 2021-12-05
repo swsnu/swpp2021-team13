@@ -121,7 +121,10 @@ class ProblemSetCreate extends Component<Props, State> {
   };
 
   render() {
-    const tabContentText = (currentProblem, index: number) => {
+    const tabContentText = (
+      currentProblem: CreateProblemType,
+      index: number
+    ) => {
       return (
         <Form.TextArea
           id="problemset-problem-content-input"
@@ -226,6 +229,110 @@ class ProblemSetCreate extends Component<Props, State> {
       );
     };
 
+    let createChoice = (
+      currentProblem: CreateMultipleChoiceProblemInterface,
+      index: number,
+      order: number
+    ) => {
+      return (
+        <>
+          <label>choice {order}</label>
+          <input
+            id={`problemset-choice${order}-input`}
+            placeholder={`choice ${order} here...`}
+            onChange={(event) => {
+              const editChoice = event.target.value;
+              const newChoice: string[] = [];
+              let _currentProblem =
+                currentProblem as CreateMultipleChoiceProblemInterface;
+              _currentProblem.choices.forEach((choice, index) => {
+                if (index === order - 1) {
+                  newChoice.push(editChoice);
+                } else {
+                  newChoice.push(choice);
+                }
+              });
+
+              const editProblem: CreateProblemType = {
+                problemType: _currentProblem.problemType,
+                problemSetID: _currentProblem.problemSetID,
+                problemNumber: _currentProblem.problemNumber,
+                content: _currentProblem.content,
+                choices: newChoice,
+                solutions: _currentProblem.solutions,
+              };
+
+              const newProblem: CreateProblemType[] = [];
+              this.state.problems.forEach((problem) => {
+                if (problem.problemNumber === index) {
+                  newProblem.push(editProblem);
+                } else {
+                  newProblem.push(problem);
+                }
+              });
+
+              this.setState({
+                ...this.state,
+                problems: newProblem,
+              });
+            }}
+          ></input>
+        </>
+      );
+    };
+
+    let createSolution = (
+      currentProblem: CreateMultipleChoiceProblemInterface,
+      index: number,
+      order: number
+    ) => {
+      return (
+        <Form.Field
+          id={`problem-solution${order}-input`}
+          label={`${order}`}
+          control="input"
+          type="checkbox"
+          onChange={() => {
+            let _currentProblem =
+              currentProblem as CreateMultipleChoiceProblemInterface;
+            let newSolutions;
+            if (_currentProblem.solutions.includes(order)) {
+              let arr = _currentProblem.solutions.filter(
+                (element) => element !== order
+              );
+              newSolutions = [...Array.from(new Set([...arr]))];
+            } else {
+              newSolutions = [
+                ...Array.from(new Set([..._currentProblem.solutions, order])),
+              ];
+            }
+            const editProblem: CreateProblemType = {
+              problemType: _currentProblem.problemType,
+              problemSetID: _currentProblem.problemSetID,
+              problemNumber: _currentProblem.problemNumber,
+              content: _currentProblem.content,
+              choices: _currentProblem.choices,
+              solutions: newSolutions,
+            };
+
+            const newProblem: CreateProblemType[] = [];
+            this.state.problems.forEach((problem) => {
+              if (problem.problemNumber === index) {
+                newProblem.push(editProblem);
+              } else {
+                newProblem.push(problem);
+              }
+            });
+
+            this.setState({
+              ...this.state,
+              problems: newProblem,
+            });
+          }}
+        />
+      );
+    };
+
     const newProblems = this.state.problems.map(
       (currentProblem: CreateProblemType, index) => {
         return (
@@ -310,361 +417,25 @@ class ProblemSetCreate extends Component<Props, State> {
               <div>
                 <label>Choose the correct answer</label>
                 <div className="ProblemChoice1">
-                  <label>choice 1</label>
-                  <input
-                    id="problemset-choice1-input"
-                    placeholder="choice 1 here..."
-                    onChange={(event) => {
-                      const editChoice1 = event.target.value;
-                      const newChoice1: string[] = [];
-                      let _currentProblem =
-                        currentProblem as CreateMultipleChoiceProblemInterface;
-                      _currentProblem.choices.forEach((choice, index) => {
-                        if (index === 0) {
-                          newChoice1.push(editChoice1);
-                        } else {
-                          newChoice1.push(choice);
-                        }
-                      });
-
-                      const editProblem: CreateProblemType = {
-                        problemType: _currentProblem.problemType,
-                        problemSetID: _currentProblem.problemSetID,
-                        problemNumber: _currentProblem.problemNumber,
-                        content: _currentProblem.content,
-                        choices: newChoice1,
-                        solutions: _currentProblem.solutions,
-                      };
-
-                      const newProblem: CreateProblemType[] = [];
-                      this.state.problems.forEach((problem) => {
-                        if (problem.problemNumber === index) {
-                          newProblem.push(editProblem);
-                        } else {
-                          newProblem.push(problem);
-                        }
-                      });
-
-                      this.setState({
-                        ...this.state,
-                        problems: newProblem,
-                      });
-                    }}
-                  ></input>
+                  {(() => createChoice(currentProblem, index, 1))()}
                 </div>
                 <div className="ProblemChoice2">
-                  <label>choice 2</label>
-                  <input
-                    id="problemset-choice2-input"
-                    placeholder="choice 2 here..."
-                    onChange={(event) => {
-                      const editChoice2 = event.target.value;
-                      const newChoice2: string[] = [];
-                      let _currentProblem =
-                        currentProblem as CreateMultipleChoiceProblemInterface;
-                      _currentProblem.choices.forEach((choice, index) => {
-                        if (index === 1) {
-                          newChoice2.push(editChoice2);
-                        } else {
-                          newChoice2.push(choice);
-                        }
-                      });
-
-                      const editProblem: CreateProblemType = {
-                        problemType: _currentProblem.problemType,
-                        problemSetID: _currentProblem.problemSetID,
-                        problemNumber: _currentProblem.problemNumber,
-                        content: _currentProblem.content,
-                        choices: newChoice2,
-                        solutions: _currentProblem.solutions,
-                      };
-
-                      const newProblem: CreateProblemType[] = [];
-                      this.state.problems.forEach((problem) => {
-                        if (problem.problemNumber === index) {
-                          newProblem.push(editProblem);
-                        } else {
-                          newProblem.push(problem);
-                        }
-                      });
-
-                      this.setState({
-                        ...this.state,
-                        problems: newProblem,
-                      });
-                    }}
-                  ></input>
+                  {(() => createChoice(currentProblem, index, 2))()}
                 </div>
                 <div className="ProblemChoice3">
-                  <label>choice 3</label>
-                  <input
-                    id="problemset-choice3-input"
-                    placeholder="choice 3 here..."
-                    onChange={(event) => {
-                      const editChoice3 = event.target.value;
-                      const newChoice3: string[] = [];
-                      let _currentProblem =
-                        currentProblem as CreateMultipleChoiceProblemInterface;
-                      _currentProblem.choices.forEach((choice, index) => {
-                        if (index === 2) {
-                          newChoice3.push(editChoice3);
-                        } else {
-                          newChoice3.push(choice);
-                        }
-                      });
-
-                      const editProblem: CreateProblemType = {
-                        problemType: _currentProblem.problemType,
-                        problemSetID: _currentProblem.problemSetID,
-                        problemNumber: _currentProblem.problemNumber,
-                        content: _currentProblem.content,
-                        choices: newChoice3,
-                        solutions: _currentProblem.solutions,
-                      };
-
-                      const newProblem: CreateProblemType[] = [];
-                      this.state.problems.forEach((problem) => {
-                        if (problem.problemNumber === index) {
-                          newProblem.push(editProblem);
-                        } else {
-                          newProblem.push(problem);
-                        }
-                      });
-
-                      this.setState({
-                        ...this.state,
-                        problems: newProblem,
-                      });
-                    }}
-                  ></input>
+                  {(() => createChoice(currentProblem, index, 3))()}
                 </div>
                 <div className="ProblemChoice4">
-                  <label>choice 4</label>
-                  <input
-                    id="problemset-choice4-input"
-                    placeholder="choice 4 here..."
-                    onChange={(event) => {
-                      const editChoice4 = event.target.value;
-                      const newChoice4: string[] = [];
-                      let _currentProblem =
-                        currentProblem as CreateMultipleChoiceProblemInterface;
-                      _currentProblem.choices.forEach((choice, index) => {
-                        if (index === 3) {
-                          newChoice4.push(editChoice4);
-                        } else {
-                          newChoice4.push(choice);
-                        }
-                      });
-
-                      const editProblem: CreateProblemType = {
-                        problemType: _currentProblem.problemType,
-                        problemSetID: _currentProblem.problemSetID,
-                        problemNumber: _currentProblem.problemNumber,
-                        content: _currentProblem.content,
-                        choices: newChoice4,
-                        solutions: _currentProblem.solutions,
-                      };
-
-                      const newProblem: CreateProblemType[] = [];
-                      this.state.problems.forEach((problem) => {
-                        if (problem.problemNumber === index) {
-                          newProblem.push(editProblem);
-                        } else {
-                          newProblem.push(problem);
-                        }
-                      });
-
-                      this.setState({
-                        ...this.state,
-                        problems: newProblem,
-                      });
-                    }}
-                  ></input>
+                  {(() => createChoice(currentProblem, index, 4))()}
                 </div>
 
                 <div className="Solution">
                   <Form.Group grouped>
                     <label>Solution</label>
-                    <Form.Field
-                      id="problem-solution1-input"
-                      label="1"
-                      control="input"
-                      type="checkbox"
-                      onChange={() => {
-                        let _currentProblem =
-                          currentProblem as CreateMultipleChoiceProblemInterface;
-                        let newSolutions;
-                        if (_currentProblem.solutions.includes(1)) {
-                          let arr = _currentProblem.solutions.filter(
-                            (element) => element !== 1
-                          );
-                          newSolutions = [...Array.from(new Set([...arr]))];
-                        } else {
-                          newSolutions = [
-                            ...Array.from(
-                              new Set([..._currentProblem.solutions, 1])
-                            ),
-                          ];
-                        }
-                        const editProblem: CreateProblemType = {
-                          problemType: _currentProblem.problemType,
-                          problemSetID: _currentProblem.problemSetID,
-                          problemNumber: _currentProblem.problemNumber,
-                          content: _currentProblem.content,
-                          choices: _currentProblem.choices,
-                          solutions: newSolutions,
-                        };
-
-                        const newProblem: CreateProblemType[] = [];
-                        this.state.problems.forEach((problem) => {
-                          if (problem.problemNumber === index) {
-                            newProblem.push(editProblem);
-                          } else {
-                            newProblem.push(problem);
-                          }
-                        });
-
-                        this.setState({
-                          ...this.state,
-                          problems: newProblem,
-                        });
-                      }}
-                    />
-                    <Form.Field
-                      id="problem-solution2-input"
-                      label="2"
-                      control="input"
-                      type="checkbox"
-                      onChange={() => {
-                        let _currentProblem =
-                          currentProblem as CreateMultipleChoiceProblemInterface;
-                        let newSolutions;
-                        if (_currentProblem.solutions.includes(2)) {
-                          let arr = _currentProblem.solutions.filter(
-                            (element) => element !== 2
-                          );
-                          newSolutions = [...Array.from(new Set([...arr]))];
-                        } else {
-                          newSolutions = [
-                            ...Array.from(
-                              new Set([..._currentProblem.solutions, 2])
-                            ),
-                          ];
-                        }
-                        const editProblem: CreateProblemType = {
-                          problemType: _currentProblem.problemType,
-                          problemSetID: _currentProblem.problemSetID,
-                          problemNumber: _currentProblem.problemNumber,
-                          content: _currentProblem.content,
-                          choices: _currentProblem.choices,
-                          solutions: newSolutions,
-                        };
-
-                        const newProblem: CreateProblemType[] = [];
-                        this.state.problems.forEach((problem) => {
-                          if (problem.problemNumber === index) {
-                            newProblem.push(editProblem);
-                          } else {
-                            newProblem.push(problem);
-                          }
-                        });
-
-                        this.setState({
-                          ...this.state,
-                          problems: newProblem,
-                        });
-                      }}
-                    />
-                    <Form.Field
-                      id="problem-solution3-input"
-                      label="3"
-                      control="input"
-                      type="checkbox"
-                      onChange={() => {
-                        let _currentProblem =
-                          currentProblem as CreateMultipleChoiceProblemInterface;
-                        let newSolutions;
-                        if (_currentProblem.solutions.includes(3)) {
-                          let arr = _currentProblem.solutions.filter(
-                            (element) => element !== 3
-                          );
-                          newSolutions = [...Array.from(new Set([...arr]))];
-                        } else {
-                          newSolutions = [
-                            ...Array.from(
-                              new Set([..._currentProblem.solutions, 3])
-                            ),
-                          ];
-                        }
-                        const editProblem: CreateProblemType = {
-                          problemType: _currentProblem.problemType,
-                          problemSetID: _currentProblem.problemSetID,
-                          problemNumber: _currentProblem.problemNumber,
-                          content: _currentProblem.content,
-                          choices: _currentProblem.choices,
-                          solutions: newSolutions,
-                        };
-
-                        const newProblem: CreateProblemType[] = [];
-                        this.state.problems.forEach((problem) => {
-                          if (problem.problemNumber === index) {
-                            newProblem.push(editProblem);
-                          } else {
-                            newProblem.push(problem);
-                          }
-                        });
-
-                        this.setState({
-                          ...this.state,
-                          problems: newProblem,
-                        });
-                      }}
-                    />
-                    <Form.Field
-                      id="problem-solution4-input"
-                      label="4"
-                      control="input"
-                      type="checkbox"
-                      onChange={() => {
-                        let _currentProblem =
-                          currentProblem as CreateMultipleChoiceProblemInterface;
-                        let newSolutions;
-                        if (_currentProblem.solutions.includes(4)) {
-                          let arr = _currentProblem.solutions.filter(
-                            (element) => element !== 4
-                          );
-                          newSolutions = [...Array.from(new Set([...arr]))];
-                        } else {
-                          newSolutions = [
-                            ...Array.from(
-                              new Set([..._currentProblem.solutions, 4])
-                            ),
-                          ];
-                        }
-                        const editProblem: CreateProblemType = {
-                          problemType: _currentProblem.problemType,
-                          problemSetID: _currentProblem.problemSetID,
-                          problemNumber: _currentProblem.problemNumber,
-                          content: _currentProblem.content,
-                          choices: _currentProblem.choices,
-                          solutions: newSolutions,
-                        };
-
-                        const newProblem: CreateProblemType[] = [];
-                        this.state.problems.forEach((problem) => {
-                          if (problem.problemNumber === index) {
-                            newProblem.push(editProblem);
-                          } else {
-                            newProblem.push(problem);
-                          }
-                        });
-
-                        this.setState({
-                          ...this.state,
-                          problems: newProblem,
-                        });
-                      }}
-                    />
+                    {(() => createSolution(currentProblem, index, 1))()}
+                    {(() => createSolution(currentProblem, index, 2))()}
+                    {(() => createSolution(currentProblem, index, 3))()}
+                    {(() => createSolution(currentProblem, index, 4))()}
                   </Form.Group>
                 </div>
               </div>
