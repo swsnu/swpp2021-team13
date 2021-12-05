@@ -736,6 +736,7 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
         problem_set.delete()
         return HttpResponse()
 
+
 class ProblemSetRecommendView(LoginRequiredMixin, View):
     """Detail view methods related to recommendation."""
 
@@ -748,7 +749,7 @@ class ProblemSetRecommendView(LoginRequiredMixin, View):
 
         .. rubric:: Behavior
 
-        If a problem set with id ``ps_id`` exists , respond with ``200 (OK)`` and 
+        If a problem set with id ``ps_id`` exists , respond with ``200 (OK)`` and
         boolean data
 
         If a problem set with id ``ps_id`` does not exist, respond with ``404 (Not
@@ -759,12 +760,10 @@ class ProblemSetRecommendView(LoginRequiredMixin, View):
         except:
             return HttpResponseNotFound()
 
-        
         user = User.objects.get(pk=request.user.pk)
-        res = {"is_recommender": problem_set.recommenders.filter(user=user).exists()}
-    
-        return JsonResponse(res, safe=False)
+        res = {"isRecommender": problem_set.recommenders.filter(user=user).exists()}
 
+        return JsonResponse(res, safe=False)
 
     def put(self, request: HttpRequest, ps_id) -> HttpResponse:
         """Update recommendation status of a specific problem set.
@@ -802,8 +801,10 @@ class ProblemSetRecommendView(LoginRequiredMixin, View):
             recommend = req_data["recommend"]
         except (KeyError, ValueError, JSONDecodeError) as e:
             return HttpResponseBadRequest()
-    
-        User.objects.get(pk=request.user.pk).statistics.recommended_problem_sets.add(problem_set)
+
+        User.objects.get(pk=request.user.pk).statistics.recommended_problem_sets.add(
+            problem_set
+        )
         return HttpResponse(status=204)
 
 

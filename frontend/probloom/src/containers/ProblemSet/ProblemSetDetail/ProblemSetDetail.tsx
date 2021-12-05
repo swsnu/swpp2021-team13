@@ -9,6 +9,7 @@ import {
   Header,
   Input,
 } from 'semantic-ui-react';
+import { Solver } from '../../../store/reducers/problemReducerInterface';
 import ProblemSetView from '../../../components/ProblemSet/ProblemSetDetail/ProblemSetView';
 import CommentComponent from '../../../components/ProblemSet/ProblemSetDetail/CommentComponent';
 import { Comment as CommentData } from '../../../store/reducers/commentReducer';
@@ -193,6 +194,8 @@ class ProblemSetDetail extends Component<
     }
 
     let isCreator = false;
+    let isSolver = false;
+    let isRecommender = false;
     let tag = '';
     let difficulty = '';
     let createdTime = '';
@@ -200,6 +203,11 @@ class ProblemSetDetail extends Component<
     if (this.props.selectedProblemSet) {
       const selectedUserID = this.props.selectedUser?.id;
       isCreator = this.props.selectedProblemSet.userID === selectedUserID;
+
+      const solver = this.props.solvers.find(
+        (element: Solver) => element.userID === selectedUserID
+      );
+      isSolver = solver !== undefined;
 
       //tag = this.props.selectedProblemSet.tag.split('-')[1];
       let dict = difficultyOptions.find(
@@ -230,6 +238,7 @@ class ProblemSetDetail extends Component<
               recommendedNum={this.props.selectedProblemSet.recommendedNum}
               solvedNum={0} //{this.props.selectedProblemSet.solverIDs.length}
               isCreator={isCreator}
+              isSolver={isSolver}
               title={this.props.selectedProblemSet.title}
               content={this.props.selectedProblemSet.content}
               onClickBackButton={() => this.onClickBackButton()}

@@ -77,7 +77,9 @@ export const getAllSolvers: (
 ) => {
   return async (dispatch: AppDispatch) => {
     try {
-      const { data } = await axios.get(`/api/solved/${problemSetID}/`);
+      const { data } = await axios.get(
+        `/api/problem_set/${problemSetID}/solvers/`
+      );
       dispatch(getAllSolvers_(data));
     } catch (err) {
       const { status } = (err as any).response;

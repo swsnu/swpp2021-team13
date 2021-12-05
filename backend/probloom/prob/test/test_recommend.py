@@ -3,6 +3,7 @@ from django.test import TestCase, Client
 
 from prob.models import User, UserStatistics, ProblemSet
 
+
 class RecommendTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -29,22 +30,33 @@ class RecommendTestCase(TestCase):
             "password": "123",
         }
         response = client.post("/api/signin/", request, content_type="application/json")
-        
 
         request_fail = {
             "FAIL": "John",
         }
-        response = client.put("/api/problem_set/2/recommend/", request_fail, content_type="application/json")
+        response = client.put(
+            "/api/problem_set/2/recommend/",
+            request_fail,
+            content_type="application/json",
+        )
         self.assertEqual(response.status_code, 404)
-        response = client.put("/api/problem_set/1/recommend/", request_fail, content_type="application/json")
+        response = client.put(
+            "/api/problem_set/1/recommend/",
+            request_fail,
+            content_type="application/json",
+        )
         self.assertEqual(response.status_code, 400)
 
         request_success = {
             "recommend": True,
         }
-        response = client.put("/api/problem_set/1/recommend/", request_success, content_type="application/json")
+        response = client.put(
+            "/api/problem_set/1/recommend/",
+            request_success,
+            content_type="application/json",
+        )
         self.assertEqual(response.status_code, 204)
-    
+
     def test_get_is_recommender(self):
         client = Client()
 
@@ -54,7 +66,7 @@ class RecommendTestCase(TestCase):
             "password": "123",
         }
         response = client.post("/api/signin/", request, content_type="application/json")
-        
+
         response = client.get("/api/problem_set/2/recommend/")
         self.assertEqual(response.status_code, 404)
         response = client.get("/api/problem_set/1/recommend/")
