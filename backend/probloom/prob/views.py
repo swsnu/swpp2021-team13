@@ -355,7 +355,7 @@ class ProblemSetListView(LoginRequiredMixin, View):
             "id", num_problems=Count("problems")
         ).filter(id=OuterRef("problem_set"))
         solved_query = (
-            Solved.objects.filter(result__exact=True)
+            Solved.objects.filter(result=True)
             .values("solver", problem_set=F("problem__problem_set"))
             .annotate(
                 unsolved_problems=(
