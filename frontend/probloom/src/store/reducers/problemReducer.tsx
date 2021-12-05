@@ -7,7 +7,7 @@ export interface ProblemSetState {
   problemSets: interfaces.ProblemSetInterface[];
   solvers: interfaces.Solver[];
   isRecommender: boolean;
-  selectedProblemSet: interfaces.ProblemSetInterface | null;
+  selectedProblemSet: interfaces.ProblemSetWithProblemsInterface | null;
   selectedProblem: interfaces.ProblemType | null;
 }
 
@@ -52,17 +52,18 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
       return { ...state, problemSets: remainProblemSet };
 
     case actionTypes.CREATE_PROBLEM:
-      if (state.selectedProblemSet === null) break;
+      if (state.selectedProblemSet === null) {
+        break;
+      }
       const afterCreateProblem = state.selectedProblemSet.problems;
-      afterCreateProblem.push(action.newProblemID);
-      return {
-        ...state,
-        selectedProblemSet: {
-          ...state.selectedProblemSet,
-          problems: afterCreateProblem,
+      afterCreateProblem.push(action.newProblem.id);
+      return { ...state, selectedProblemSet: {
+        ...state.selectedProblemSet,
+        problems: afterCreateProblem
         },
-      };
-
+        selectedProblem: action.newProblem,
+      }
+    
     case actionTypes.GET_PROBLEM:
       return { ...state, selectedProblem: action.selectedProblem };
 

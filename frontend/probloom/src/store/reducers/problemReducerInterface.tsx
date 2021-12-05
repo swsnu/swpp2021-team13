@@ -11,6 +11,9 @@ export interface ProblemSetInterface {
   username: string;
   solvedNum: number;
   recommendedNum: number;
+}
+
+export interface ProblemSetWithProblemsInterface extends ProblemSetInterface {
   problems: number[];
 }
 
@@ -30,7 +33,7 @@ export interface ProblemInterface {
 }
 
 export interface MultipleChoiceProblemInterface extends ProblemInterface {
-  problemType: 'multiple-choice';
+  problemType: 'multiple-choice'
   choices: string[];
   solution?: number[];
 }
@@ -44,10 +47,11 @@ export interface SubjectiveProblemInterface extends ProblemInterface {
 export interface Solver {
   userID: number;
   username: string;
+  problemID: number;
+  problemtitle: string;
   result: boolean;
-  problems: (boolean | null)[];
 }
-
+  
 export interface NewProblemSet {
   index: number;
   problem_type: string;
@@ -56,7 +60,7 @@ export interface NewProblemSet {
   solution: string;
   explanation: string;
 }
-
+  
 export interface ProblemSetCreateState {
   title: string;
   content: string;

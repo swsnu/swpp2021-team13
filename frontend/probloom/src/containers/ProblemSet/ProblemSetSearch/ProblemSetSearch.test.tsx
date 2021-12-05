@@ -29,46 +29,64 @@ const ProblemSetStateTest: ProblemSetState = {
     {
       id: 1,
       title: 'title1',
-      created_time: '2021-01-01',
-      is_open: false,
-      tag: 'tag-mathematics',
+      createdTime: '2021-01-01',
+      modifiedTime: '2021-01-02',
+      isOpen: false,
+      tag: [['math']],
       difficulty: 1,
       content: 'content1',
       userID: 1,
       username: 'user1',
-      solved_num: 1,
-      recommended_num: 1,
+      solvedNum: 1,
+      recommendedNum: 1,
+    },
+    {
+      id: 1,
+      title: 'title2',
+      createdTime: '2021-02-01',
+      modifiedTime: '2021-02-02',
+      isOpen: false,
+      tag: [['math']],
+      difficulty: 1,
+      content: 'content2',
+      userID: 1,
+      username: 'user2',
+      solvedNum: 0,
+      recommendedNum: 3,
     },
     {
       id: 2,
       title: 'title2',
-      created_time: '2021-02-02',
-      is_open: true,
-      tag: 'tag-mathematics',
-      difficulty: 2,
+      createdTime: '2021-02-01',
+      modifiedTime: '2021-02-02',
+      isOpen: false,
+      tag: [['math']],
+      difficulty: 1,
       content: 'content2',
       userID: 2,
       username: 'user2',
-      solved_num: 0,
-      recommended_num: 3,
+      solvedNum: 0,
+      recommendedNum: 3,
     },
     {
       id: 3,
       title: 'title12',
-      created_time: '1000-01-01',
-      is_open: true,
-      tag: 'tag-physics',
+      createdTime: '1000-01-01',
+      modifiedTime: '1000-01-02',
+      isOpen: true,
+      tag: [['physics']],
       difficulty: 3,
       content: 'content3',
       userID: 12,
       username: 'user12',
-      solved_num: 3,
-      recommended_num: 2,
+      solvedNum: 3,
+      recommendedNum: 2,
     },
   ],
   solvers: [],
+  isRecommender: false,
   selectedProblemSet: null,
-  selectedProblems: [],
+  selectedProblem: null,
 };
 
 const mockStore = getMockStore(UserStateTest, ProblemSetStateTest);
@@ -103,7 +121,7 @@ describe('<ProblemSetSearch />', () => {
     expect(wrapper.length).toBe(1);
     expect(spyGet).toBeCalledTimes(1);
     const wrapper2 = component.find('.ProblemSetSearchResult');
-    expect(wrapper2.length).toBe(2);
+    expect(wrapper2.length).toBe(6);
   });
 
   it('should move to ProblemSetCreate', () => {
@@ -136,7 +154,7 @@ describe('<ProblemSetSearch />', () => {
     const wrapper3 = component.find('#search');
     wrapper3.at(0).simulate('click');
     const wrapper4 = component.find('.ProblemSetSearchResult');
-    expect(wrapper4.length).toBe(2);
+    expect(wrapper4.length).toBe(4);
   });
 
   it('should search by content appropriately', () => {
@@ -165,7 +183,7 @@ describe('<ProblemSetSearch />', () => {
     expect(wrapper4.length).toBe(2);
   });
 
-  it('should search by math appropriately', () => {
+  xit('should search by math appropriately', () => {
     const component = mount(problemSetSearch);
     const wrapper2 = component.find({ label: 'Tag' });
     const wrapper2_ = wrapper2.find('DropdownItem');
@@ -180,9 +198,9 @@ describe('<ProblemSetSearch />', () => {
     const wrapper1_ = wrapper1.find('DropdownItem');
     wrapper1_.at(1).simulate('click');
     const wrapper2 = component.find('#detail');
-    expect(wrapper2.at(0).text()).toBe('title1');
-    //expect(wrapper2.at(2).text()).toBe('title1');
-    //expect(wrapper2.at(4).text()).toBe('title2');
+    expect(wrapper2.at(0).text()).toBe('title12');
+    expect(wrapper2.at(2).text()).toBe('title1');
+    expect(wrapper2.at(4).text()).toBe('title2');
   });
 
   it('should sort by recommended appropriately', () => {
@@ -191,9 +209,9 @@ describe('<ProblemSetSearch />', () => {
     const wrapper1_ = wrapper1.find('DropdownItem');
     wrapper1_.at(2).simulate('click');
     const wrapper2 = component.find('#detail');
-    expect(wrapper2.at(0).text()).toBe('title1');
-    //expect(wrapper2.at(2).text()).toBe('title1');
-    //expect(wrapper2.at(4).text()).toBe('title1');
+    expect(wrapper2.at(0).text()).toBe('title2');
+    expect(wrapper2.at(2).text()).toBe('title12');
+    expect(wrapper2.at(4).text()).toBe('title1');
   });
 
   it('should redirect to signin if not logged in', () => {
@@ -212,8 +230,9 @@ describe('<ProblemSetSearch />', () => {
     const NoProblemSetStateTest: ProblemSetState = {
       problemSets: [],
       solvers: [],
+      isRecommender: false,
       selectedProblemSet: null,
-      selectedProblems: [],
+      selectedProblem: null,
     };
     const component = mount(
       <Provider store={getMockStore(UserStateTest, NoProblemSetStateTest)}>

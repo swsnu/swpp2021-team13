@@ -236,6 +236,7 @@ class ProblemSetDetail extends Component<
         {!this.state.isProblemSetEdit && (
           <Container text>
             <ProblemSetView
+              id={this.props.match.params.id}
               creator={this.props.selectedUser.username}
               createdTime={createdTime}
               modifiedTime={modifiedTime}

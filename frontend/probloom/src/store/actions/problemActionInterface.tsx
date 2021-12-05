@@ -12,7 +12,6 @@ export interface GetProblemSetResponse {
   username: string;
   solverIDs: number[];
   recommendedNum: number;
-  problems: number[];
 }
 
 // CreateProblem
@@ -30,6 +29,7 @@ export interface CreateProblemRequestBase {
 export interface CreateMultipleChoiceProblemRequest extends CreateProblemRequestBase {
   problemType: 'multiple-choice';
   choices: string[];
+  solution: number[];
 }
 
 export interface CreateSubjectiveProblemRequest extends CreateProblemRequestBase {

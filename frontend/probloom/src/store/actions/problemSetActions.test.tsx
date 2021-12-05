@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { getAllProblemSets } from '.';
-import { ProblemSetInterface } from '../reducers/problemReducerInterface';
+import { ProblemSetInterface, ProblemSetWithProblemsInterface } from '../reducers/problemReducerInterface';
+import * as a_interfaces from './problemActionInterface';
 import store, { AppDispatch } from '../store';
 import * as actionCreators from './problemSetActions';
 
@@ -29,7 +30,6 @@ describe('Get Problem List', () => {
         username: 'creator1',
         solvedNum: 1,
         recommendedNum: 1,
-        problems: [1],
       },
       {
         id: 2,
@@ -44,7 +44,6 @@ describe('Get Problem List', () => {
         username: 'creator2',
         solvedNum: 1,
         recommendedNum: 2,
-        problems: [1],
       },
     ];
 
@@ -58,7 +57,7 @@ describe('Get Problem List', () => {
   });
 
   it('Test getProblemSet', async () => {
-    const stubProblemSet = {
+    const stubProblemSet : ProblemSetWithProblemsInterface = {
       id: 1,
       title: 'title1',
       createdTime: 'create_time1',
@@ -73,29 +72,19 @@ describe('Get Problem List', () => {
       recommendedNum: 1,
       problems: [1],
     };
-    const stubNewProblemSet = {
-      index: 4,
-      problem_type: 'stub-type',
-      problem_statement: 'stub-statement',
-      choice: ['stub-choice1', 'stub-choice2', 'stub-choice3', 'stub-choice4'],
-      solution: 'stub-solution',
-      explanation: 'stub-explanation',
-    };
 
-    spy = jest.spyOn(axios, 'get').mockImplementation(async (_) => {
+    spy = jest.spyOn(axios, 'get').mockImplementation(async () => {
       return {
         status: 200,
-        pset: stubProblemSet,
-        problems_list: [stubNewProblemSet],
+        data: stubProblemSet,
       };
     });
 
     try {
-      await dispatch(actionCreators.getProblemSet(1));
+      await dispatch(actionCreators.getProblemSet(0));
     } catch (err) {}
-
     const newState = store.getState();
-    expect(newState.problemset.problemSets[0]).toEqual(stubProblemSet);
+    expect(newState.problemset.selectedProblemSet).toEqual(stubProblemSet);
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
@@ -135,7 +124,7 @@ describe('Create & Edit ProblemSet', () => {
   });
 
   it('Test createProblemSet', async () => {
-    const stubProblemSet = {
+    const stubProblemSet : ProblemSetWithProblemsInterface = {
       id: 1,
       title: 'title1',
       createdTime: 'create_time1',
@@ -176,7 +165,7 @@ describe('Create & Edit ProblemSet', () => {
     });
 
     try {
-      dispatch(
+      await dispatch(
         actionCreators.createProblemSet(
           'stub-title',
           'stub-content',
@@ -202,7 +191,7 @@ describe('Create & Edit ProblemSet', () => {
       );
     } catch (err) {}
     const newState = store.getState();
-    expect(newState.problemset.problemSets[0]).toEqual(stubProblemSet);
+    expect(newState.problemset.problemSets.length).toEqual(3);
     expect(spy).toHaveBeenCalledTimes(1);
   });
 });
@@ -216,7 +205,7 @@ describe('Delete ProblemSet', () => {
   });
 
   it('Test updateProblemSet', async () => {
-    const stubProblemSet = {
+    const stubProblemSet : ProblemSetWithProblemsInterface = {
       id: 1,
       title: 'title1',
       createdTime: 'create_time1',
@@ -235,15 +224,15 @@ describe('Delete ProblemSet', () => {
     spy = jest.spyOn(axios, 'put').mockImplementation(async () => {
       return {
         status: 200,
-        data: 0,
+        data: stubProblemSet,
       };
     });
 
     try {
-      dispatch(actionCreators.updateProblemSet(0));
+      await dispatch(actionCreators.updateProblemSet(0));
     } catch (err) {}
     const newState = store.getState();
-    expect(newState.problemset.problemSets[0]).toEqual(stubProblemSet);
+    expect(newState.problemset.selectedProblemSet).toEqual(stubProblemSet);
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
@@ -275,7 +264,129 @@ describe('Delete ProblemSet', () => {
       dispatch(actionCreators.deleteProblemSet(0));
     } catch (err) {}
     const newState = store.getState();
-    expect(newState.problemset.problemSets[0]).toEqual(stubProblemSet);
+    expect(newState.problemset.selectedProblemSet).toEqual(stubProblemSet);
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('Problem', () => {
+  let spy: jest.SpyInstance;
+
+  afterEach(() => {
+    jest.clearAllMocks();
+    spy.mockClear();
+  });
+
+  it('Test getProblem', async () => {
+    const stubProblem : a_interfaces.GetMultipleChoiceProblemResponse = {
+      id: 1,
+      problemType: 'multiple-choice',
+      problemSetID: 1,
+      problemNumber: 1,
+      creatorID: 1,
+      createdTime: 'createdTime',
+      content: 'content',
+      solverIDs: [],
+      choices: [],
+    }
+
+    spy = jest.spyOn(axios, 'get').mockImplementation(async () => {
+      return {
+        status: 200,
+        data: stubProblem,
+      };
+    });
+
+    try {
+      await dispatch(actionCreators.getProblem(1));
+    } catch (err) {}
+    const newState = store.getState();
+    expect(newState.problemset.selectedProblem).toEqual(stubProblem);
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('Test updateProblem', async () => {
+    const stubProblem : a_interfaces.GetMultipleChoiceProblemResponse = {
+      id: 1,
+      problemType: 'multiple-choice',
+      problemSetID: 1,
+      problemNumber: 1,
+      creatorID: 1,
+      createdTime: 'createdTime',
+      content: 'stub_content',
+      solverIDs: [],
+      choices: [],
+    }
+
+    const stubUpdateMultipleChoiceProblemRequest : a_interfaces.UpdateMultipleChoiceProblemRequest = {
+      problemType: 'multiple-choice',
+      content: 'stub_content',
+      choices: []
+    }
+
+    spy = jest.spyOn(axios, 'put').mockImplementation(async () => {
+      return {
+        status: 200,
+        data: stubProblem,
+      };
+    });
+
+    try {
+      await dispatch(actionCreators.updateProblem(1, stubUpdateMultipleChoiceProblemRequest));
+    } catch (err) {}
+    const newState = store.getState();
+    expect(newState.problemset.selectedProblem).toEqual(stubProblem);
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('Test createProblem', async () => {
+    const stubProblem : a_interfaces.GetMultipleChoiceProblemResponse = {
+      id: 2,
+      problemType: 'multiple-choice',
+      problemSetID: 1,
+      problemNumber: 2,
+      creatorID: 1,
+      createdTime: 'createdTime',
+      content: 'content',
+      solverIDs: [],
+      choices: [],
+    }
+    const stubCreateProblemRequest : a_interfaces.CreateMultipleChoiceProblemRequest= {
+      problemType: 'multiple-choice',
+      problemSetID: 2,
+      problemNumber: 2,
+      content: 'stub_content',
+      choices: [],
+    }
+
+    spy = jest.spyOn(axios, 'post').mockImplementation(async () => {
+      return {
+        status: 200,
+        data: stubProblem,
+      };
+    });
+
+    try {
+      await dispatch(actionCreators.createProblem(1, stubCreateProblemRequest));
+    } catch (err) {}
+    const newState = store.getState();
+    expect(newState.problemset.selectedProblemSet?.problems).toEqual([1, 2]);
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('Test deleteProblem', async () => {
+    spy = jest.spyOn(axios, 'delete').mockImplementation(async () => {
+      return {
+        status: 200,
+      };
+    });
+
+    try {
+      await dispatch(actionCreators.deleteProblem(2));
+    } catch (err) {}
+    const newState = store.getState();
+    expect(newState.problemset.selectedProblemSet?.problems).toEqual([1]);
+    expect(newState.problemset.selectedProblem).toEqual(null);
     expect(spy).toHaveBeenCalledTimes(1);
   });
 });

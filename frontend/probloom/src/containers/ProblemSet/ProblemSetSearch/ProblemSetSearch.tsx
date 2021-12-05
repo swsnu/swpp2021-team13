@@ -113,7 +113,7 @@ class ProblemSetSearch extends Component<
         (prob) =>
           prob.userID === this.props.user?.id || this.state.creator !== 'own'
       )
-      .filter((prob) => this.state.tag === 'all') //|| prob.tag === this.state.tag)
+//      .filter((prob) => this.state.tag === 'all') //|| prob.tag === this.state.tag)
       .sort((a, b) => {
         switch (this.state.sort) {
           case 'solved':
@@ -125,10 +125,10 @@ class ProblemSetSearch extends Component<
             return b.createdTime.localeCompare(a.createdTime);
         }
       })
-      .map((prob) => {
+      .map((prob, index) => {
         return (
           <ProblemSetSearchResult
-            key={prob.id}
+            key={index}
             title={prob.title}
             date={prob.createdTime}
             creator={prob.username}

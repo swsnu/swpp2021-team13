@@ -37,11 +37,11 @@ export const getAllProblemSets: () => ThunkAction<
 
 export interface GetProblemSetAction {
   type: typeof actionTypes.GET_PROBLEMSET;
-  pset: r_interfaces.ProblemSetInterface;
+  pset: r_interfaces.ProblemSetWithProblemsInterface;
 }
 
 export const getProblemSet_: (problemSet) => GetProblemSetAction = (
-  problemSet
+  problemSet : r_interfaces.ProblemSetWithProblemsInterface
 ) => ({
   type: actionTypes.GET_PROBLEMSET,
   pset: problemSet,
@@ -50,10 +50,11 @@ export const getProblemSet_: (problemSet) => GetProblemSetAction = (
 export const getProblemSet: (
   problemSetID: number
 ) => ThunkAction<void, RootState, null, GetProblemSetAction> = (
-  problemSetID
+  problemSetID: number
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data } = await axios.get(`/api/problem_set/${problemSetID}/`);
+    const { data }: { data: r_interfaces.ProblemSetWithProblemsInterface } = 
+      await axios.get(`/api/problem_set/${problemSetID}/`);
     dispatch(getProblemSet_(data));
   };
 };
@@ -189,11 +190,11 @@ export const createProblemSet: (
 
 export interface UpdateProblemSetAction {
   type: typeof actionTypes.UPDATE_PROBLEMSET;
-  pset: r_interfaces.ProblemSetInterface;
+  pset: r_interfaces.ProblemSetWithProblemsInterface;
 }
 
 export const updateProblemSet_: (
-  problemSet: r_interfaces.ProblemSetInterface
+  problemSet: r_interfaces.ProblemSetWithProblemsInterface
 ) => UpdateProblemSetAction = (problemSet) => ({
   type: actionTypes.UPDATE_PROBLEMSET,
   pset: problemSet,
@@ -205,7 +206,7 @@ export const updateProblemSet: (
   problemSet
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data }: { data: r_interfaces.ProblemSetInterface } =
+    const { data }: { data: r_interfaces.ProblemSetWithProblemsInterface } =
       await axios.put(`/api/problem_set/${problemSet.id}/`, problemSet);
     dispatch(updateProblemSet_(data));
   };
@@ -217,10 +218,10 @@ export interface DeleteProblemSetAction {
 }
 
 export const deleteProblemSet_: (
-  problemSet: r_interfaces.ProblemSetInterface
-) => DeleteProblemSetAction = (problemSet) => ({
+  problemSetID: number
+) => DeleteProblemSetAction = (problemSetID) => ({
   type: actionTypes.DELETE_PROBLEMSET,
-  targetID: problemSet.id,
+  targetID: problemSetID,
 });
 
 export const deleteProblemSet: (
@@ -229,20 +230,21 @@ export const deleteProblemSet: (
   problemSetID
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data }: { data: r_interfaces.ProblemSetInterface } =
-      await axios.delete(`/api/problem_set/${problemSetID}/`);
-    dispatch(deleteProblemSet_(data));
+    await axios.delete(`/api/problem_set/${problemSetID}/`);
+    dispatch(deleteProblemSet_(problemSetID));
   };
 };
 
 export interface CreateProblemAction {
   type: typeof actionTypes.CREATE_PROBLEM;
-  newProblemID: number;
+  newProblem: a_interfaces.GetProblemResponse;
 }
 
-export const createProblem_: (id) => CreateProblemAction = (id) => ({
+export const createProblem_: (newProblem) => CreateProblemAction = (
+  newProblem
+) => ({
   type: actionTypes.CREATE_PROBLEM,
-  newProblemID: id,
+  newProblem: newProblem,
 });
 
 export const createProblem: (
@@ -253,11 +255,8 @@ export const createProblem: (
   problemData: a_interfaces.CreateProblemRequest
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data } = await axios.post(
-      `/api/problem_set/${ps_id}/`,
-      problemData
-    );
-    dispatch(createProblem_(data.id));
+    const { data } = await axios.post(`/api/problem_set/${ps_id}/`, problemData);
+    dispatch(createProblem_(data));
   };
 };
 
@@ -266,11 +265,11 @@ export interface GetProblemAction {
   selectedProblem: a_interfaces.GetProblemResponse;
 }
 
-export const getProblem_: (problemData) => GetProblemAction = (
-  problemData
+export const getProblem_: (problem) => GetProblemAction = (
+  problem
 ) => ({
   type: actionTypes.GET_PROBLEM,
-  selectedProblem: problemData,
+  selectedProblem: problem
 });
 
 export const getProblem: (
@@ -284,13 +283,13 @@ export const getProblem: (
 
 export const updateProblem: (
   id: number,
-  problemData: a_interfaces.UpdateProblemRequest
+  updatedProblem: a_interfaces.UpdateProblemRequest
 ) => ThunkAction<void, RootState, null, GetProblemAction> = (
   id: number,
-  problemData: a_interfaces.UpdateProblemRequest
+  updatedProblem: a_interfaces.UpdateProblemRequest
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data } = await axios.put(`/api/problem/${id}/`, problemData);
+    const { data } = await axios.put(`/api/problem/${id}/`, updatedProblem);
     dispatch(getProblem_(data));
   };
 };
@@ -310,7 +309,7 @@ export const deleteProblem: (
 ) => ThunkAction<void, RootState, null, GetProblemAction> = (id: number) => {
   return async (dispatch: AppDispatch) => {
     await axios.delete(`/api/problem/${id}/`);
-    dispatch(getProblem_(id));
+    dispatch(deleteProblem_(id));
   };
 };
 
