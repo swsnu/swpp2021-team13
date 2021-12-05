@@ -52,6 +52,7 @@ class SolvedTestCase(TestCase):
             creator_id=cls.turing.pk,
         )
         cls.problem1_1 = MultipleChoiceProblem.objects.create(
+            pk=1,
             problem_set=cls.problem_set1,
             number=1,
             content=Content.objects.create(text="This is problem 1-1."),
@@ -59,6 +60,7 @@ class SolvedTestCase(TestCase):
             solution="",
         )
         cls.problem1_2 = MultipleChoiceProblem.objects.create(
+            pk=2,
             problem_set=cls.problem_set1,
             number=2,
             content=Content.objects.create(text="This is problem 1-2."),
@@ -75,6 +77,7 @@ class SolvedTestCase(TestCase):
             creator_id=cls.meitner.pk,
         )
         cls.problem2_1 = MultipleChoiceProblem.objects.create(
+            pk=3,
             problem_set=cls.problem_set2,
             number=1,
             content=Content.objects.create(text="This is problem 2-1."),
@@ -82,6 +85,7 @@ class SolvedTestCase(TestCase):
             solution="",
         )
         cls.problem2_2 = MultipleChoiceProblem.objects.create(
+            pk=4,
             problem_set=cls.problem_set2,
             number=2,
             content=Content.objects.create(text="This is problem 2-2."),
@@ -120,6 +124,31 @@ class SolvedTestCase(TestCase):
         self.assertEqual(response_json[0]["solvedNum"], 1)
         self.assertEqual(response_json[1]["id"], 2)
         self.assertEqual(response_json[1]["solvedNum"], 0)
+
+    def test_problem_set_info_get(self):
+        test_cases = [
+            {"ps_id": 1, "solvedNum": 1},
+            {"ps_id": 2, "solvedNum": 0},
+        ]
+        for test_case in test_cases:
+            with self.subTest(**test_case):
+                response = self.client.get(f"/api/problem_set/{test_case['ps_id']}/")
+                self.assertEqual(response.status_code, http.HTTPStatus.OK)
+                response_json = response.json()
+                self.assertEqual(response_json["solvedNum"], test_case["solvedNum"])
+
+    def test_problem_info_get(self):
+        test_cases = [
+            {"p_id": 1, "solverIDs": [1, 2]},
+            {"p_id": 3, "solverIDs": [1]},
+            {"p_id": 4, "solverIDs": []},
+        ]
+        for test_case in test_cases:
+            with self.subTest(**test_case):
+                response = self.client.get(f"/api/problem/{test_case['p_id']}/")
+                self.assertEqual(response.status_code, http.HTTPStatus.OK)
+                response_json = response.json()
+                self.assertEqual(response_json["solverIDs"], test_case["solverIDs"])
 
     def test_login_required(self):
         paths = [
