@@ -259,7 +259,7 @@ export const deleteProblem: (
   id: number,
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data } = await axios.delete(`/api/problem/${id}/`);
+    await axios.delete(`/api/problem/${id}/`);
     dispatch(deleteProblem_(id));
   };
 };
