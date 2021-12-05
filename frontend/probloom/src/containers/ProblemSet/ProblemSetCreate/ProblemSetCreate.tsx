@@ -78,13 +78,13 @@ class ProblemSetCreate extends Component<Props, State> {
   }
 
   addProblemHandler = (index: number) => {
-    let newProblem: CreateProblemType = {
+    let newProblem: CreateMultipleChoiceProblemInterface = {
       problemType: 'multiple-choice',
       problemSetID: 0,
       problemNumber: index,
       content: 'problem here...',
       choices: ['', '', '', ''],
-      solutions: [],
+      solution: [],
     };
 
     this.setState({
@@ -141,13 +141,13 @@ class ProblemSetCreate extends Component<Props, State> {
                 problemNumber: _currentProblem.problemNumber,
                 content: event.target.value,
                 choices: _currentProblem.choices,
-                solutions: currentProblem.solutions,
+                solution: _currentProblem.solution,
               };
             } else {
               let _currentProblem =
                 currentProblem as CreateSubjectiveProblemInterface;
               editProblem = {
-                problemType: 'subjective',
+                problemType: _currentProblem.problemType,
                 problemSetID: _currentProblem.problemSetID,
                 problemNumber: _currentProblem.problemNumber,
                 content: event.target.value,
@@ -172,6 +172,7 @@ class ProblemSetCreate extends Component<Props, State> {
         />
       );
     };
+
     let tabContentImage = (currentProblem, index: number) => {
       return (
         <>
@@ -180,24 +181,37 @@ class ProblemSetCreate extends Component<Props, State> {
             type="file"
             accept="image/*"
             onChange={(event) => {
-              // console.log('************ index : ', index);
-
               if (!event.target.files) {
                 return;
               }
               const file = event.target.files[0];
-              // console.log(event.target.files[0]);
 
               const reader = new FileReader();
               reader.onloadend = () => {
-                const editProblem: CreateProblemType = {
-                  problemType: currentProblem.problemType,
-                  problemSetID: currentProblem.problemSetID,
-                  problemNumber: currentProblem.problemNumber,
-                  content: reader.result as string,
-                  choices: currentProblem.choices,
-                  solutions: currentProblem.solutions,
-                };
+                let editProblem: CreateProblemType;
+                if (currentProblem.problemType === 'multiple-choice') {
+                  let _currentProblem =
+                    currentProblem as CreateMultipleChoiceProblemInterface;
+                  editProblem = {
+                    problemType: _currentProblem.problemType,
+                    problemSetID: _currentProblem.problemSetID,
+                    problemNumber: _currentProblem.problemNumber,
+                    content: reader.result as string,
+                    choices: _currentProblem.choices,
+                    solution: _currentProblem.solution,
+                  };
+                } else {
+                  let _currentProblem =
+                    currentProblem as CreateSubjectiveProblemInterface;
+                  editProblem = {
+                    problemType: _currentProblem.problemType,
+                    problemSetID: _currentProblem.problemSetID,
+                    problemNumber: _currentProblem.problemNumber,
+                    content: reader.result as string,
+                    solutions: _currentProblem.solutions,
+                  };
+                }
+
                 const newProblem: CreateProblemType[] = [];
                 this.state.problems.forEach((problem) => {
                   if (problem.problemNumber === index) {
@@ -236,9 +250,10 @@ class ProblemSetCreate extends Component<Props, State> {
     ) => {
       return (
         <>
-          <label>choice {order}</label>
-          <input
-            id={`problemset-choice${order}-input`}
+          <Form.Field
+            id={`problem-choice${order}-input`}
+            label={`choice ${order}`}
+            control="input"
             placeholder={`choice ${order} here...`}
             onChange={(event) => {
               const editChoice = event.target.value;
@@ -253,13 +268,13 @@ class ProblemSetCreate extends Component<Props, State> {
                 }
               });
 
-              const editProblem: CreateProblemType = {
+              const editProblem: CreateMultipleChoiceProblemInterface = {
                 problemType: _currentProblem.problemType,
                 problemSetID: _currentProblem.problemSetID,
                 problemNumber: _currentProblem.problemNumber,
                 content: _currentProblem.content,
                 choices: newChoice,
-                solutions: _currentProblem.solutions,
+                solution: _currentProblem.solution,
               };
 
               const newProblem: CreateProblemType[] = [];
@@ -276,7 +291,7 @@ class ProblemSetCreate extends Component<Props, State> {
                 problems: newProblem,
               });
             }}
-          ></input>
+          ></Form.Field>
         </>
       );
     };
@@ -295,15 +310,15 @@ class ProblemSetCreate extends Component<Props, State> {
           onChange={() => {
             let _currentProblem =
               currentProblem as CreateMultipleChoiceProblemInterface;
-            let newSolutions;
-            if (_currentProblem.solutions.includes(order)) {
-              let arr = _currentProblem.solutions.filter(
+            let newSolution;
+            if (_currentProblem.solution.includes(order)) {
+              let arr = _currentProblem.solution.filter(
                 (element) => element !== order
               );
-              newSolutions = [...Array.from(new Set([...arr]))];
+              newSolution = [...Array.from(new Set([...arr]))];
             } else {
-              newSolutions = [
-                ...Array.from(new Set([..._currentProblem.solutions, order])),
+              newSolution = [
+                ...Array.from(new Set([..._currentProblem.solution, order])),
               ];
             }
             const editProblem: CreateProblemType = {
@@ -312,7 +327,7 @@ class ProblemSetCreate extends Component<Props, State> {
               problemNumber: _currentProblem.problemNumber,
               content: _currentProblem.content,
               choices: _currentProblem.choices,
-              solutions: newSolutions,
+              solution: newSolution,
             };
 
             const newProblem: CreateProblemType[] = [];
@@ -345,23 +360,25 @@ class ProblemSetCreate extends Component<Props, State> {
 
             <div className="ProblemContent">
               <Tab
+                id="asdfg"
                 panes={[
                   {
-                    menuItem: `Make content in TEXT`,
+                    menuItem: `Make content`,
                     render: () => (
-                      <Tab.Pane>
+                      <Tab.Pane id="qwerty">
                         {(() => tabContentText(currentProblem, index))()}
-                      </Tab.Pane>
-                    ),
-                  },
-                  {
-                    menuItem: `Make content in IMAGE`,
-                    render: () => (
-                      <Tab.Pane>
                         {(() => tabContentImage(currentProblem, index))()}
                       </Tab.Pane>
                     ),
                   },
+                  // {
+                  //   menuItem: `Make content in IMAGE`,
+                  //   render: () => (
+                  //     <Tab.Pane id="qwerty2">
+                  //       {(() => tabContentImage(currentProblem, index))()}
+                  //     </Tab.Pane>
+                  //   ),
+                  // },
                 ]}
               />
             </div>
@@ -373,27 +390,27 @@ class ProblemSetCreate extends Component<Props, State> {
               label="Type"
               defaultValue="multiple-choice"
               onChange={(_, { value }) => {
+                // Always change type
                 let editProblem: any;
+
                 if (value === 'multiple-choice') {
-                  let _currentProblem =
-                    currentProblem as CreateMultipleChoiceProblemInterface;
+                  // 1. from subjective to multiple-choice
                   editProblem = {
                     problemType: value,
-                    problemSetID: _currentProblem.problemSetID,
-                    problemNumber: _currentProblem.problemNumber,
-                    content: _currentProblem.content,
-                    choices: _currentProblem.choices,
-                    solutions: currentProblem.solutions,
+                    problemSetID: currentProblem.problemSetID,
+                    problemNumber: currentProblem.problemNumber,
+                    content: currentProblem.content,
+                    choices: ['', '', '', ''], // initialize with empty list
+                    solution: [], // initialize with empty list
                   };
                 } else {
-                  let _currentProblem =
-                    currentProblem as CreateSubjectiveProblemInterface;
+                  // 2. from multiple-choice to subjective
                   editProblem = {
                     problemType: value,
-                    problemSetID: _currentProblem.problemSetID,
-                    problemNumber: _currentProblem.problemNumber,
-                    content: _currentProblem.content,
-                    solutions: _currentProblem.solutions,
+                    problemSetID: currentProblem.problemSetID,
+                    problemNumber: currentProblem.problemNumber,
+                    content: currentProblem.content,
+                    solutions: [], // initialize with empty list
                   };
                 }
 
@@ -443,50 +460,47 @@ class ProblemSetCreate extends Component<Props, State> {
 
             {currentProblem.problemType === 'subjective' && (
               <div>
-                <Form>
-                  <Form.Field>
-                    <label>Subjective problem answer</label>
-                    <input
-                      id="subjective-problem-answer-input"
-                      placeholder="Write your answer here..."
-                      onChange={(event) => {
-                        const editAnswer = event.target.value;
-                        const newAnswer: string[] = [];
-                        let _currentProblem =
-                          currentProblem as CreateSubjectiveProblemInterface;
-                        _currentProblem.solutions.forEach((solution, index) => {
-                          if (index === 0) {
-                            newAnswer.push(editAnswer);
-                          } else {
-                            newAnswer.push(solution + '');
-                          }
-                        });
+                <Form.Field
+                  id="subjective-problem-answer-input"
+                  label="Subjective problem answer"
+                  control="input"
+                  placeholder="Write your answer here..."
+                  onChange={(event) => {
+                    const editAnswer: string = event.target.value;
+                    // const newAnswer: string[] = [];
+                    let _currentProblem =
+                      currentProblem as CreateSubjectiveProblemInterface;
+                    // _currentProblem.solutions.forEach((solution, index) => {
+                    //   if (index === 0) {
+                    //     newAnswer.push(editAnswer);
+                    //   } else {
+                    //     newAnswer.push(solution + '');
+                    //   }
+                    // });
 
-                        const editProblem: CreateProblemType = {
-                          problemType: _currentProblem.problemType,
-                          problemSetID: _currentProblem.problemSetID,
-                          problemNumber: _currentProblem.problemNumber,
-                          content: _currentProblem.content,
-                          solutions: newAnswer,
-                        };
+                    const editProblem: CreateProblemType = {
+                      problemType: _currentProblem.problemType,
+                      problemSetID: _currentProblem.problemSetID,
+                      problemNumber: _currentProblem.problemNumber,
+                      content: _currentProblem.content,
+                      solutions: [editAnswer],
+                    };
 
-                        const newProblem: CreateProblemType[] = [];
-                        this.state.problems.forEach((problem) => {
-                          if (problem.problemNumber === index) {
-                            newProblem.push(editProblem);
-                          } else {
-                            newProblem.push(problem);
-                          }
-                        });
+                    const newProblem: CreateProblemType[] = [];
+                    this.state.problems.forEach((problem) => {
+                      if (problem.problemNumber === index) {
+                        newProblem.push(editProblem);
+                      } else {
+                        newProblem.push(problem);
+                      }
+                    });
 
-                        this.setState({
-                          ...this.state,
-                          problems: newProblem,
-                        });
-                      }}
-                    />
-                  </Form.Field>
-                </Form>
+                    this.setState({
+                      ...this.state,
+                      problems: newProblem,
+                    });
+                  }}
+                />
               </div>
             )}
 
@@ -507,7 +521,7 @@ class ProblemSetCreate extends Component<Props, State> {
     // console.log('this.state.tag', this.state.tag);
     // console.log('this.state.difficulty', this.state.difficulty);
     // console.log('this.state.content', this.state.content);
-    console.log('this.state.problems', this.state.problems);
+    // console.log('this.state.problems', this.state.problems);
     // ------------ Just for debugging messages -----------------
 
     return (
@@ -526,17 +540,15 @@ class ProblemSetCreate extends Component<Props, State> {
           <Divider />
 
           <Form>
-            <Form.Field className="Title">
-              <label>Problem Set Title</label>
-              <Input
-                id="input-title"
-                placeholder="Title"
-                value={this.state.title}
-                onChange={(event) => {
-                  this.setState({ title: event.target.value });
-                }}
-              />
-            </Form.Field>
+            <Form.Field
+              id="input-title"
+              label="Problem Set Title"
+              placeholder="Title"
+              control="input"
+              onChange={(event) => {
+                this.setState({ title: event.target.value });
+              }}
+            ></Form.Field>
 
             <Form.TextArea
               id="input-content-text"

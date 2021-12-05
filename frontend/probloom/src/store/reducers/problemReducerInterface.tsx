@@ -77,7 +77,7 @@ export interface CreateMultipleChoiceProblemInterface
   extends CreateProblemInterface {
   problemType: 'multiple-choice';
   choices: string[];
-  solutions: number[];
+  solution: number[];
 }
 
 export interface CreateSubjectiveProblemInterface
@@ -85,23 +85,3 @@ export interface CreateSubjectiveProblemInterface
   problemType: 'subjective';
   solutions: string[];
 }
-
-// <------------ Deprecated : will be removed later
-export interface NewProblemSet {
-  index: number;
-  problem_type: string;
-  problem_statement: string;
-  choice: string[];
-  solution: string;
-}
-
-export interface ProblemSetCreateState {
-  title: string;
-  content: string;
-  scope: string;
-  tag: string;
-  difficulty: string;
-  problems: NewProblemSet[];
-  numberOfProblems: number;
-}
-// Deprecated : will be removed later ------------>
