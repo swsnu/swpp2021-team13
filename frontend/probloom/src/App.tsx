@@ -12,7 +12,6 @@ import AppHeader from './containers/AppHeader/AppHeader';
 import ProblemSetCreate from './containers/ProblemSet/ProblemSetCreate/ProblemSetCreate';
 import ProblemSetDetail from './containers/ProblemSet/ProblemSetDetail/ProblemSetDetail';
 import ProblemSetEdit from './containers/ProblemSet/ProblemSetEdit/ProblemSetEdit';
-import ProblemSetExplanationDetail from './containers/ProblemSet/ProblemSetExplanation/ProblemSetExplanationDetail';
 import ProblemSetSearch from './containers/ProblemSet/ProblemSetSearch/ProblemSetSearch';
 import ProblemSetSolve from './containers/ProblemSet/ProblemSetSolve/ProblemSetSolve';
 import Profile from './containers/Profile/Profile';
@@ -63,11 +62,6 @@ class App extends Component<AppProps> {
               component={ProblemSetSolve}
             />
             <Route path="/problem/:id/edit/" exact component={ProblemSetEdit} />
-            <Route
-              path="/problem/:id/explanation/"
-              exact
-              component={ProblemSetExplanationDetail}
-            />
             <Route component={NotFound} />
           </Switch>
           <Footer />

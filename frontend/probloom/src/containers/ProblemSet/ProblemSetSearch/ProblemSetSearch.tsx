@@ -117,7 +117,7 @@ class ProblemSetSearch extends Component<
       .sort((a, b) => {
         switch (this.state.sort) {
           case 'solved':
-            return b.solverIDs.length - a.solverIDs.length;
+            return b.solvedNum - a.solvedNum;
           case 'recommended':
             return b.recommendedNum - a.recommendedNum;
           case 'date':

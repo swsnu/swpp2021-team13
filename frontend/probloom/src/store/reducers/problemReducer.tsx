@@ -6,6 +6,7 @@ import * as interfaces from './problemReducerInterface';
 export interface ProblemSetState {
   problemSets: interfaces.ProblemSetInterface[];
   solvers: interfaces.Solver[];
+  isRecommender: boolean;
   selectedProblemSet: interfaces.ProblemSetInterface | null;
   selectedProblem: interfaces.ProblemType | null;
 }
@@ -13,6 +14,7 @@ export interface ProblemSetState {
 const initialState: ProblemSetState = {
   problemSets: [],
   solvers: [],
+  isRecommender: false,
   selectedProblemSet: null,
   selectedProblem: null,
 };
@@ -30,6 +32,9 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
       };
     case actionTypes.GET_ALL_SOLVER_OF_PROBLEMSET:
       return { ...state, solvers: action.solvers };
+    case actionTypes.GET_IS_RECOMMENDER:
+    case actionTypes.UPDATE_RECOMMEND:
+      return { ...state, isRecommender: action.isRecommender };
     case actionTypes.CREATE_PROBLEM_SET:
       return {
         ...state,
@@ -47,26 +52,35 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
       return { ...state, problemSets: remainProblemSet };
 
     case actionTypes.CREATE_PROBLEM:
-      if (state.selectedProblemSet == null) break;
-      const afterCreateProblem = state.selectedProblemSet.problems
+      if (state.selectedProblemSet === null) break;
+      const afterCreateProblem = state.selectedProblemSet.problems;
       afterCreateProblem.push(action.newProblemID);
-      return { ...state, selectedProblemSet: {
-        ...state.selectedProblemSet,
-        problems: afterCreateProblem
-      }}
-    
+      return {
+        ...state,
+        selectedProblemSet: {
+          ...state.selectedProblemSet,
+          problems: afterCreateProblem,
+        },
+      };
+
     case actionTypes.GET_PROBLEM:
-      return { ...state, selectedProblem: action.selectedProblem }
+      return { ...state, selectedProblem: action.selectedProblem };
 
     case actionTypes.DELETE_PROBLEM:
-      if (state.selectedProblemSet == null) break;
+      if (state.selectedProblemSet === null) break;
       const afterDeleteProblem = state.selectedProblemSet.problems;
-      afterDeleteProblem.splice(afterDeleteProblem.indexOf(action.targetProblemID), 1);
+      afterDeleteProblem.splice(
+        afterDeleteProblem.indexOf(action.targetProblemID),
+        1
+      );
       return {
-        ...state, 
-        selectedProblemSet: { ...state.selectedProblemSet, problems: afterDeleteProblem },
-        selectedProblem: null
-      }
+        ...state,
+        selectedProblemSet: {
+          ...state.selectedProblemSet,
+          problems: afterDeleteProblem,
+        },
+        selectedProblem: null,
+      };
 
     default:
       break;
