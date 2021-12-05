@@ -6,13 +6,15 @@ import * as interfaces from './problemReducerInterface';
 export interface ProblemSetState {
   problemSets: interfaces.ProblemSetInterface[];
   solvers: interfaces.Solver[];
-  selectedProblemSet: interfaces.ProblemSetInterface | null;
+  isRecommender: boolean;
+  selectedProblemSet: interfaces.ProblemSetWithProblemsInterface | null;
   selectedProblem: interfaces.ProblemType | null;
 }
 
 const initialState: ProblemSetState = {
   problemSets: [],
   solvers: [],
+  isRecommender: false,
   selectedProblemSet: null,
   selectedProblem: null,
 };
@@ -30,6 +32,9 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
       };
     case actionTypes.GET_ALL_SOLVER_OF_PROBLEMSET:
       return { ...state, solvers: action.solvers };
+    case actionTypes.GET_IS_RECOMMENDER:
+    case actionTypes.UPDATE_RECOMMEND:
+      return { ...state, isRecommender: action.isRecommender };
     case actionTypes.CREATE_PROBLEM_SET:
       return {
         ...state,
@@ -60,19 +65,23 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
       }
     
     case actionTypes.GET_PROBLEM:
-      return { ...state, selectedProblem: action.selectedProblem }
+      return { ...state, selectedProblem: action.selectedProblem };
 
     case actionTypes.DELETE_PROBLEM:
-      if (state.selectedProblemSet === null) {
-        break;
-      }
-      const afterDeleteProblem = state.selectedProblemSet.problems
-        .filter((problemID) => problemID !== action.targetProblemID);
+      if (state.selectedProblemSet === null) break;
+      const afterDeleteProblem = state.selectedProblemSet.problems;
+      afterDeleteProblem.splice(
+        afterDeleteProblem.indexOf(action.targetProblemID),
+        1
+      );
       return {
-        ...state, 
-        selectedProblemSet: { ...state.selectedProblemSet, problems: afterDeleteProblem },
-        selectedProblem: null
-      }
+        ...state,
+        selectedProblemSet: {
+          ...state.selectedProblemSet,
+          problems: afterDeleteProblem,
+        },
+        selectedProblem: null,
+      };
 
     default:
       break;

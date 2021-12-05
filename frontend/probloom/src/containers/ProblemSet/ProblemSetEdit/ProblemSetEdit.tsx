@@ -5,7 +5,8 @@ import { RouteComponentProps } from 'react-router';
 import { NavLink } from 'react-router-dom';
 
 import * as actionCreators from '../../../store/actions';
-import * as interfaces from '../../../store/actions/problemActionInterface';
+import * as r_interfaces from '../../../store/reducers/problemReducerInterface';
+import * as a_interfaces from '../../../store/actions/problemActionInterface';
 import MultipleChoiceProblemForm from '../../../components/ProblemForm/MultipleChoiceProblemForm';
 import SubjectiveProblemForm from '../../../components/ProblemForm/SubjectiveProblemForm';
 
@@ -20,19 +21,19 @@ interface ProblemSetEditProps {
 }
 
 interface StateFromProps {
-  selectedProblemSet: interfaces.GetProblemSetResponse;
-  selectedProblem: interfaces.GetProblemResponse;
+  selectedProblemSet: r_interfaces.ProblemSetWithProblemsInterface;
+  selectedProblem: r_interfaces.ProblemType;
 }
 
 interface DispatchFromProps {
-  onCreateProblem: (id: number, problemData: interfaces.CreateProblemRequest) => void;
+  onCreateProblem: (id: number, problemData: a_interfaces.CreateProblemRequest) => void;
   onGetProblem: (id: number) => void;
-  onUpdateProblem: (id: number, problemData: interfaces.UpdateProblemRequest) => void;
+  onUpdateProblem: (id: number, problemData: a_interfaces.UpdateProblemRequest) => void;
   onDeleteProblem: (id: number) => void;
 }
 
 interface ProblemSetEditState {
-  editingProblem: interfaces.GetProblemResponse | null;
+  editingProblem: r_interfaces.ProblemType | null;
 }
 
 type Props = ProblemSetEditProps &
@@ -59,7 +60,7 @@ class ProblemSetEdit extends Component<Props, State> {
       content: 'new problem',
     }
     if (type === "multiple-choice") {
-      const newMultipleChoiceProblem : interfaces.CreateMultipleChoiceProblemRequest= {
+      const newMultipleChoiceProblem : a_interfaces.CreateMultipleChoiceProblemRequest= {
         ...newProblem, problemType: "multiple-choice", choices: []
       }
       this.props.onCreateProblem(
@@ -67,7 +68,7 @@ class ProblemSetEdit extends Component<Props, State> {
         newMultipleChoiceProblem
       );
     } else {
-      const newSubjectiveProblem : interfaces.CreateSubjectiveProblemRequest= {
+      const newSubjectiveProblem : a_interfaces.CreateSubjectiveProblemRequest= {
         ...newProblem, problemType: "subjective", solutions: []
       }
       this.props.onCreateProblem(
@@ -190,13 +191,13 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    onCreateProblem: (id: number, problem: interfaces.CreateProblemRequest) => {
+    onCreateProblem: (id: number, problem: a_interfaces.CreateProblemRequest) => {
       dispatch(actionCreators.createProblem(id, problem)); 
     },
     onGetProblem: (id: number) => {
       dispatch(actionCreators.getProblem(id)); 
     },
-    onUpdateProblem: (id: number, problem: interfaces.UpdateProblemRequest) => {
+    onUpdateProblem: (id: number, problem: a_interfaces.UpdateProblemRequest) => {
       dispatch(actionCreators.updateProblem(id, problem)); 
     },
     onDeleteProblem: (id: number) => {

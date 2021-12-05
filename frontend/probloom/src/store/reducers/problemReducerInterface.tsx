@@ -9,8 +9,11 @@ export interface ProblemSetInterface {
   content: string;
   userID: number;
   username: string;
-  solverIDs: number[];
+  solvedNum: number;
   recommendedNum: number;
+}
+
+export interface ProblemSetWithProblemsInterface extends ProblemSetInterface {
   problems: number[];
 }
 

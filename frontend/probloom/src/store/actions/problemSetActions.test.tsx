@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { getAllProblemSets } from '.';
-import { ProblemSetInterface } from '../reducers/problemReducerInterface';
+import { ProblemSetInterface, ProblemSetWithProblemsInterface } from '../reducers/problemReducerInterface';
 import * as a_interfaces from './problemActionInterface';
 import store, { AppDispatch } from '../store';
 import * as actionCreators from './problemSetActions';
@@ -28,9 +28,8 @@ describe('Get Problem List', () => {
         content: 'content1',
         userID: 1,
         username: 'creator1',
-        solverIDs: [1],
+        solvedNum: 1,
         recommendedNum: 1,
-        problems: [1],
       },
       {
         id: 2,
@@ -43,9 +42,8 @@ describe('Get Problem List', () => {
         content: 'content2',
         userID: 2,
         username: 'creator2',
-        solverIDs: [2],
+        solvedNum: 1,
         recommendedNum: 2,
-        problems: [1],
       },
     ];
 
@@ -59,7 +57,7 @@ describe('Get Problem List', () => {
   });
 
   it('Test getProblemSet', async () => {
-    const stubProblemSet = {
+    const stubProblemSet : ProblemSetWithProblemsInterface = {
       id: 1,
       title: 'title1',
       createdTime: 'create_time1',
@@ -70,24 +68,23 @@ describe('Get Problem List', () => {
       content: 'content1',
       userID: 1,
       username: 'creator1',
-      solverIDs: [1],
+      solvedNum: 1,
       recommendedNum: 1,
       problems: [1],
     };
 
-    spy = jest.spyOn(axios, 'get').mockImplementation(async (_) => {
+    spy = jest.spyOn(axios, 'get').mockImplementation(async () => {
       return {
         status: 200,
-        pset: stubProblemSet,
+        data: stubProblemSet,
       };
     });
 
     try {
-      await dispatch(actionCreators.getProblemSet(1));
+      await dispatch(actionCreators.getProblemSet(0));
     } catch (err) {}
-
     const newState = store.getState();
-    expect(newState.problemset.problemSets[0]).toEqual(stubProblemSet);
+    expect(newState.problemset.selectedProblemSet).toEqual(stubProblemSet);
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
@@ -114,7 +111,7 @@ describe('Get Problem List', () => {
 
     expect(newState.problemset.solvers[0]).toEqual(stubSolver);
     expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenCalledWith('/api/solved/0/');
+    expect(spy).toHaveBeenCalledWith('/api/problem_set/0/solvers/');
   });
 });
 
@@ -127,7 +124,7 @@ describe('Create & Edit ProblemSet', () => {
   });
 
   it('Test createProblemSet', async () => {
-    const stubProblemSet = {
+    const stubProblemSet : ProblemSetWithProblemsInterface = {
       id: 1,
       title: 'title1',
       createdTime: 'create_time1',
@@ -138,7 +135,7 @@ describe('Create & Edit ProblemSet', () => {
       content: 'content1',
       userID: 1,
       username: 'creator1',
-      solverIDs: [1],
+      solvedNum: 1,
       recommendedNum: 1,
       problems: [1],
     };
@@ -168,7 +165,7 @@ describe('Create & Edit ProblemSet', () => {
     });
 
     try {
-      dispatch(
+      await dispatch(
         actionCreators.createProblemSet(
           'stub-title',
           'stub-content',
@@ -194,7 +191,7 @@ describe('Create & Edit ProblemSet', () => {
       );
     } catch (err) {}
     const newState = store.getState();
-    expect(newState.problemset.problemSets[0]).toEqual(stubProblemSet);
+    expect(newState.problemset.problemSets.length).toEqual(3);
     expect(spy).toHaveBeenCalledTimes(1);
   });
 });
@@ -208,7 +205,7 @@ describe('Delete ProblemSet', () => {
   });
 
   it('Test updateProblemSet', async () => {
-    const stubProblemSet = {
+    const stubProblemSet : ProblemSetWithProblemsInterface = {
       id: 1,
       title: 'title1',
       createdTime: 'create_time1',
@@ -219,7 +216,7 @@ describe('Delete ProblemSet', () => {
       content: 'content1',
       userID: 1,
       username: 'creator1',
-      solverIDs: [1],
+      solvedNum: 1,
       recommendedNum: 1,
       problems: [1],
     };
@@ -232,10 +229,10 @@ describe('Delete ProblemSet', () => {
     });
 
     try {
-      dispatch(actionCreators.updateProblemSet(0));
+      await dispatch(actionCreators.updateProblemSet(0));
     } catch (err) {}
     const newState = store.getState();
-    expect(newState.problemset.problemSets[0]).toEqual(stubProblemSet);
+    expect(newState.problemset.selectedProblemSet).toEqual(stubProblemSet);
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
@@ -251,7 +248,7 @@ describe('Delete ProblemSet', () => {
       content: 'content1',
       userID: 1,
       username: 'creator1',
-      solverIDs: [1],
+      solvedNum: 1,
       recommendedNum: 1,
       problems: [1],
     };
@@ -267,7 +264,7 @@ describe('Delete ProblemSet', () => {
       dispatch(actionCreators.deleteProblemSet(0));
     } catch (err) {}
     const newState = store.getState();
-    expect(newState.problemset.problemSets[0]).toEqual(stubProblemSet);
+    expect(newState.problemset.selectedProblemSet).toEqual(stubProblemSet);
     expect(spy).toHaveBeenCalledTimes(1);
   });
 });

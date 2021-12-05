@@ -27,6 +27,7 @@ const defaultUserState = {
 const defaultProblemSetState = {
   problemSets: [],
   solvers: [],
+  isRecommender: false,
   selectedProblemSet: null,
   selectedProblem: null,
 };

@@ -11,6 +11,8 @@ export {
   getAllProblemSets,
   getProblemSet,
   getAllSolvers,
+  getIsRecommender,
+  updateRecommend,
   createProblemSet,
   deleteProblemSet,
   createProblem,

@@ -12,7 +12,6 @@ export interface GetProblemSetResponse {
   username: string;
   solverIDs: number[];
   recommendedNum: number;
-  problems: number[];
 }
 
 // CreateProblem

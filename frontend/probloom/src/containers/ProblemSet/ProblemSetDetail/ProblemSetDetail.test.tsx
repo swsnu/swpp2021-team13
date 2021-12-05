@@ -8,9 +8,9 @@ import * as problemActions from '../../../store/actions/problemSetActions';
 import * as commentActions from '../../../store/actions/commentActions';
 import {
   Solver,
-  ProblemSet,
-  ProblemSetState,
-} from '../../../store/reducers/problemReducer';
+  ProblemSetInterface,
+} from '../../../store/reducers/problemReducerInterface';
+import { ProblemSetState } from '../../../store/reducers/problemReducer';
 import { Comment, CommentState } from '../../../store/reducers/commentReducer';
 import ProblemSetDetail from './ProblemSetDetail';
 import { history } from '../../../store/store';
@@ -40,12 +40,11 @@ const UserStateTest: UserState = {
 const solver1: Solver = {
   userID: 1,
   username: 'user1',
-  problemID: 1,
-  problemtitle: 'title1',
   result: true,
+  problems: [null],
 };
 
-const problemSet1: ProblemSet = {
+const problemSet1: ProblemSetInterface = {
   id: 1,
   title: 'title1',
   createdTime: '2021-01-01',
@@ -56,7 +55,7 @@ const problemSet1: ProblemSet = {
   content: 'content1',
   userID: 1,
   username: 'user1',
-  solverIDs: [1],
+  solvedNum: 1,
   recommendedNum: 1,
   problems: [1],
 };
@@ -64,8 +63,9 @@ const problemSet1: ProblemSet = {
 const ProblemSetStateTest: ProblemSetState = {
   problemSets: [problemSet1],
   solvers: [solver1],
+  isRecommender: false,
   selectedProblemSet: problemSet1,
-  selectedProblems: [],
+  selectedProblem: null,
 };
 
 const comment1: Comment = {
@@ -93,6 +93,8 @@ describe('<ProblemSetDetail />', () => {
   let spyGetProblemSet,
     spyGetComments,
     spyGetSolvers,
+    spyGetIsRecommender,
+    spyUpdateRecommend,
     spyDeleteProblemSet,
     spyUpdateProblemSet,
     spyCreateComment,
@@ -129,6 +131,16 @@ describe('<ProblemSetDetail />', () => {
       .mockImplementation((problemID: number) => {
         return (dispatch) => {};
       });
+    spyGetIsRecommender = jest
+      .spyOn(problemActions, 'getIsRecommender')
+      .mockImplementation((problemID: number) => {
+        return (dispatch) => {};
+      });
+    spyUpdateRecommend = jest
+      .spyOn(problemActions, 'updateRecommend')
+      .mockImplementation((problemID: number) => {
+        return (dispatch) => {};
+      });
     spyGetComments = jest
       .spyOn(commentActions, 'getCommentsOfProblemSet')
       .mockImplementation((problemID: number) => {
@@ -162,6 +174,7 @@ describe('<ProblemSetDetail />', () => {
     expect(spyGetProblemSet).toBeCalledTimes(1);
     expect(spyGetComments).toBeCalledTimes(1);
     expect(spyGetSolvers).toBeCalledTimes(1);
+    expect(spyGetIsRecommender).toBeCalledTimes(1);
     history.push('/');
   });
 
@@ -169,8 +182,9 @@ describe('<ProblemSetDetail />', () => {
     const ProblemSetStateTest: ProblemSetState = {
       problemSets: [problemSet1],
       solvers: [solver1],
+      isRecommender: false,
       selectedProblemSet: null,
-      selectedProblems: [],
+      selectedProblem: null,
     };
     const mockStore = getMockStore(
       UserStateTest,
@@ -254,7 +268,7 @@ describe('<ProblemSetDetail />', () => {
   });
 
   it('other cases: is_open===true and difficulty is not defined', () => {
-    const problemSet1: ProblemSet = {
+    const problemSet1: ProblemSetInterface = {
       id: 1,
       title: 'title1',
       createdTime: '2021-01-01',
@@ -265,15 +279,16 @@ describe('<ProblemSetDetail />', () => {
       content: 'content1',
       userID: 1,
       username: 'user1',
-      solverIDs: [1],
+      solvedNum: 1,
       recommendedNum: 1,
       problems: [1],
     };
     const ProblemSetStateTest: ProblemSetState = {
       problemSets: [problemSet1],
       solvers: [solver1],
+      isRecommender: false,
       selectedProblemSet: problemSet1,
-      selectedProblems: [],
+      selectedProblem: null,
     };
     const mockStore = getMockStore(
       UserStateTest,
@@ -328,10 +343,11 @@ describe('<ProblemSetDetail />', () => {
     history.push('/');
   });
 
-  it('click explanation problem set button', () => {
+  it('click recommendation button', () => {
     const component = mount(problemSetDetail);
-    const wrapper = component.find('button.explanationButton');
+    const wrapper = component.find('button.recommendationButton');
     wrapper.simulate('click');
+    expect(spyUpdateRecommend).toBeCalledTimes(1);
     history.push('/');
   });
 
