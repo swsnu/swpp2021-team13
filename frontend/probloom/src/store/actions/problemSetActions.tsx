@@ -92,6 +92,57 @@ export const getAllSolvers: (
   };
 };
 
+export interface GetIsRecommenderAction {
+  type: typeof actionTypes.GET_IS_RECOMMENDER;
+  isRecommender: boolean;
+}
+
+export const getIsRecommender_: (
+  isRecommender: boolean
+) => GetIsRecommenderAction = (isRecommender) => ({
+  type: actionTypes.GET_IS_RECOMMENDER,
+  isRecommender: isRecommender,
+});
+
+export const getIsRecommender: (
+  problemSetID: number
+) => ThunkAction<void, RootState, null, GetIsRecommenderAction> = (
+  problemSetID
+) => {
+  return async (dispatch: AppDispatch) => {
+    const { data } = await axios.get(
+      `/api/problem_set/${problemSetID}/recommend/`
+    );
+    dispatch(getIsRecommender_(data));
+  };
+};
+
+export interface UpdateRecommendAction {
+  type: typeof actionTypes.UPDATE_RECOMMEND;
+  isRecommender: boolean;
+}
+
+export const updateRecommend_: (data: any) => UpdateRecommendAction = (
+  isRecommender
+) => ({
+  type: actionTypes.UPDATE_RECOMMEND,
+  isRecommender: true,
+});
+
+export const updateRecommend: (
+  problemSetID: number
+) => ThunkAction<void, RootState, null, UpdateRecommendAction> = (
+  problemSetID
+) => {
+  return async (dispatch: AppDispatch) => {
+    const { data } = await axios.put(
+      `/api/problem_set/${problemSetID}/recommend/`,
+      { recommend: true }
+    );
+    dispatch(updateRecommend_(data));
+  };
+};
+
 export interface CreateProblemSetAction {
   type: typeof actionTypes.CREATE_PROBLEM_SET;
   problemSet: r_interfaces.ProblemSetInterface;
@@ -135,6 +186,7 @@ export const createProblemSet: (
     dispatch(push(`/problem/${data.id}/detail/`));
   };
 };
+
 export interface UpdateProblemSetAction {
   type: typeof actionTypes.UPDATE_PROBLEMSET;
   pset: r_interfaces.ProblemSetInterface;
@@ -266,6 +318,8 @@ export type ProblemSetAction =
   | GetAllProblemSetsAction
   | GetProblemSetAction
   | GetAllSolversAction
+  | GetIsRecommenderAction
+  | UpdateRecommendAction
   | CreateProblemSetAction
   | UpdateProblemSetAction
   | DeleteProblemSetAction

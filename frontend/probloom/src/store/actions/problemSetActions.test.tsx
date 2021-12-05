@@ -27,7 +27,7 @@ describe('Get Problem List', () => {
         content: 'content1',
         userID: 1,
         username: 'creator1',
-        solverIDs: [1],
+        solvedNum: 1,
         recommendedNum: 1,
         problems: [1],
       },
@@ -42,7 +42,7 @@ describe('Get Problem List', () => {
         content: 'content2',
         userID: 2,
         username: 'creator2',
-        solverIDs: [2],
+        solvedNum: 1,
         recommendedNum: 2,
         problems: [1],
       },
@@ -69,7 +69,7 @@ describe('Get Problem List', () => {
       content: 'content1',
       userID: 1,
       username: 'creator1',
-      solverIDs: [1],
+      solvedNum: 1,
       recommendedNum: 1,
       problems: [1],
     };
@@ -122,7 +122,7 @@ describe('Get Problem List', () => {
 
     expect(newState.problemset.solvers[0]).toEqual(stubSolver);
     expect(spy).toHaveBeenCalledTimes(1);
-    expect(spy).toHaveBeenCalledWith('/api/solved/0/');
+    expect(spy).toHaveBeenCalledWith('/api/problem_set/0/solvers/');
   });
 });
 
@@ -146,7 +146,7 @@ describe('Create & Edit ProblemSet', () => {
       content: 'content1',
       userID: 1,
       username: 'creator1',
-      solverIDs: [1],
+      solvedNum: 1,
       recommendedNum: 1,
       problems: [1],
     };
@@ -227,7 +227,7 @@ describe('Delete ProblemSet', () => {
       content: 'content1',
       userID: 1,
       username: 'creator1',
-      solverIDs: [1],
+      solvedNum: 1,
       recommendedNum: 1,
       problems: [1],
     };
@@ -259,7 +259,7 @@ describe('Delete ProblemSet', () => {
       content: 'content1',
       userID: 1,
       username: 'creator1',
-      solverIDs: [1],
+      solvedNum: 1,
       recommendedNum: 1,
       problems: [1],
     };

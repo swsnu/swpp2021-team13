@@ -8,6 +8,7 @@ describe('Problem Reducer', () => {
     const stubInitialState = {
       problemSets: [],
       solvers: [],
+      isRecommender: false,
       selectedProblemSet: null,
       selectedProblem: null,
     };
@@ -27,7 +28,7 @@ describe('Problem Reducer', () => {
       content: 'content1',
       userID: 1,
       username: 'creator1',
-      solverIDs: [1],
+      solvedNum: 1,
       recommendedNum: 1,
       problems: [1],
     };
@@ -42,7 +43,7 @@ describe('Problem Reducer', () => {
       content: 'content2',
       userID: 2,
       username: 'creator2',
-      solverIDs: [1, 2],
+      solvedNum: 1,
       recommendedNum: 2,
       problems: [2],
     };
@@ -58,6 +59,7 @@ describe('Problem Reducer', () => {
       problemSets: problemSets,
       selectedProblemSet: null,
       solvers: [],
+      isRecommender: false,
       selectedProblem: null,
     });
   });

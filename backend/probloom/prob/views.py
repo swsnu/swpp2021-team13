@@ -766,7 +766,7 @@ class ProblemSetRecommendView(LoginRequiredMixin, View):
             return HttpResponseNotFound()
 
         user = User.objects.get(pk=request.user.pk)
-        res = {"isRecommender": problem_set.recommenders.filter(user=user).exists()}
+        res = problem_set.recommenders.filter(user=user).exists()
 
         return JsonResponse(res, safe=False)
 

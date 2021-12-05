@@ -24,6 +24,8 @@ import {
   updateComment,
   deleteComment,
   updateProblemSet,
+  getIsRecommender,
+  updateRecommend,
 } from '../../../store/actions';
 import { tagOptions } from '../ProblemSetSearch/ProblemSetSearch';
 import {
@@ -77,6 +79,7 @@ class ProblemSetDetail extends Component<
     this.props.onGetProblemSet(parseInt(this.props.match.params.id));
     this.props.onGetCommentsOfProblemSet(parseInt(this.props.match.params.id));
     this.props.onGetAllSolvers(parseInt(this.props.match.params.id));
+    this.props.onGetIsRecommender(parseInt(this.props.match.params.id));
 
     if (this.props.selectedProblemSet) {
       this.setState({
@@ -181,6 +184,10 @@ class ProblemSetDetail extends Component<
     this.props.onGetCommentsOfProblemSet(parseInt(this.props.match.params.id));
   };
 
+  onClickRecommendationButton = () => {
+    this.props.onUpdateRecommend(parseInt(this.props.match.params.id));
+  };
+
   formatTime = (text: string) => {
     let timeList = text.split(/T|\./);
     let timeText = timeList[0] + '\u00A0\u00A0' + timeList[1];
@@ -195,7 +202,6 @@ class ProblemSetDetail extends Component<
 
     let isCreator = false;
     let isSolver = false;
-    let isRecommender = false;
     let tag = '';
     let difficulty = '';
     let createdTime = '';
@@ -207,6 +213,7 @@ class ProblemSetDetail extends Component<
       const solver = this.props.solvers.find(
         (element: Solver) => element.userID === selectedUserID
       );
+
       isSolver = solver !== undefined;
 
       //tag = this.props.selectedProblemSet.tag.split('-')[1];
@@ -236,9 +243,10 @@ class ProblemSetDetail extends Component<
               scope={this.props.selectedProblemSet.isOpen}
               tag={tag}
               recommendedNum={this.props.selectedProblemSet.recommendedNum}
-              solvedNum={0} //{this.props.selectedProblemSet.solverIDs.length}
+              solvedNum={this.props.selectedProblemSet.solvedNum}
               isCreator={isCreator}
               isSolver={isSolver}
+              isRecommender={this.props.isRecommender}
               title={this.props.selectedProblemSet.title}
               content={this.props.selectedProblemSet.content}
               onClickBackButton={() => this.onClickBackButton()}
@@ -250,6 +258,9 @@ class ProblemSetDetail extends Component<
                 this.onClickDeleteProblemButton()
               }
               onClickSolveProblemButton={() => this.onClickSolveProblemButton()}
+              onClickRecommendationButton={() =>
+                this.onClickRecommendationButton()
+              }
             />
             <Comment.Group className="Comment">
               <Header as="h3" dividing>
@@ -402,6 +413,7 @@ const mapStateToProps = (state: RootState) => {
   return {
     selectedUser: state.user.selectedUser,
     selectedProblemSet: state.problemset.selectedProblemSet,
+    isRecommender: state.problemset.isRecommender,
     solvers: state.problemset.solvers,
     comments: state.comment.comments,
     selectedComment: state.comment.selectedComment,
@@ -416,6 +428,10 @@ const mapDispatchToProps = (dispatch: AppDispatch) => {
       dispatch(getProblemSet(problemSetID)),
     onGetAllSolvers: (problemSetID: number) =>
       dispatch(getAllSolvers(problemSetID)),
+    onGetIsRecommender: (problemSetID: number) =>
+      dispatch(getIsRecommender(problemSetID)),
+    onUpdateRecommend: (problemSetID: number) =>
+      dispatch(updateRecommend(problemSetID)),
     onUpdateProblemSet: (problemSet: any) =>
       dispatch(updateProblemSet(problemSet)),
     onDeleteProblemSet: (problemSetID: number) =>

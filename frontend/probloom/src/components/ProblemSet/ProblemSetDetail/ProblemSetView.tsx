@@ -38,13 +38,13 @@ const ProblemSetView = (props) => {
             >
               Solve Problems
             </Button>
-            {(props.isCreator || props.isSolver) && (
+            {!props.isRecommender && (props.isCreator || props.isSolver) && (
               <Button
                 secondary
-                className="explanationButton"
-                onClick={() => props.onClickExplanationButton()}
+                className="recommendationButton"
+                onClick={() => props.onClickRecommendationButton()}
               >
-                Explanations
+                Recommendation
               </Button>
             )}
           </Grid.Column>
