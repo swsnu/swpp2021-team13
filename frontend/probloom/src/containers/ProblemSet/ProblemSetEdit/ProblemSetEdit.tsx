@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { returntypeof } from 'react-redux-typescript';
 import { RouteComponentProps } from 'react-router';
 import { NavLink } from 'react-router-dom';
+import { Container, Button, Header } from 'semantic-ui-react';
 
 import * as actionCreators from '../../../store/actions';
 import * as r_interfaces from '../../../store/reducers/problemReducerInterface';
@@ -49,9 +50,9 @@ class ProblemSetEdit extends Component<Props, State> {
     this.props.onDeleteProblem(this.props.selectedProblem.id)
   }
 
-  onClickProblemNumberButton = (number: number) => {
-    this.props.onGetProblem(this.props.selectedProblemSet.problems[number]);
-    this.setState({ editingProblem: this.props.selectedProblem })
+  onClickProblemNumberButton = async (number: number) => {
+    await this.props.onGetProblem(this.props.selectedProblemSet.problems[number]);
+    this.setState({ editingProblem: this.props.selectedProblem });
   }
 
   onClickNewProblemButton = (type: "multiple-choice" | "subjective") => {
@@ -61,7 +62,7 @@ class ProblemSetEdit extends Component<Props, State> {
     }
     if (type === "multiple-choice") {
       const newMultipleChoiceProblem : a_interfaces.CreateMultipleChoiceProblemRequest= {
-        ...newProblem, problemType: "multiple-choice", choices: []
+        ...newProblem, problemType: "multiple-choice", choices: [], solution: []
       }
       this.props.onCreateProblem(
         Number(this.props.match.params.id), 
@@ -125,12 +126,14 @@ class ProblemSetEdit extends Component<Props, State> {
   render() {
     const problemNumberButtons = this.props.selectedProblemSet.problems
       .map((_, index) => (
-        <button
+        <Button
           key={index}
-          id={`problemsetedit-p${index}`}
+          primary
+          size="tiny"
+          className={`${index}Button`}
           onClick={() => this.onClickProblemNumberButton(index)}>
           {index}
-        </button>
+        </Button>
       ));
 
     let currentProblem;
@@ -140,8 +143,14 @@ class ProblemSetEdit extends Component<Props, State> {
       const editingProblem : any = this.state.editingProblem;
       currentProblem = 
       <div>
-        <button id="problemsetedit-delete"
-          onClick={() => this.onClickDeleteButton()}>Delete</button>
+        <Button
+          primary
+          size="small"
+          className="Delete"
+          onClick={() => this.onClickDeleteButton()}
+        >
+          Delete
+        </Button>
         {editingProblem.problemType === 'multiple-choice' ?
           <MultipleChoiceProblemForm 
             problem={this.state.editingProblem}
@@ -152,31 +161,51 @@ class ProblemSetEdit extends Component<Props, State> {
             editContent={this.editProblemHandler}
           />
         }
-        <button id="problemsetedit-save" 
-          onClick={() => this.onClickSaveButton()}>Save</button>
+        <Button 
+          primary
+          size="small"
+          className="SaveButton" 
+          onClick={() => this.onClickSaveButton()}
+        >
+          Save
+        </Button>
       </div>
     }
 
     return (
       <div className="ProblemSetEdit">
-        <h1>ProblemSetEdit Page</h1>
+        <Container>
+          <Header as="h1">ProblemSetEdit Page</Header>
 
-        <NavLink
-          id="problemsetedit-back"
-          to={`/problem/${this.props.match.params.id}/detail/`}
-        >
-          Back to problem set search
-        </NavLink>
+          <NavLink
+            id="problemsetedit-back"
+            to={`/problem/${this.props.match.params.id}/detail/`}
+          >
+            Back to problem set detail
+          </NavLink>
 
-        <div>
-          <button id="problemsetedit-newmcp"
-            onClick={() => this.onClickNewProblemButton("multiple-choice")} />
-          <button id="problemsetedit-newsp"
-            onClick={() => this.onClickNewProblemButton("subjective")} />
-        </div>
+          <div>
+            <Button 
+              primary
+              size="small"
+              className="NewMCPButton"
+              onClick={() => this.onClickNewProblemButton("multiple-choice")}
+            >
+              new multiple choice problem
+            </Button>
+            <Button 
+              primary
+              size="small"
+              className="NewSPButton"
+              onClick={() => this.onClickNewProblemButton("subjective")}
+            >
+              new subjective problem
+            </Button>
+          </div>
 
-        {problemNumberButtons}
-        {currentProblem}
+          {problemNumberButtons}
+          {currentProblem}
+        </Container>
       </div>
     );
   }
