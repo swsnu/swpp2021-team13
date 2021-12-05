@@ -3,7 +3,7 @@ from typing import Any, Dict, Mapping, Optional
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import BadRequest
+from django.core.exceptions import BadRequest, ObjectDoesNotExist
 from django.db.models import (
     BooleanField,
     CharField,
@@ -18,7 +18,9 @@ from django.db.models import (
     TextField,
     UUIDField,
 )
+from django.db.models.aggregates import Count
 from django.db.models.deletion import CASCADE, RESTRICT, SET
+from django.db.models.expressions import F, OuterRef, Subquery
 from polymorphic.models import PolymorphicModel
 
 
@@ -150,6 +152,25 @@ class ProblemSet(Model):
 
     def info_dict(self):
         recommended_num = self.recommenders.all().count()
+        num_problems_query = ProblemSet.objects.values(
+            "id", num_problems=Count("problems")
+        ).filter(id=OuterRef("problem_set"))
+        try:
+            solved_num = (
+                Solved.objects.filter(result=True)
+                .values("solver", problem_set=F("problem__problem_set"))
+                .annotate(
+                    unsolved_problems=(
+                        Subquery(num_problems_query.values("num_problems"))
+                        - Count("problem_set")
+                    )
+                )
+                .filter(unsolved_problems__lte=0)
+                .values("problem_set", solved_num=Count("solver", distinct=True))
+                .get(problem_set=self.pk)["solved_num"]
+            )
+        except ObjectDoesNotExist:
+            solved_num = 0
         return {
             "id": self.pk,
             "title": self.title,
@@ -161,7 +182,7 @@ class ProblemSet(Model):
             "content": self.description,
             "userID": self.creator.user.pk,
             "username": self.creator.user.username,
-            "solvedNum": 0,
+            "solvedNum": solved_num,
             "recommendedNum": recommended_num,
         }
 
@@ -250,6 +271,8 @@ class Problem(PolymorphicModel):
     )
 
     def info_dict(self, with_solution=True):
+        solver_query = Solved.objects.filter(problem_id=self.pk).values("solver")
+        solver_ids = list(map(lambda record: record["solver"], solver_query))
         return {
             "id": self.pk,
             "problemType": "",
@@ -258,7 +281,7 @@ class Problem(PolymorphicModel):
             "creatorID": self.creator.pk,
             "createdTime": self.created_time,
             "content": self.content.text,
-            "solverIDs": [],  ## TODO
+            "solverIDs": solver_ids,
         }
 
 
