@@ -337,6 +337,9 @@ class ProblemSetListView(LoginRequiredMixin, View):
              recommendedNum: number;
            }
 
+        ``solvedNum`` equals the number of users who solved all problems in the
+        problem set correctly.
+
         Each entry of ``tag`` consists of list of paths to each tag. For
         example, if the problem set has tags 'Statistics' and 'Mathematics' and
         both tags are children of 'Science' tag, the tag entry will be as
@@ -546,12 +549,14 @@ class ProblemSetInfoView(LoginRequiredMixin, View):
              content: string;
              userID: number;
              username: string;
-             solverIDs: number[];
+             solvedNum: number;
              recommendedNum: number;
              problems: GetProblemResponse[];
            }
 
-        where ``GetProblemResponse`` is defined in :meth:`ProblemInfoView.get`.
+        where ``solvedNum`` equals the number of users who solved all problems
+        in the problem set correctly, and ``GetProblemResponse`` is defined in
+        :meth:`ProblemInfoView.get`.
 
         If a problem set with id ``ps_id`` does not exist, respond with ``404 (Not Found)``.
         """
@@ -1030,6 +1035,9 @@ class ProblemInfoView(LoginRequiredMixin, View):
              problemType: 'subjective';
              solutions?: string[];
            }
+
+        ``solverIDs`` equals the id of users who solved the problem (regardless
+        of the correctness of the solution).
 
         ``solution`` field of ``GetMultipleChoiceProblemResponse`` and
         ``solutions`` field of ``GetSubjectiveProblemResponse`` are available
