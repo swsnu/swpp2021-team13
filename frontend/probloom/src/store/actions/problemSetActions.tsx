@@ -175,7 +175,7 @@ export const createProblemSet: (
 ) => {
   return async (dispatch: AppDispatch) => {
     const { data }: { data: r_interfaces.ProblemSetInterface } =
-      await axios.post(`/api/problem/`, {
+      await axios.post(`/api/problem_set/`, {
         title: title,
         scope: scope,
         tag: tag,

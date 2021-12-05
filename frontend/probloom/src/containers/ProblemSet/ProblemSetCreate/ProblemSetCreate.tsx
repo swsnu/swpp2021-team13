@@ -49,7 +49,7 @@ export const scopeOptions = [
   { text: 'Public', value: 'scope-public' },
 ];
 
-const difficultyOptions = [
+export const difficultyOptions = [
   { key: 1, text: 'Everyone', value: 1 },
   { key: 2, text: 'Elementary School', value: 2 },
   { key: 3, text: 'Middle School', value: 3 },
