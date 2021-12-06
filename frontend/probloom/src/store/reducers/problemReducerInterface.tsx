@@ -43,13 +43,11 @@ export interface SubjectiveProblemInterface extends ProblemInterface {
   solutions?: string[];
 }
 
-// to modify
 export interface Solver {
   userID: number;
   username: string;
-  problemID: number;
-  problemtitle: string;
   result: boolean;
+  problems: (boolean | null)[];
 }
 
 // ----------------------- ProblemSetCreate -----------------------

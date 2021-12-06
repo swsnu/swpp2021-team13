@@ -112,7 +112,19 @@ class ProblemSetDetail extends Component<
   };
 
   onClickEditProblemSetButton = () => {
-    this.setState({ isProblemSetEdit: true });
+    this.setState({
+      ...this.state,
+      editProblemSetTitle: this.props.selectedProblemSet!.title,
+      editProblemSetDescription: this.props.selectedProblemSet!.content,
+      editProblemSetScope: this.props.selectedProblemSet!.isOpen
+        ? 'scope-public'
+        : 'scope-private',
+      editProblemSetDifficulty: String(
+        this.props.selectedProblemSet!.difficulty
+      ),
+      isProblemSetEdit: true,
+      //editProblemSetTag: this.props.selectedProblemSet.tag
+    });
   };
 
   onClickConfirmProblemSetEditButton = () => {

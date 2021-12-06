@@ -149,7 +149,6 @@ class ProblemSetCreate extends Component<Props, State> {
                 solution: _currentProblem.solution,
               };
             } else {
-              console.log('test1');
               let _currentProblem =
                 currentProblem as CreateSubjectiveProblemInterface;
               editProblem = {
