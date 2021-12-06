@@ -41,7 +41,7 @@ interface DispatchFromProps {
 
 interface ProblemSetEditState {
   editingProblem: r_interfaces.ProblemType | null;
-  update: boolean;
+  needUpdate: boolean;
 }
 
 type Props = ProblemSetEditProps &
@@ -51,16 +51,25 @@ type Props = ProblemSetEditProps &
 type State = ProblemSetEditState;
 
 class ProblemSetEdit extends Component<Props, State> {
-  state = { editingProblem: null, update: false };
+  state = { editingProblem: null, needUpdate: false };
+
+  componentDidUpdate() {
+    if (this.props.selectedProblem && this.state.needUpdate) {
+      this.setState({
+        editingProblem: this.props.selectedProblem,
+        needUpdate: false,
+      });
+    }
+  }
 
   onClickDeleteButton = () => {
     this.props.onDeleteProblem(this.props.selectedProblem.id);
-    this.setState({ editingProblem: null })
+    this.setState({ editingProblem: null });
   };
 
   onClickProblemNumberButton = (number: number) => {
     this.props.onGetProblem(this.props.selectedProblemSet.problems[number]);
-    this.setState({ update: true });
+    this.setState({ needUpdate: true });
   }
 
   onClickNewProblemButton = (type: 'multiple-choice' | 'subjective') => {
@@ -142,7 +151,7 @@ class ProblemSetEdit extends Component<Props, State> {
       updateProblem['solutions'] = currentProblem.solutions;
     }
     this.props.onUpdateProblem(currentProblem.id, updateProblem);
-    this.setState({ editingProblem: null, update: false });
+    this.setState({ editingProblem: null });
   };
 
   render() {
@@ -159,9 +168,7 @@ class ProblemSetEdit extends Component<Props, State> {
         </Button>
       )
     );
-    if (this.state.update && this.props.selectedProblem) {
-      this.setState({ editingProblem: this.props.selectedProblem, update: false });
-    }
+
     let currentProblem;
     if (this.state.editingProblem == null) {
       currentProblem = null;

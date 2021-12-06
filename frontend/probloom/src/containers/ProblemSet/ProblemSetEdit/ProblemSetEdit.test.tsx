@@ -76,7 +76,7 @@ const ProblemSetStateTest1: ProblemSetState = {
 };
 
 const ProblemSetStateTest2: ProblemSetState = {
-  problemSets: [problemSet],
+  problemSets: [],
   solvers: [],
   isRecommender: false,
   selectedProblemSet: problemSet,
@@ -193,10 +193,8 @@ describe('<ProblemSetEdit />', () => {
   it('change mcp textarea', () => {
     const component = mount(problemEdit1);
     const problemNumberButton = component
-      .find('.P0Button').at(1);
+      .find('.P0Button').at(0);
     problemNumberButton.simulate('click');
-    const t = component.find('.MutipleChoiceProblemForm');
-    console.log(component.debug())
     const problemContent = component
       .find('.MCPTextarea').at(0);
     problemContent.simulate('change', { target: { value: 'modified' } });
