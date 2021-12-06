@@ -56,19 +56,11 @@ class ProblemSetEdit extends Component<Props, State> {
     this.props.onDeleteProblem(this.props.selectedProblem.id);
   };
 
-<<<<<<< HEAD
   onClickProblemNumberButton = (number: number) => {
     this.props.onGetProblem(this.props.selectedProblemSet.problems[number]);
-    this.setState({ editingProblem: this.props.selectedProblem })
-  }
-=======
-  onClickProblemNumberButton = async (number: number) => {
-    await this.props.onGetProblem(
-      this.props.selectedProblemSet.problems[number]
-    );
+    setTimeout(function() {}, 500);
     this.setState({ editingProblem: this.props.selectedProblem });
-  };
->>>>>>> 8a9c986f6cbb67a1d850d0487cfeb738321034e2
+  }
 
   onClickNewProblemButton = (type: 'multiple-choice' | 'subjective') => {
     const newProblem = {
@@ -151,18 +143,11 @@ class ProblemSetEdit extends Component<Props, State> {
         <Button
           key={index}
           primary
-<<<<<<< HEAD
           size="mini"
           className={`P${index}Button`}
-          onClick={() => this.onClickProblemNumberButton(index)}>
-          {index+1}
-=======
-          size="tiny"
-          className={`${index}Button`}
           onClick={() => this.onClickProblemNumberButton(index)}
         >
-          {index}
->>>>>>> 8a9c986f6cbb67a1d850d0487cfeb738321034e2
+          {index+1}
         </Button>
       )
     );
@@ -171,45 +156,13 @@ class ProblemSetEdit extends Component<Props, State> {
     if (this.state.editingProblem == null) {
       currentProblem = null;
     } else {
-<<<<<<< HEAD
-      const editingProblem : any = this.state.editingProblem;
-      currentProblem = 
-      <div>
-        <Button
-          primary
-          size="small"
-          className="DeleteButton"
-          onClick={() => this.onClickDeleteButton()}
-        >
-          Delete
-        </Button>
-        {editingProblem.problemType === 'multiple-choice' ?
-          <MultipleChoiceProblemForm 
-            problem={this.state.editingProblem}
-            editContent={this.editProblemHandler}
-          />
-        : <SubjectiveProblemForm
-            problem={this.state.editingProblem}
-            editContent={this.editProblemHandler}
-          />
-        }
-        <Button 
-          primary
-          size="small"
-          className="SaveButton" 
-          onClick={() => this.onClickSaveButton()}
-        >
-          Save
-        </Button>
-      </div>
-=======
       const editingProblem: any = this.state.editingProblem;
       currentProblem = (
         <div>
           <Button
             primary
             size="small"
-            className="Delete"
+            className="DeleteButton"
             onClick={() => this.onClickDeleteButton()}
           >
             Delete
@@ -235,7 +188,6 @@ class ProblemSetEdit extends Component<Props, State> {
           </Button>
         </div>
       );
->>>>>>> 8a9c986f6cbb67a1d850d0487cfeb738321034e2
     }
 
     return (

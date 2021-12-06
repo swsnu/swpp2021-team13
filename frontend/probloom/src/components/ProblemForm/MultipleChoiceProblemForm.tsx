@@ -1,6 +1,6 @@
 import Choice from './Choice';
 import { GetMultipleChoiceProblemResponse } from '../../store/actions/problemActionInterface';
-import { Button, Form } from 'semantic-ui-react';
+import { Button, TextArea } from 'semantic-ui-react';
 
 interface MultipleChoiceProblemFormProps {
   problem: GetMultipleChoiceProblemResponse;
@@ -21,7 +21,7 @@ const MultipleChoiceProblemForm = (props: MultipleChoiceProblemFormProps) => {
   ));
   return (
     <div className="MultipleChoiceProblemForm">
-      <Form.TextArea
+      <TextArea
         className="MCPTextarea"
         rows={4}
         placeholder="content"

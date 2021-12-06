@@ -1,6 +1,6 @@
 import Solution from './Solution'
 import { GetSubjectiveProblemResponse } from '../../store/actions/problemActionInterface'
-import { Button, Form } from 'semantic-ui-react';
+import { Button, TextArea } from 'semantic-ui-react';
 
 interface SubjectiveProblemFormProps {
   problem: GetSubjectiveProblemResponse;
@@ -24,7 +24,7 @@ const SubjectiveProblemForm = (props: SubjectiveProblemFormProps) => {
 
   return (
     <div className="SubjectiveProblemForm">
-      <Form.TextArea
+      <TextArea
         className='SPTextarea'
         rows={4}
         placeholder="Content"

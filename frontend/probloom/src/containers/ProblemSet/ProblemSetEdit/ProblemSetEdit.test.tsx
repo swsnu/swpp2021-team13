@@ -218,7 +218,7 @@ describe('<ProblemSetEdit />', () => {
       .find('.P0Button').at(0);
     problemNumberButton.simulate('click');
     const problemContent = component
-      .find('.Choice1 .ChoiceInput').at(0);
+      .find('.Choice1 .ChoiceInput input').at(0);
     problemContent.simulate('change', { target: { value: 'modified' } });
   })
 
@@ -229,6 +229,7 @@ describe('<ProblemSetEdit />', () => {
     problemNumberButton.simulate('click');
     const problemContent1 = component
       .find('.Choice1 .ChoiceCheckbox').at(0);
+    problemContent1.simulate('change');
     problemContent1.simulate('change');
     const problemContent2 = component
       .find('.Choice2 .ChoiceCheckbox').at(0);
@@ -261,7 +262,7 @@ describe('<ProblemSetEdit />', () => {
       .find('.P0Button').at(0);
     problemNumberButton.simulate('click');
     const problemContent = component
-      .find('.SolutionInput').at(0);
+      .find('.Solution1 .SolutionInput input').at(0);
     problemContent.simulate('change', { target: { value: 'modified' } });
   })
 

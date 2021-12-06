@@ -1,4 +1,4 @@
-import { Form } from "semantic-ui-react";
+import { Input } from "semantic-ui-react";
 
 export interface SolutionProps {
   index: number;
@@ -14,7 +14,7 @@ export interface SolutionProps {
     return (
       <div className={`Solution${props.index}`} >
         <label>{`solution ${props.index}`}</label>
-        <Form.Input
+        <Input
           className="SolutionInput"
           placeholdeer="solution content"
           value={`${props.solution}`}
