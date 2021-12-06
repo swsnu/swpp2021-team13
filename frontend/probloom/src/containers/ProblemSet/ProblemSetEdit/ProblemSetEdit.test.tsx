@@ -234,7 +234,7 @@ describe('<ProblemSetEdit />', () => {
     problemContent2.simulate('change');
   })
 
-  it('add solution', () => {
+  it('delete choice', () => {
     const component = mount(problemEdit1);
     const problemNumberButton = component
       .find('.P0Button').at(0);
@@ -274,7 +274,7 @@ describe('<ProblemSetEdit />', () => {
     problemContent.simulate('change', { target: { value: 'modified' } });
   })
 
-  it('add solution', () => {
+  it('delete solution', () => {
     const component = mount(problemEdit2);
     const problemNumberButton = component
       .find('.P0Button').at(0);
