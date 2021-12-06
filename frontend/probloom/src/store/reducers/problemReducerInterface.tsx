@@ -33,7 +33,7 @@ export interface ProblemInterface {
 }
 
 export interface MultipleChoiceProblemInterface extends ProblemInterface {
-  problemType: 'multiple-choice'
+  problemType: 'multiple-choice';
   choices: string[];
   solution?: number[];
 }
@@ -51,22 +51,37 @@ export interface Solver {
   problemtitle: string;
   result: boolean;
 }
-  
-export interface NewProblemSet {
-  index: number;
-  problem_type: string;
-  problem_statement: string;
-  choice: string[];
-  solution: string;
-  explanation: string;
-}
-  
-export interface ProblemSetCreateState {
+
+// ----------------------- ProblemSetCreate -----------------------
+export interface CreateProblemSetRequest {
   title: string;
-  content: string;
   scope: string;
-  tag: string;
-  difficulty: string;
-  problems: NewProblemSet[];
-  numberOfProblems: number;
+  tag: string[];
+  difficulty: number;
+  content: string;
+  problems: CreateProblemType[];
+}
+
+export type CreateProblemType =
+  | CreateMultipleChoiceProblemInterface
+  | CreateSubjectiveProblemInterface;
+
+export interface CreateProblemInterface {
+  problemType: string;
+  problemSetID: number;
+  problemNumber: number;
+  content: string;
+}
+
+export interface CreateMultipleChoiceProblemInterface
+  extends CreateProblemInterface {
+  problemType: 'multiple-choice';
+  choices: string[];
+  solution: number[];
+}
+
+export interface CreateSubjectiveProblemInterface
+  extends CreateProblemInterface {
+  problemType: 'subjective';
+  solutions: string[];
 }

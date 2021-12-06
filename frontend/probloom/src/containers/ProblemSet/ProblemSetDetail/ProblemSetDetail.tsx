@@ -27,7 +27,7 @@ import {
   getIsRecommender,
   updateRecommend,
 } from '../../../store/actions';
-import { tagOptions } from '../ProblemSetSearch/ProblemSetSearch';
+import { tagOptions1 } from '../ProblemSetSearch/ProblemSetSearch';
 import {
   scopeOptions,
   difficultyOptions,
@@ -372,7 +372,7 @@ class ProblemSetDetail extends Component<
                   <Form.Dropdown
                     className="Tag"
                     item
-                    options={tagOptions}
+                    options={tagOptions1}
                     label="Tag"
                     //defaultValue={this.state.editProblemSetTag}
                     onChange={(_, { value }) => {
