@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import { returntypeof } from 'react-redux-typescript';
-import { RouteComponentProps } from 'react-router';
+import { Redirect, RouteComponentProps } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import { Container, Button, Header } from 'semantic-ui-react';
 
@@ -10,6 +10,7 @@ import * as r_interfaces from '../../../store/reducers/problemReducerInterface';
 import * as a_interfaces from '../../../store/actions/problemActionInterface';
 import MultipleChoiceProblemForm from '../../../components/ProblemForm/MultipleChoiceProblemForm';
 import SubjectiveProblemForm from '../../../components/ProblemForm/SubjectiveProblemForm';
+import { User } from '../../../store/reducers/userReducer';
 
 interface MatchParams {
   id: string;
@@ -24,6 +25,7 @@ interface ProblemSetEditProps {
 interface StateFromProps {
   selectedProblemSet: r_interfaces.ProblemSetWithProblemsInterface;
   selectedProblem: r_interfaces.ProblemType;
+  selectedUser: User
 }
 
 interface DispatchFromProps {
@@ -155,6 +157,10 @@ class ProblemSetEdit extends Component<Props, State> {
   };
 
   render() {
+    if (!this.props.selectedUser) {
+      return <Redirect to="/" />;
+    }
+
     const problemNumberButtons = this.props.selectedProblemSet.problems.map(
       (_, index) => (
         <Button
@@ -249,6 +255,7 @@ const mapStateToProps = (state: any) => {
   return {
     selectedProblemSet: state.problemset.selectedProblemSet,
     selectedProblem: state.problemset.selectedProblem,
+    selectedUser: state.user.selectedUser,
   };
 };
 
