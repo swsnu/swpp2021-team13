@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import { returntypeof } from 'react-redux-typescript';
+import { Redirect } from 'react-router';
 
 import * as actionCreators from '../../../store/actions';
 import {
@@ -121,6 +122,10 @@ class ProblemSetCreate extends Component<Props, State> {
   };
 
   render() {
+    if (!this.props.selectedUser) {
+      return <Redirect to="/" />;
+    }
+
     const tabContentText = (
       currentProblem: CreateProblemType,
       index: number
@@ -144,6 +149,7 @@ class ProblemSetCreate extends Component<Props, State> {
                 solution: _currentProblem.solution,
               };
             } else {
+              console.log('test1');
               let _currentProblem =
                 currentProblem as CreateSubjectiveProblemInterface;
               editProblem = {
@@ -633,7 +639,7 @@ class ProblemSetCreate extends Component<Props, State> {
 }
 
 const mapStateToProps = (state: any) => {
-  return {};
+  return { selectedUser: state.user.selectedUser };
 };
 
 const mapDispatchToProps = (dispatch: any) => {

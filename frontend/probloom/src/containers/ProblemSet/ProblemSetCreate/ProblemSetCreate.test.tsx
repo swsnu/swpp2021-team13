@@ -443,4 +443,24 @@ describe('<ProblemSetCreate />', () => {
     const submitButton = component.find('#problemsetcreate-submit').at(0);
     submitButton.simulate('click');
   });
+
+  it('should render signin', () => {
+    const UserStateTest: UserState = {
+      users: [testUser1, testUser2],
+      selectedUser: null,
+      selectedUserProfile: null,
+      selectedUserStatistics: null,
+    };
+    const mockStore = getMockStore(UserStateTest);
+    const component = mount(
+      <Provider store={mockStore}>
+        <ConnectedRouter history={history}>
+          <Switch>
+            <Route path="/" exact component={ProblemSetCreate} />
+          </Switch>
+        </ConnectedRouter>
+      </Provider>
+    );
+    history.push('/');
+  });
 });
