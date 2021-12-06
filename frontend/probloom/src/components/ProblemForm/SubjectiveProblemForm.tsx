@@ -24,15 +24,17 @@ const SubjectiveProblemForm = (props: SubjectiveProblemFormProps) => {
 
   return (
     <div className="SubjectiveProblemForm">
-      <TextArea
-        className='SPTextarea'
-        rows={4}
-        placeholder="Content"
-        value={`${props.problem.content}`}
-        onChange={(event) => props.editContent(
-          'content',
-          event.target.value)}
-      />
+      <div>
+        <TextArea
+          className='SPTextarea'
+          rows={4}
+          placeholder="Content"
+          value={`${props.problem.content}`}
+          onChange={(event) => props.editContent(
+            'content',
+            event.target.value)}
+        />
+      </div>
       <Button
         primary
         size="small"

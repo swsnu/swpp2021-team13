@@ -41,6 +41,7 @@ interface DispatchFromProps {
 
 interface ProblemSetEditState {
   editingProblem: r_interfaces.ProblemType | null;
+  update: boolean;
 }
 
 type Props = ProblemSetEditProps &
@@ -50,16 +51,16 @@ type Props = ProblemSetEditProps &
 type State = ProblemSetEditState;
 
 class ProblemSetEdit extends Component<Props, State> {
-  state = { editingProblem: null };
+  state = { editingProblem: null, update: false };
 
   onClickDeleteButton = () => {
     this.props.onDeleteProblem(this.props.selectedProblem.id);
+    this.setState({ editingProblem: null })
   };
 
   onClickProblemNumberButton = (number: number) => {
     this.props.onGetProblem(this.props.selectedProblemSet.problems[number]);
-    setTimeout(function() {}, 500);
-    this.setState({ editingProblem: this.props.selectedProblem });
+    this.setState({ update: true });
   }
 
   onClickNewProblemButton = (type: 'multiple-choice' | 'subjective') => {
@@ -111,11 +112,17 @@ class ProblemSetEdit extends Component<Props, State> {
       case 'choice_not_solution':
         newProblem.solution.splice(newProblem.solution.indexOf(index), 1);
         break;
+      case 'choice_delete':
+        newProblem.choices.splice(index, 1);
+        break;
       case 'add_solution':
         newProblem.solutions.push('new solution');
         break;
       case 'solution_content':
         newProblem.solutions[index] = content;
+        break;
+      case 'solution_delete':
+        newProblem.solutions.splice(index, 1);
         break;
     }
     this.setState({ editingProblem: newProblem });
@@ -135,6 +142,7 @@ class ProblemSetEdit extends Component<Props, State> {
       updateProblem['solutions'] = currentProblem.solutions;
     }
     this.props.onUpdateProblem(currentProblem.id, updateProblem);
+    this.setState({ editingProblem: null, update: false });
   };
 
   render() {
@@ -151,7 +159,9 @@ class ProblemSetEdit extends Component<Props, State> {
         </Button>
       )
     );
-
+    if (this.state.update && this.props.selectedProblem) {
+      this.setState({ editingProblem: this.props.selectedProblem, update: false });
+    }
     let currentProblem;
     if (this.state.editingProblem == null) {
       currentProblem = null;
@@ -221,8 +231,7 @@ class ProblemSetEdit extends Component<Props, State> {
             </Button>
           </div>
 
-          {problemNumberButtons}
-          {currentProblem}
+          {currentProblem ? currentProblem : problemNumberButtons}
         </Container>
       </div>
     );

@@ -236,6 +236,16 @@ describe('<ProblemSetEdit />', () => {
     problemContent2.simulate('change');
   })
 
+  it('add solution', () => {
+    const component = mount(problemEdit1);
+    const problemNumberButton = component
+      .find('.P0Button').at(0);
+    problemNumberButton.simulate('click');
+    const problemContent = component
+      .find('.ChoiceDeleteButton').at(0);
+    problemContent.simulate('click');
+  })
+
   it('change sp textarea', () => {
     const component = mount(problemEdit2);
     const problemNumberButton = component
@@ -264,6 +274,16 @@ describe('<ProblemSetEdit />', () => {
     const problemContent = component
       .find('.Solution1 .SolutionInput input').at(0);
     problemContent.simulate('change', { target: { value: 'modified' } });
+  })
+
+  it('add solution', () => {
+    const component = mount(problemEdit2);
+    const problemNumberButton = component
+      .find('.P0Button').at(0);
+    problemNumberButton.simulate('click');
+    const problemContent = component
+      .find('.SolutionDeleteButton').at(0);
+    problemContent.simulate('click');
   })
 
   it('save modified mcp', () => {

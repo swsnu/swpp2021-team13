@@ -335,7 +335,7 @@ describe('Problem', () => {
       await dispatch(actionCreators.updateProblem(1, stubUpdateMultipleChoiceProblemRequest));
     } catch (err) {}
     const newState = store.getState();
-    expect(newState.problemset.selectedProblem).toEqual(stubProblem);
+    expect(newState.problemset.selectedProblem).toEqual(null);
     expect(spy).toHaveBeenCalledTimes(1);
   });
 

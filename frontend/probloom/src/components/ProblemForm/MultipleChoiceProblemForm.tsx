@@ -14,20 +14,22 @@ const MultipleChoiceProblemForm = (props: MultipleChoiceProblemFormProps) => {
       index={index}
       choice={choice}
       isSolution={
-        props.problem.solution !== undefined && index in props.problem.solution
+        props.problem.solution !== undefined && props.problem.solution.includes(index)
       }
       editContent={props.editContent}
     />
   ));
   return (
     <div className="MultipleChoiceProblemForm">
-      <TextArea
-        className="MCPTextarea"
-        rows={4}
-        placeholder="content"
-        value={`${props.problem.content}`}
-        onChange={(event) => props.editContent('content', event.target.value)}
-      />
+      <div>
+        <TextArea
+          className="MCPTextarea"
+          rows={4}
+          placeholder="content"
+          value={`${props.problem.content}`}
+          onChange={(event) => props.editContent('content', event.target.value)}
+        />
+      </div>
       <Button
         primary
         size="small"

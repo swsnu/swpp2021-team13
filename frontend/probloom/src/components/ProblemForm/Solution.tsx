@@ -1,4 +1,4 @@
-import { Input } from "semantic-ui-react";
+import { Button, Input } from "semantic-ui-react";
 
 export interface SolutionProps {
   index: number;
@@ -23,6 +23,18 @@ export interface SolutionProps {
             event.target.value,
             props.index)}
         />
+        <Button
+          primary
+          size="small"
+          className="SolutionDeleteButton"
+          onClick={() => props.editContent(
+            'solution_delete',
+            "",
+            props.index
+          )}
+        >
+          Delete
+        </Button>
       </div>
     )
   }

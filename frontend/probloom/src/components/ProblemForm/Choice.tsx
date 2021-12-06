@@ -1,4 +1,4 @@
-import { Checkbox, Input } from "semantic-ui-react";
+import { Checkbox, Input, Button } from "semantic-ui-react";
 
 export interface ChoiceProps {
   index: number;
@@ -33,6 +33,18 @@ const Choice = (props: ChoiceProps) => {
           null,
           props.index)}
       />
+      <Button
+        primary
+        size="small"
+        className="ChoiceDeleteButton"
+        onClick={() => props.editContent(
+          'choice_delete',
+          "",
+          props.index
+        )}
+      >
+        Delete
+      </Button>
     </div>
   )
 }

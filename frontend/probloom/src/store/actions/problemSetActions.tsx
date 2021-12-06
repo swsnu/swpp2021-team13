@@ -262,7 +262,7 @@ export const createProblem: (
 
 export interface GetProblemAction {
   type: typeof actionTypes.GET_PROBLEM;
-  selectedProblem: a_interfaces.GetProblemResponse;
+  selectedProblem: a_interfaces.GetProblemResponse | null;
 }
 
 export const getProblem_: (problem) => GetProblemAction = (
@@ -289,8 +289,8 @@ export const updateProblem: (
   updatedProblem: a_interfaces.UpdateProblemRequest
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data } = await axios.put(`/api/problem/${id}/`, updatedProblem);
-    dispatch(getProblem_(data));
+    await axios.put(`/api/problem/${id}/`, updatedProblem);
+    dispatch(getProblem_(null));
   };
 };
 
