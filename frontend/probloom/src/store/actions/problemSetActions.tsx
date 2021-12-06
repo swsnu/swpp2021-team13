@@ -41,7 +41,7 @@ export interface GetProblemSetAction {
 }
 
 export const getProblemSet_: (problemSet) => GetProblemSetAction = (
-  problemSet : r_interfaces.ProblemSetWithProblemsInterface
+  problemSet: r_interfaces.ProblemSetWithProblemsInterface
 ) => ({
   type: actionTypes.GET_PROBLEMSET,
   pset: problemSet,
@@ -53,7 +53,7 @@ export const getProblemSet: (
   problemSetID: number
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data }: { data: r_interfaces.ProblemSetWithProblemsInterface } = 
+    const { data }: { data: r_interfaces.ProblemSetWithProblemsInterface } =
       await axios.get(`/api/problem_set/${problemSetID}/`);
     dispatch(getProblemSet_(data));
   };
@@ -255,7 +255,10 @@ export const createProblem: (
   problemData: a_interfaces.CreateProblemRequest
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data } = await axios.post(`/api/problem_set/${ps_id}/`, problemData);
+    const { data } = await axios.post(
+      `/api/problem_set/${ps_id}/`,
+      problemData
+    );
     dispatch(createProblem_(data));
   };
 };
@@ -265,11 +268,9 @@ export interface GetProblemAction {
   selectedProblem: a_interfaces.GetProblemResponse | null;
 }
 
-export const getProblem_: (problem) => GetProblemAction = (
-  problem
-) => ({
+export const getProblem_: (problem) => GetProblemAction = (problem) => ({
   type: actionTypes.GET_PROBLEM,
-  selectedProblem: problem
+  selectedProblem: problem,
 });
 
 export const getProblem: (
