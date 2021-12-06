@@ -1369,7 +1369,8 @@ def find_solvers(_: HttpRequest, ps_id: int) -> HttpResponse:
                 "problems": [None] * num_problems,
             }
         res_entry["problems"][record.number - 1] = record.result
-    res_entry["result"] = all(res_entry["problems"])
+    if res_entry != {}:
+        res_entry["result"] = all(res_entry["problems"])
     res.append(res_entry)
 
     return JsonResponse(res, safe=False)
