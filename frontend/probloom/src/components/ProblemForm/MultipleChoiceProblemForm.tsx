@@ -1,5 +1,6 @@
 import Choice from './Choice';
 import { GetMultipleChoiceProblemResponse } from '../../store/actions/problemActionInterface';
+import { Button, Form } from 'semantic-ui-react';
 
 interface MultipleChoiceProblemFormProps {
   problem: GetMultipleChoiceProblemResponse;
@@ -20,20 +21,21 @@ const MultipleChoiceProblemForm = (props: MultipleChoiceProblemFormProps) => {
   ));
   return (
     <div className="MultipleChoiceProblemForm">
-      <div>
-        <textarea
-          id="mcp-textarea"
-          rows={4}
-          value={`${props.problem.content}`}
-          onChange={(event) => props.editContent('content', event.target.value)}
-        />
-        <button
-          id="mcp-addchoice"
-          onClick={() => props.editContent('add_choice')}
-        >
-          New
-        </button>
-      </div>
+      <Form.TextArea
+        className="MCPTextarea"
+        rows={4}
+        placeholder="content"
+        value={`${props.problem.content}`}
+        onChange={(event) => props.editContent('content', event.target.value)}
+      />
+      <Button
+        primary
+        size="small"
+        className="AddChoiceButton"
+        onClick={() => props.editContent('add_choice')}
+      >
+        New
+      </Button>
       {choices}
     </div>
   );

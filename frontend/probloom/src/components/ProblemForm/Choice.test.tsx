@@ -5,7 +5,7 @@ describe('<Choice />', () => {
   it('Clicked component should render without errors', () => {
     const component = shallow(
       <Choice
-        index={0}
+        index={1}
         choice='choice'
         isSolution={true}
         editContent={(
@@ -13,7 +13,7 @@ describe('<Choice />', () => {
           content?: any,
           index?: any
           )=>{{}}}/>);
-    const wrapper = component.find('.Choice');
+    const wrapper = component.find('.Choice1');
     expect(wrapper.length).toBe(1);
   });
 });

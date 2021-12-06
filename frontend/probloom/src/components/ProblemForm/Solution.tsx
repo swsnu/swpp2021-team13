@@ -1,3 +1,5 @@
+import { Form } from "semantic-ui-react";
+
 export interface SolutionProps {
   index: number;
   solution: string;
@@ -10,10 +12,11 @@ export interface SolutionProps {
     
   const Solution = (props: SolutionProps) => {
     return (
-      <div className="Solution" >
+      <div className={`Solution${props.index}`} >
         <label>{`solution ${props.index}`}</label>
-        <input
-          id='solution-input'
+        <Form.Input
+          className="SolutionInput"
+          placeholdeer="solution content"
           value={`${props.solution}`}
           onChange={(event) => props.editContent(
             'solution_content',

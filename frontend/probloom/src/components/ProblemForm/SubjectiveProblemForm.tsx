@@ -1,5 +1,6 @@
 import Solution from './Solution'
 import { GetSubjectiveProblemResponse } from '../../store/actions/problemActionInterface'
+import { Button, Form } from 'semantic-ui-react';
 
 interface SubjectiveProblemFormProps {
   problem: GetSubjectiveProblemResponse;
@@ -23,21 +24,25 @@ const SubjectiveProblemForm = (props: SubjectiveProblemFormProps) => {
 
   return (
     <div className="SubjectiveProblemForm">
-      <div>
-        <textarea
-          id='sp-textarea'
-          rows={4}
-          value={`${props.problem.content}`}
-          onChange={(event) => props.editContent(
-            'content',
-            event.target.value)}
-        />
-      </div>
-      <button 
-        id='sp-addsolution'
+      <Form.TextArea
+        className='SPTextarea'
+        rows={4}
+        placeholder="Content"
+        value={`${props.problem.content}`}
+        onChange={(event) => props.editContent(
+          'content',
+          event.target.value)}
+      />
+      <Button
+        primary
+        size="small"
+        className="AddSolutionButton"
         onClick={() => props.editContent(
-        'add_solution'
-        )}>New</button>
+          'add_solution'
+        )}
+      >
+          New
+      </Button>
       {solutions}
     </div>
   );

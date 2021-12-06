@@ -50,9 +50,9 @@ class ProblemSetEdit extends Component<Props, State> {
     this.props.onDeleteProblem(this.props.selectedProblem.id)
   }
 
-  onClickProblemNumberButton = async (number: number) => {
-    await this.props.onGetProblem(this.props.selectedProblemSet.problems[number]);
-    this.setState({ editingProblem: this.props.selectedProblem });
+  onClickProblemNumberButton = (number: number) => {
+    this.props.onGetProblem(this.props.selectedProblemSet.problems[number]);
+    this.setState({ editingProblem: this.props.selectedProblem })
   }
 
   onClickNewProblemButton = (type: "multiple-choice" | "subjective") => {
@@ -129,10 +129,10 @@ class ProblemSetEdit extends Component<Props, State> {
         <Button
           key={index}
           primary
-          size="tiny"
-          className={`${index}Button`}
+          size="mini"
+          className={`P${index}Button`}
           onClick={() => this.onClickProblemNumberButton(index)}>
-          {index}
+          {index+1}
         </Button>
       ));
 
@@ -146,7 +146,7 @@ class ProblemSetEdit extends Component<Props, State> {
         <Button
           primary
           size="small"
-          className="Delete"
+          className="DeleteButton"
           onClick={() => this.onClickDeleteButton()}
         >
           Delete

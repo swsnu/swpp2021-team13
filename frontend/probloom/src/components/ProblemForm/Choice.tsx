@@ -1,3 +1,5 @@
+import { Checkbox, Form } from "semantic-ui-react";
+
 export interface ChoiceProps {
   index: number;
   choice: string;
@@ -11,18 +13,19 @@ export interface ChoiceProps {
 
 const Choice = (props: ChoiceProps) => {
   return (
-    <div className="Choice" >
+    <div className={`Choice${props.index}`} >
       <label>{`choice ${props.index}`}</label>
-      <input
-        id='choice-input'
+      <Form.Input
+        className='ChoiceInput'
+        plsaceholder="choice content"
         value={`${props.choice}`}
         onChange={(event) => props.editContent(
           'choice_content',
           event.target.value,
           props.index)}
       />
-      <input
-        id='choice-checkbox'
+      <Checkbox
+        className='ChoiceCheckbox'
         type="checkbox"
         checked={props.isSolution}
         onChange={() => props.editContent(
