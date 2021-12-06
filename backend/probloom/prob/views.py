@@ -72,7 +72,7 @@ class SignUpView(View):
             "id": new_user.pk,
             "username": new_user.username,
             "email": new_user.email,
-            "logged_in": True,
+            "logged_in": False,
         }
         return JsonResponse(res, status=201, safe=False)
 
