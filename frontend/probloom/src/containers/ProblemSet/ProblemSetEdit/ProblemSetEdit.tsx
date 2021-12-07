@@ -65,6 +65,10 @@ class ProblemSetEdit extends Component<Props, State> {
   }
 
   onClickDeleteButton = () => {
+    if (this.props.selectedProblemSet.problems.length == 1) {
+      alert("Each problem set must has at least one problem");
+      return;
+    }
     this.props.onDeleteProblem(this.props.selectedProblem.id);
     this.setState({ editingProblem: null });
   };
@@ -139,6 +143,11 @@ class ProblemSetEdit extends Component<Props, State> {
     this.setState({ editingProblem: newProblem });
   };
 
+  onClickCancelButton = () => {
+    this.setState({ editingProblem: this.props.selectedProblem });
+    this.onClickSaveButton();
+  }
+  
   onClickSaveButton = () => {
     const currentProblem: any = this.state.editingProblem;
     const updateProblem: any = {
@@ -201,6 +210,14 @@ class ProblemSetEdit extends Component<Props, State> {
               editContent={this.editProblemHandler}
             />
           )}
+          <Button
+            primary
+            size="small"
+            className="CancelButton"
+            onClick={() => this.onClickCancelButton()}
+          >
+            Cancel
+          </Button>
           <Button
             primary
             size="small"
