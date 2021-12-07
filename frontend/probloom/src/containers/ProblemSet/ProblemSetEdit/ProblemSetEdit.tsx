@@ -57,16 +57,17 @@ class ProblemSetEdit extends Component<Props, State> {
 
   componentDidUpdate() {
     if (this.props.selectedProblem && this.state.needUpdate) {
+      const problemBuffer = Object.assign({}, this.props.selectedProblem);
       this.setState({
-        editingProblem: this.props.selectedProblem,
+        editingProblem: problemBuffer,
         needUpdate: false,
       });
     }
   }
 
   onClickDeleteButton = () => {
-    if (this.props.selectedProblemSet.problems.length == 1) {
-      alert("Each problem set must has at least one problem");
+    if (this.props.selectedProblemSet.problems.length === 1) {
+      alert("Each problem set must have at least one problem");
       return;
     }
     this.props.onDeleteProblem(this.props.selectedProblem.id);
@@ -88,7 +89,7 @@ class ProblemSetEdit extends Component<Props, State> {
         {
           ...newProblem,
           problemType: 'multiple-choice',
-          choices: [],
+          choices: ["new choice"],
           solution: [],
         };
       this.props.onCreateProblem(
@@ -100,7 +101,7 @@ class ProblemSetEdit extends Component<Props, State> {
         {
           ...newProblem,
           problemType: 'subjective',
-          solutions: [],
+          solutions: ["new solution"],
         };
       this.props.onCreateProblem(
         Number(this.props.match.params.id),
@@ -128,7 +129,12 @@ class ProblemSetEdit extends Component<Props, State> {
         newProblem.solution.splice(newProblem.solution.indexOf(index), 1);
         break;
       case 'choice_delete':
+        if (newProblem.choices.length === 1) {
+          alert("Multiple choice problem must have at least one choice");
+          break;
+        }
         newProblem.choices.splice(index, 1);
+        newProblem.solution.splice(newProblem.solution.indexOf(index), 1);
         break;
       case 'add_solution':
         newProblem.solutions.push('new solution');
@@ -137,18 +143,17 @@ class ProblemSetEdit extends Component<Props, State> {
         newProblem.solutions[index] = content;
         break;
       case 'solution_delete':
+        if (newProblem.solutions.length === 1) {
+          alert("Subjective problem must have at least one solution");
+          break;
+        }
         newProblem.solutions.splice(index, 1);
         break;
     }
     this.setState({ editingProblem: newProblem });
   };
-
-  onClickCancelButton = () => {
-    this.setState({ editingProblem: this.props.selectedProblem });
-    this.onClickSaveButton();
-  }
   
-  onClickSaveButton = () => {
+  onClickSaveButton = (mode?: "cancel") => {
     const currentProblem: any = this.state.editingProblem;
     const updateProblem: any = {
       problemType: currentProblem.problemType,
@@ -210,14 +215,6 @@ class ProblemSetEdit extends Component<Props, State> {
               editContent={this.editProblemHandler}
             />
           )}
-          <Button
-            primary
-            size="small"
-            className="CancelButton"
-            onClick={() => this.onClickCancelButton()}
-          >
-            Cancel
-          </Button>
           <Button
             primary
             size="small"

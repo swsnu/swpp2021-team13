@@ -16,7 +16,7 @@ const SubjectiveProblemForm = (props: SubjectiveProblemFormProps) => {
   const solutions = solutionExist.map((solution, index) => (
     <Solution
       key={index}
-      index={index+1}
+      index={index}
       solution={solution}
       editContent={props.editContent}
     />

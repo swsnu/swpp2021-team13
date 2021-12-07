@@ -13,7 +13,7 @@ export interface SolutionProps {
   const Solution = (props: SolutionProps) => {
     return (
       <div className={`Solution${props.index}`} >
-        <label>{`solution ${props.index}`}</label>
+        <label>{`solution ${props.index+1}`}</label>
         <Input
           className="SolutionInput"
           placeholdeer="solution content"

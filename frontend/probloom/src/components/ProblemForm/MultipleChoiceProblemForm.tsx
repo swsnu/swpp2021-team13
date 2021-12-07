@@ -11,7 +11,7 @@ const MultipleChoiceProblemForm = (props: MultipleChoiceProblemFormProps) => {
   const choices = props.problem.choices.map((choice, index) => (
     <Choice
       key={index}
-      index={index+1}
+      index={index}
       choice={choice}
       isSolution={
         props.problem.solution !== undefined && props.problem.solution.includes(index)

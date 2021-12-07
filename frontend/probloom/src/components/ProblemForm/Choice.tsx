@@ -14,7 +14,7 @@ export interface ChoiceProps {
 const Choice = (props: ChoiceProps) => {
   return (
     <div className={`Choice${props.index}`} >
-      <label>{`choice ${props.index}`}</label>
+      <label>{`choice ${props.index+1}`}</label>
       <Input
         className='ChoiceInput'
         plsaceholder="choice content"
