@@ -93,6 +93,29 @@ export const getAllSolvers: (
   };
 };
 
+export interface GetSolverAction {
+  type: typeof actionTypes.GET_SOLVER;
+  solver: r_interfaces.Solver;
+}
+
+export const getSolver_: (solver: r_interfaces.Solver) => GetSolverAction = (
+  solver
+) => ({
+  type: actionTypes.GET_SOLVER,
+  solver: solver,
+});
+
+export const getSolver: (
+  idSet: any
+) => ThunkAction<void, RootState, null, GetSolverAction> = (idSet) => {
+  return async (dispatch: AppDispatch) => {
+    const { data } = await axios.get(
+      `/api/problem_set/${idSet.problemSetID}/solvers/${idSet.userID}/`
+    );
+    dispatch(getSolver_(data));
+  };
+};
+
 export interface GetIsRecommenderAction {
   type: typeof actionTypes.GET_IS_RECOMMENDER;
   isRecommender: boolean;
@@ -318,6 +341,7 @@ export type ProblemSetAction =
   | GetAllProblemSetsAction
   | GetProblemSetAction
   | GetAllSolversAction
+  | GetSolverAction
   | GetIsRecommenderAction
   | UpdateRecommendAction
   | CreateProblemSetAction

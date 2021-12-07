@@ -6,6 +6,7 @@ import * as interfaces from './problemReducerInterface';
 export interface ProblemSetState {
   problemSets: interfaces.ProblemSetInterface[];
   solvers: interfaces.Solver[];
+  selectedSolver: interfaces.Solver | null;
   isRecommender: boolean;
   selectedProblemSet: interfaces.ProblemSetWithProblemsInterface | null;
   selectedProblem: interfaces.ProblemType | null;
@@ -14,6 +15,7 @@ export interface ProblemSetState {
 const initialState: ProblemSetState = {
   problemSets: [],
   solvers: [],
+  selectedSolver: null,
   isRecommender: false,
   selectedProblemSet: null,
   selectedProblem: null,
@@ -32,6 +34,8 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
       };
     case actionTypes.GET_ALL_SOLVER_OF_PROBLEMSET:
       return { ...state, solvers: action.solvers };
+    case actionTypes.GET_SOLVER:
+      return { ...state, selectedSolver: action.solver };
     case actionTypes.GET_IS_RECOMMENDER:
     case actionTypes.UPDATE_RECOMMEND:
       return { ...state, isRecommender: action.isRecommender };
@@ -57,13 +61,15 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
       }
       const afterCreateProblem = state.selectedProblemSet.problems;
       afterCreateProblem.push(action.newProblem.id);
-      return { ...state, selectedProblemSet: {
-        ...state.selectedProblemSet,
-        problems: afterCreateProblem
+      return {
+        ...state,
+        selectedProblemSet: {
+          ...state.selectedProblemSet,
+          problems: afterCreateProblem,
         },
         selectedProblem: action.newProblem,
-      }
-    
+      };
+
     case actionTypes.GET_PROBLEM:
       return { ...state, selectedProblem: action.selectedProblem };
 
