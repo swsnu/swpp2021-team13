@@ -1,18 +1,25 @@
 import React, { Component } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 import { Redirect, RouteComponentProps } from 'react-router';
-import {
-  Button,
-  Icon,
-  Container,
-  Form,
-  Header,
-  Input,
-} from 'semantic-ui-react';
+import { Button, Icon, Grid, Container, Form } from 'semantic-ui-react';
 import { AppDispatch, RootState } from '../../../store/store';
 import NotFound from '../../../components/NotFound/NotFound';
 import { getProblemSet, getProblem } from '../../../store/actions';
 import Latex from 'react-latex';
+import axios from 'axios';
+import ChoiceSolveForm from '../../../components/ProblemForm/ChoiceSolveForm';
+
+export type SolveProblemRequest =
+  | SolveMultipleChoiceProblemRequest
+  | SolveSubjectiveProblemRequest;
+
+export interface SolveMultipleChoiceProblemRequest {
+  solution: number[];
+}
+
+export interface SolveSubjectiveProblemRequest {
+  solution: string;
+}
 
 interface MatchParams {
   id: string;
@@ -25,9 +32,10 @@ interface ProblemSetSolveProps extends PropsFromRedux {
 }
 
 interface ProblemSetSolveState {
-  subjectSolution: Object;
-  choiceSolution: Object;
+  subjectiveSolution: string;
+  multipleChoiceSolution: number[];
   checkNum: number;
+  isFinalSubmit: boolean;
 }
 
 let problemIDList: number[] = [];
@@ -39,9 +47,10 @@ class ProblemSetSolve extends Component<
     super(props);
 
     this.state = {
-      subjectSolution: {},
-      choiceSolution: {},
+      subjectiveSolution: '',
+      multipleChoiceSolution: [],
       checkNum: 0,
+      isFinalSubmit: false,
     };
   }
 
@@ -57,16 +66,16 @@ class ProblemSetSolve extends Component<
   }
 
   onClickNextButton = () => {
-    let problemTab = problemIDList[this.state.checkNum];
-    this.props.onGetProblem(problemTab);
+    let problemID = problemIDList[this.state.checkNum];
+    this.props.onGetProblem(problemID);
     this.setState({
       checkNum: this.state.checkNum + 1,
     });
   };
 
   onClickPrevButton = () => {
-    let problemTab = problemIDList[this.state.checkNum - 2];
-    this.props.onGetProblem(problemTab);
+    let problemID = problemIDList[this.state.checkNum - 2];
+    this.props.onGetProblem(problemID);
     this.setState({
       checkNum: this.state.checkNum - 1,
     });
@@ -82,60 +91,162 @@ class ProblemSetSolve extends Component<
     this.props.history.push('/problem/search/');
   };
 
+  onClickSubmitButton = async (isSubjective: boolean) => {
+    let pSol: SolveProblemRequest | null = null;
+    if (isSubjective) {
+      pSol = { solution: this.state.subjectiveSolution };
+    } else {
+      pSol = { solution: this.state.multipleChoiceSolution };
+    }
+
+    try {
+      await axios.post(
+        `/api/problem/${problemIDList[this.state.checkNum - 1]}/solve/`,
+        pSol
+      );
+    } catch (error) {
+      console.error(error);
+    }
+
+    if (this.state.checkNum === problemIDList.length) {
+      this.setState({ isFinalSubmit: true });
+    }
+
+    this.onClickNextButton();
+  };
+
+  onClickResultButton = () => {
+    this.props.history.push(
+      '/problem/' + this.props.match.params.id + '/solve/result/'
+    );
+  };
+
+  onSelectChoice = (index: number) => {
+    this.setState({
+      multipleChoiceSolution: [...this.state.multipleChoiceSolution, index + 1],
+    });
+  };
+
   render() {
     if (!this.props.selectedUser) {
       return <Redirect to="/" />;
     }
 
+    if (!this.props.selectedProblem) {
+      return <NotFound />;
+    }
+
+    // For avoiding type error
+    let problem: any = this.props.selectedProblem;
+
     return (
       <div className="ProblemSetSolve">
-        <Button
-          primary
-          size="small"
-          className="backDetailButton"
-          onClick={() => this.onClickBackDetailButton()}
-        >
-          Back to detail page
-        </Button>
-        <Button
-          primary
-          size="small"
-          className="backSearchButton"
-          onClick={() => this.onClickBackSearchButton()}
-        >
-          Back to search page
-        </Button>
-        {this.state.checkNum > 1 && (
-          <div className="Problem_prev">
-            <Button
-              primary
-              size="small"
-              className="prevButton"
-              onClick={() => this.onClickPrevButton()}
-              icon
-              labelPosition="left"
-            >
-              Prev
-              <Icon className="left arrow" />
-            </Button>
-          </div>
-        )}
-        <Latex displayMode={true}>{this.props.selectedProblem?.content}</Latex>
-        {this.state.checkNum > 0 && this.state.checkNum < problemIDList.length && (
-          <div className="Problem_next">
-            <Button
-              primary
-              size="small"
-              className="nextButton"
-              onClick={() => this.onClickNextButton()}
-              icon
-              labelPosition="right"
-            >
-              Next
-              <Icon className="right arrow" />
-            </Button>
-          </div>
-        )}
+        <Container text>
+          <Grid columns="equal">
+            <Grid.Column>
+              <Button
+                primary
+                size="small"
+                className="backDetailButton"
+                onClick={() => this.onClickBackDetailButton()}
+              >
+                Back to detail page
+              </Button>
+              <Button
+                secondary
+                size="small"
+                className="backSearchButton"
+                onClick={() => this.onClickBackSearchButton()}
+              >
+                Back to search page
+              </Button>
+            </Grid.Column>
+          </Grid>
+          {!this.state.isFinalSubmit && (
+            <Grid>
+              <Grid.Column width={10}>
+                <Form>
+                  <Form.Field>
+                    <h2>Promblem {this.state.checkNum}</h2>
+                    <Latex className="latex" displayMode={true}>
+                      {problem.content}
+                    </Latex>
+                    {problem.problemType === 'subjective' && (
+                      <Form.TextArea
+                        className="subjectiveSolution"
+                        label="Sol"
+                        placeholder="Enter your answer"
+                        value={this.state.subjectiveSolution}
+                        onChange={(event) => {
+                          this.setState({
+                            subjectiveSolution: event.target.value,
+                          });
+                        }}
+                      />
+                    )}
+                    {problem.problemType === 'multiple-choice' &&
+                      problem.choices.map((content, index) => (
+                        <ChoiceSolveForm
+                          className="Choice"
+                          content={content}
+                          onSelectChoice={() => this.onSelectChoice(index)}
+                        />
+                      ))}
+                  </Form.Field>
+                  <Button.Group>
+                    {this.state.checkNum > 1 && (
+                      <Button
+                        className="prevButton"
+                        onClick={() => this.onClickPrevButton()}
+                        icon
+                        labelPosition="left"
+                      >
+                        Prev
+                        <Icon className="left arrow" />
+                      </Button>
+                    )}
+                    <Button
+                      className="submitButton"
+                      onClick={() =>
+                        this.onClickSubmitButton(
+                          this.props.selectedProblem!.problemType ===
+                            'subjective'
+                        )
+                      }
+                      type="submit"
+                      content="Submit"
+                    />
+                    {this.state.checkNum > 0 &&
+                      this.state.checkNum < problemIDList.length && (
+                        <Button
+                          className="nextButton"
+                          onClick={() => this.onClickNextButton()}
+                          icon
+                          labelPosition="right"
+                        >
+                          Next
+                          <Icon className="right arrow" />
+                        </Button>
+                      )}
+                  </Button.Group>
+                </Form>
+              </Grid.Column>
+            </Grid>
+          )}
+          {this.state.isFinalSubmit && (
+            <Grid columns="equal" textAlign="center">
+              <Grid.Column>
+                <Button
+                  size="small"
+                  className="resultButton"
+                  onClick={() => this.onClickResultButton()}
+                >
+                  Go Result!
+                </Button>
+              </Grid.Column>
+            </Grid>
+          )}
+        </Container>
       </div>
     );
   }
