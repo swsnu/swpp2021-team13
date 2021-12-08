@@ -1417,7 +1417,7 @@ def get_solver(_: HttpRequest, ps_id: int, u_id: int) -> HttpResponse:
         .order_by("number")
         .values("number", "result")
     )
-
+ 
     problems = [None] * num_problems
     for record in solved_query:
         problems[record["number"] - 1] = record["result"]

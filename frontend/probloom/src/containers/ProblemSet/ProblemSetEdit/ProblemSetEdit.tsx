@@ -24,7 +24,7 @@ interface ProblemSetEditProps {
 interface StateFromProps {
   selectedProblemSet: r_interfaces.ProblemSetWithProblemsInterface;
   selectedProblem: r_interfaces.ProblemType;
-  selectedUser: User
+  selectedUser: User;
 }
 
 interface DispatchFromProps {
@@ -66,7 +66,7 @@ class ProblemSetEdit extends Component<Props, State> {
 
   onClickDeleteButton = () => {
     if (this.props.selectedProblemSet.problems.length === 1) {
-      alert("Each problem set must have at least one problem");
+      alert('Each problem set must have at least one problem');
       return;
     }
     this.props.onDeleteProblem(this.props.selectedProblem.id);
@@ -76,7 +76,7 @@ class ProblemSetEdit extends Component<Props, State> {
   onClickProblemNumberButton = (number: number) => {
     this.props.onGetProblem(this.props.selectedProblemSet.problems[number]);
     this.setState({ needUpdate: true });
-  }
+  };
 
   onClickNewProblemButton = (type: 'multiple-choice' | 'subjective') => {
     const newProblem = {
@@ -88,7 +88,12 @@ class ProblemSetEdit extends Component<Props, State> {
         {
           ...newProblem,
           problemType: 'multiple-choice',
-          choices: ["new choice 1", "new choice 2", "new choice 3", "new choice 4"],
+          choices: [
+            'new choice 1',
+            'new choice 2',
+            'new choice 3',
+            'new choice 4',
+          ],
           solution: [1],
         };
       this.props.onCreateProblem(
@@ -100,7 +105,7 @@ class ProblemSetEdit extends Component<Props, State> {
         {
           ...newProblem,
           problemType: 'subjective',
-          solutions: ["new solution"],
+          solutions: ['new solution'],
         };
       this.props.onCreateProblem(
         Number(this.props.match.params.id),
@@ -115,47 +120,49 @@ class ProblemSetEdit extends Component<Props, State> {
       case 'content':
         newProblem.content = content;
         break;
-//      case 'add_choice':
-//        newProblem.choices.push('new choice');
-//        break;
+      //      case 'add_choice':
+      //        newProblem.choices.push('new choice');
+      //        break;
       case 'choice_content':
-        newProblem.choices[index-1] = content;
+        newProblem.choices[index - 1] = content;
         break;
       case 'choice_solution':
         newProblem.solution.push(index);
         break;
       case 'choice_not_solution':
-        if (newProblem.solution.length == 1) {
-          alert("Each multiple choice problems must have at least one solution");
+        if (newProblem.solution.length === 1) {
+          alert(
+            'Each multiple choice problems must have at least one solution'
+          );
           break;
         }
         newProblem.solution.splice(newProblem.solution.indexOf(index), 1);
         break;
-//      case 'choice_delete':
-//        if (newProblem.choices.length === 1) {
-//          alert("Multiple choice problem must have at least one choice");
-//          break;
-//        }
-//        newProblem.choices.splice(index-1, 1);
-//        newProblem.solution.splice(newProblem.solution.indexOf(index), 1);
-//        break;
+      //      case 'choice_delete':
+      //        if (newProblem.choices.length === 1) {
+      //          alert("Multiple choice problem must have at least one choice");
+      //          break;
+      //        }
+      //        newProblem.choices.splice(index-1, 1);
+      //        newProblem.solution.splice(newProblem.solution.indexOf(index), 1);
+      //        break;
       case 'add_solution':
         newProblem.solutions.push('new solution');
         break;
       case 'solution_content':
-        newProblem.solutions[index-1] = content;
+        newProblem.solutions[index - 1] = content;
         break;
       case 'solution_delete':
         if (newProblem.solutions.length === 1) {
-          alert("Each subjective problem must have at least one solution");
+          alert('Each subjective problem must have at least one solution');
           break;
         }
-        newProblem.solutions.splice(index-1, 1);
+        newProblem.solutions.splice(index - 1, 1);
         break;
     }
     this.setState({ editingProblem: newProblem });
   };
-  
+
   onClickSaveButton = () => {
     const currentProblem: any = this.state.editingProblem;
     const updateProblem: any = {
@@ -175,7 +182,7 @@ class ProblemSetEdit extends Component<Props, State> {
 
   onClickBackButton = () => {
     this.props.history.push(`/problem/${this.props.match.params.id}/detail/`);
-  }
+  };
 
   render() {
     if (!this.props.selectedUser) {
@@ -189,7 +196,7 @@ class ProblemSetEdit extends Component<Props, State> {
           className={`P${index}Button`}
           onClick={() => this.onClickProblemNumberButton(index)}
         >
-          {index+1}
+          {index + 1}
         </Menu.Item>
       )
     );
@@ -225,13 +232,15 @@ class ProblemSetEdit extends Component<Props, State> {
         <Container text>
           <Header as="h1">ProblemSetEdit Page</Header>
           {currentProblem ? (
-            currentProblem 
+            currentProblem
           ) : (
             <div>
               <Menu>
                 <Menu.Item
                   className="NewMCPButton"
-                  onClick={() => this.onClickNewProblemButton('multiple-choice')}
+                  onClick={() =>
+                    this.onClickNewProblemButton('multiple-choice')
+                  }
                 >
                   new multiple choice
                 </Menu.Item>
