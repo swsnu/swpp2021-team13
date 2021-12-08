@@ -169,8 +169,10 @@ describe('<ProblemSetCreate />', () => {
   it('simulate create inputs', async () => {
     const component = mount(problemSetCreate);
 
+    const alert = jest.spyOn(window, 'alert').mockImplementation(() => {});
     const submitButton1 = component.find('#problemsetcreate-submit').at(0);
     submitButton1.simulate('click');
+    expect(alert).toHaveBeenCalledTimes(1);
 
     // -------------------------- problem set --------------------------
     const inputTitle = component.find('.ProblemSetCreate #input-title').at(0);
