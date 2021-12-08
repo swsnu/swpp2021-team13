@@ -1,13 +1,19 @@
 import React, { Component } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 import { Redirect, RouteComponentProps } from 'react-router';
-import { Button, Icon, Grid, Container, Form } from 'semantic-ui-react';
+import {
+  Button,
+  Icon,
+  Grid,
+  Container,
+  Form,
+  Checkbox,
+} from 'semantic-ui-react';
 import { AppDispatch, RootState } from '../../../store/store';
 import NotFound from '../../../components/NotFound/NotFound';
 import { getProblemSet, getProblem } from '../../../store/actions';
 import Latex from 'react-latex';
 import axios from 'axios';
-import ChoiceSolveForm from '../../../components/ProblemForm/ChoiceSolveForm';
 
 export type SolveProblemRequest =
   | SolveMultipleChoiceProblemRequest
@@ -209,9 +215,7 @@ class ProblemSetSolve extends Component<
                 <Form>
                   <Form.Field>
                     <h2>Promblem {this.state.checkNum}</h2>
-                    <Latex className="latex" displayMode={true}>
-                      {problem.content}
-                    </Latex>
+                    <Latex className="latex">{problem.content}</Latex>
                     {problem.problemType === 'subjective' && (
                       <Form.TextArea
                         className="subjectiveSolution"
@@ -227,12 +231,16 @@ class ProblemSetSolve extends Component<
                     )}
                     {problem.problemType === 'multiple-choice' &&
                       problem.choices.map((content, index) => (
-                        <ChoiceSolveForm
-                          className="Choice"
-                          content={content}
-                          checked={this.state.choiceChecker[index]}
-                          onSelectChoice={() => this.onSelectChoice(index)}
-                        />
+                        <div className="Choice">
+                          <Form.Field>
+                            <Checkbox
+                              name="checkboxRadioGroup"
+                              checked={this.state.choiceChecker[index]}
+                              onChange={() => this.onSelectChoice(index)}
+                            ></Checkbox>
+                            <Latex>{content}</Latex>
+                          </Form.Field>
+                        </div>
                       ))}
                   </Form.Field>
                   <Button.Group>
