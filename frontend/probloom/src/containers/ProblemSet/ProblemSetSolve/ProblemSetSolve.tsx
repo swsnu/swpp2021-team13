@@ -34,6 +34,9 @@ interface ProblemSetSolveProps extends PropsFromRedux {
 interface ProblemSetSolveState {
   subjectiveSolution: string;
   multipleChoiceSolution: number[];
+  // for solving the problem that the choice is not automatically initialized.
+  // *Caution*: Since the number of choices is fixed to 4, it can cause a bug.
+  choiceChecker: boolean[];
   checkNum: number;
   isFinalSubmit: boolean;
 }
@@ -49,6 +52,7 @@ class ProblemSetSolve extends Component<
     this.state = {
       subjectiveSolution: '',
       multipleChoiceSolution: [],
+      choiceChecker: [false, false, false, false],
       checkNum: 0,
       isFinalSubmit: false,
     };
@@ -70,6 +74,9 @@ class ProblemSetSolve extends Component<
     this.props.onGetProblem(problemID);
     this.setState({
       checkNum: this.state.checkNum + 1,
+      subjectiveSolution: '',
+      multipleChoiceSolution: [],
+      choiceChecker: [false, false, false, false],
     });
   };
 
@@ -78,6 +85,9 @@ class ProblemSetSolve extends Component<
     this.props.onGetProblem(problemID);
     this.setState({
       checkNum: this.state.checkNum - 1,
+      subjectiveSolution: '',
+      multipleChoiceSolution: [],
+      choiceChecker: [false, false, false, false],
     });
   };
 
@@ -108,6 +118,12 @@ class ProblemSetSolve extends Component<
       console.error(error);
     }
 
+    this.setState({
+      subjectiveSolution: '',
+      multipleChoiceSolution: [],
+      choiceChecker: [false, false, false, false],
+    });
+
     if (this.state.checkNum === problemIDList.length) {
       this.setState({ isFinalSubmit: true });
     }
@@ -121,9 +137,34 @@ class ProblemSetSolve extends Component<
     );
   };
 
+  insert_or_delete = (arr: number[], num: number) => {
+    let index = arr.indexOf(num);
+
+    if (index > -1) {
+      arr.splice(index, 1);
+    } else {
+      arr.push(num);
+    }
+
+    return arr.sort();
+  };
+
   onSelectChoice = (index: number) => {
+    let new_multipleChoiceSolution = this.insert_or_delete(
+      this.state.multipleChoiceSolution,
+      index + 1
+    );
+
+    let new_checker = !this.state.choiceChecker[index];
+    let new_choiceChecker = this.state.choiceChecker.splice(
+      index,
+      1,
+      new_checker
+    );
+
     this.setState({
-      multipleChoiceSolution: [...this.state.multipleChoiceSolution, index + 1],
+      multipleChoiceSolution: new_multipleChoiceSolution,
+      choiceChecker: new_choiceChecker,
     });
   };
 
@@ -189,6 +230,7 @@ class ProblemSetSolve extends Component<
                         <ChoiceSolveForm
                           className="Choice"
                           content={content}
+                          checked={this.state.choiceChecker[index]}
                           onSelectChoice={() => this.onSelectChoice(index)}
                         />
                       ))}

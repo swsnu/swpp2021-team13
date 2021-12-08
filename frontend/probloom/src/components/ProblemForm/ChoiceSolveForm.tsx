@@ -6,8 +6,8 @@ const ChoiceSolveForm = (props) => {
     <div className="Choice">
       <Form.Field>
         <Checkbox
-          radio
           name="checkboxRadioGroup"
+          checked={props.checked}
           onChange={() => props.onSelectChoice()}
         ></Checkbox>
         <Latex displayMode={true}>{props.content}</Latex>
