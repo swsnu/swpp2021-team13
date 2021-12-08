@@ -111,7 +111,6 @@ class ProblemSetEdit extends Component<Props, State> {
 
   editProblemHandler = (target: string, content?: any, index?: any) => {
     const newProblem: any = this.state.editingProblem;
-    index -= 1;
     switch (target) {
       case 'content':
         newProblem.content = content;
@@ -120,7 +119,7 @@ class ProblemSetEdit extends Component<Props, State> {
         newProblem.choices.push('new choice');
         break;
       case 'choice_content':
-        newProblem.choices[index] = content;
+        newProblem.choices[index-1] = content;
         break;
       case 'choice_solution':
         newProblem.solution.push(index);
@@ -133,21 +132,21 @@ class ProblemSetEdit extends Component<Props, State> {
           alert("Multiple choice problem must have at least one choice");
           break;
         }
-        newProblem.choices.splice(index, 1);
+        newProblem.choices.splice(index-1, 1);
         newProblem.solution.splice(newProblem.solution.indexOf(index), 1);
         break;
       case 'add_solution':
         newProblem.solutions.push('new solution');
         break;
       case 'solution_content':
-        newProblem.solutions[index] = content;
+        newProblem.solutions[index-1] = content;
         break;
       case 'solution_delete':
         if (newProblem.solutions.length === 1) {
           alert("Subjective problem must have at least one solution");
           break;
         }
-        newProblem.solutions.splice(index, 1);
+        newProblem.solutions.splice(index-1, 1);
         break;
     }
     this.setState({ editingProblem: newProblem });
