@@ -33,18 +33,18 @@ const Choice = (props: ChoiceProps) => {
             <Input
               className='ChoiceInput'
               placeholder="content"
-              label={
-                <Button
-                  className="ChoiceDeleteButton"
-                  onClick={() => props.editContent(
-                    'choice_delete',
-                    "",
-                    props.index
-                  )}
-                >
-                  Delete
-                </Button>
-              }
+//              label={
+//                <Button
+//                  className="ChoiceDeleteButton"
+//                  onClick={() => props.editContent(
+//                    'choice_delete',
+//                    "",
+//                    props.index
+//                  )}
+//                >
+//                  Delete
+//                </Button>
+//              }
               labelPosition="right"
               value={`${props.choice}`}
               onChange={(event) => props.editContent(

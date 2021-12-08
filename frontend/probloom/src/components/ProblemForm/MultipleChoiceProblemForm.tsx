@@ -38,18 +38,7 @@ const MultipleChoiceProblemForm = (props: MultipleChoiceProblemFormProps) => {
             </Form>
           </Grid.Column>
         </Grid.Row>
-        <Grid.Row>
-          <Grid.Column>
-            <Button
-              primary
-              size="small"
-              className="AddChoiceButton"
-              onClick={() => props.editContent('add_choice')}
-            >
-              New choice
-            </Button>
-          </Grid.Column>
-        </Grid.Row>
+
         {choices}
         <Grid.Row>
           <Grid.Column textAlign="right">

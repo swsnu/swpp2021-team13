@@ -327,16 +327,7 @@ class ProblemSetSearch extends Component<
                 }}
               />
 
-              <Form.Dropdown
-                width={4}
-                item
-                options={tagOptions2['tag-science']}
-                label="Tag"
-                defaultValue="all"
-                onChange={(_, { value }) =>
-                  this.setState({ tag: value as string })
-                }
-              />
+
 
               <Form.Dropdown
                 width={4}
