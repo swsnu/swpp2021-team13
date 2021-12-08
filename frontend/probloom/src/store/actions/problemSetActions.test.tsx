@@ -1,6 +1,11 @@
 import axios from 'axios';
 import { getAllProblemSets } from '.';
-import { ProblemSetInterface, ProblemSetWithProblemsInterface } from '../reducers/problemReducerInterface';
+import {
+  CreateProblemType,
+  CreateProblemSetRequest,
+  ProblemSetInterface,
+  ProblemSetWithProblemsInterface,
+} from '../reducers/problemReducerInterface';
 import * as a_interfaces from './problemActionInterface';
 import store, { AppDispatch } from '../store';
 import * as actionCreators from './problemSetActions';
@@ -57,7 +62,7 @@ describe('Get Problem List', () => {
   });
 
   it('Test getProblemSet', async () => {
-    const stubProblemSet : ProblemSetWithProblemsInterface = {
+    const stubProblemSet: ProblemSetWithProblemsInterface = {
       id: 1,
       title: 'title1',
       createdTime: 'create_time1',
@@ -115,7 +120,7 @@ describe('Get Problem List', () => {
   });
 });
 
-describe('Create & Edit ProblemSet', () => {
+describe('Create ProblemSet', () => {
   let spy: jest.SpyInstance;
 
   afterEach(() => {
@@ -124,7 +129,7 @@ describe('Create & Edit ProblemSet', () => {
   });
 
   it('Test createProblemSet', async () => {
-    const stubProblemSet : ProblemSetWithProblemsInterface = {
+    const stubProblemSet: ProblemSetWithProblemsInterface = {
       id: 1,
       title: 'title1',
       createdTime: 'create_time1',
@@ -139,54 +144,63 @@ describe('Create & Edit ProblemSet', () => {
       recommendedNum: 1,
       problems: [1],
     };
-    const stubNewProblemSet = {
-      index: 4,
-      problem_type: 'stub-type',
-      problem_statement: 'stub-statement',
-      choice: ['stub-choice1', 'stub-choice2', 'stub-choice3', 'stub-choice4'],
-      solution: 'stub-solution',
-      explanation: 'stub-explanation',
+
+    const stubNewProblem1: CreateProblemType = {
+      problemType: 'multiple-choice',
+      problemSetID: 1,
+      problemNumber: 1,
+      content: 'test-content',
+      choices: ['1', '', '', '4'],
+      solution: [1, 2],
     };
-    const stubProblemSetCreateState = {
-      title: 'stub-title',
-      content: 'stub-content',
-      scope: 'stub-scope',
-      tag: 'stub-tag',
-      difficulty: 'stub-difficulty',
-      problems: [stubNewProblemSet],
-      numberOfProblems: 1,
+    const stubNewProblem2: CreateProblemType = {
+      problemType: 'multiple-choice',
+      problemSetID: 1,
+      problemNumber: 2,
+      content: 'test-content',
+      choices: ['1', '', '', '4'],
+      solution: [1, 2],
+    };
+    const stubNewProblemSet: CreateProblemSetRequest = {
+      title: 'test-title',
+      scope: 'test-scope',
+      tag: ['test-tag1', 'test-tag2'],
+      difficulty: 1,
+      content: 'test-content',
+      problems: [stubNewProblem1, stubNewProblem2],
     };
 
     spy = jest.spyOn(axios, 'post').mockImplementation(async () => {
       return {
         status: 200,
-        data: stubProblemSetCreateState,
+        data: stubNewProblemSet,
       };
     });
 
     try {
       await dispatch(
         actionCreators.createProblemSet(
-          'stub-title',
-          'stub-content',
-          'stub-scope',
-          'stub-tag',
-          'stub-difficulty',
-          [
-            {
-              index: 4,
-              problem_type: 'stub-type',
-              problem_statement: 'stub-statement',
-              choice: [
-                'stub-choice1',
-                'stub-choice2',
-                'stub-choice3',
-                'stub-choice4',
-              ],
-              solution: 'stub-solution',
-              explanation: 'stub-explanation',
-            },
-          ]
+          stubNewProblemSet.title,
+          stubNewProblemSet.scope,
+          stubNewProblemSet.tag,
+          stubNewProblemSet.difficulty,
+          stubNewProblemSet.content,
+          stubNewProblemSet.problems
+          // [
+          //   {
+          //     index: 4,
+          //     problem_type: 'stub-type',
+          //     problem_statement: 'stub-statement',
+          //     choice: [
+          //       'stub-choice1',
+          //       'stub-choice2',
+          //       'stub-choice3',
+          //       'stub-choice4',
+          //     ],
+          //     solution: 'stub-solution',
+          //     explanation: 'stub-explanation',
+          //   },
+          // ]
         )
       );
     } catch (err) {}
@@ -205,7 +219,7 @@ describe('Delete ProblemSet', () => {
   });
 
   it('Test updateProblemSet', async () => {
-    const stubProblemSet : ProblemSetWithProblemsInterface = {
+    const stubProblemSet: ProblemSetWithProblemsInterface = {
       id: 1,
       title: 'title1',
       createdTime: 'create_time1',
@@ -278,7 +292,7 @@ describe('Problem', () => {
   });
 
   it('Test getProblem', async () => {
-    const stubProblem : a_interfaces.GetMultipleChoiceProblemResponse = {
+    const stubProblem: a_interfaces.GetMultipleChoiceProblemResponse = {
       id: 1,
       problemType: 'multiple-choice',
       problemSetID: 1,
@@ -288,7 +302,7 @@ describe('Problem', () => {
       content: 'content',
       solverIDs: [],
       choices: [],
-    }
+    };
 
     spy = jest.spyOn(axios, 'get').mockImplementation(async () => {
       return {
@@ -306,7 +320,7 @@ describe('Problem', () => {
   });
 
   it('Test updateProblem', async () => {
-    const stubProblem : a_interfaces.GetMultipleChoiceProblemResponse = {
+    const stubProblem: a_interfaces.GetMultipleChoiceProblemResponse = {
       id: 1,
       problemType: 'multiple-choice',
       problemSetID: 1,
@@ -316,13 +330,14 @@ describe('Problem', () => {
       content: 'stub_content',
       solverIDs: [],
       choices: [],
-    }
+    };
 
-    const stubUpdateMultipleChoiceProblemRequest : a_interfaces.UpdateMultipleChoiceProblemRequest = {
-      problemType: 'multiple-choice',
-      content: 'stub_content',
-      choices: []
-    }
+    const stubUpdateMultipleChoiceProblemRequest: a_interfaces.UpdateMultipleChoiceProblemRequest =
+      {
+        problemType: 'multiple-choice',
+        content: 'stub_content',
+        choices: [],
+      };
 
     spy = jest.spyOn(axios, 'put').mockImplementation(async () => {
       return {
@@ -332,7 +347,9 @@ describe('Problem', () => {
     });
 
     try {
-      await dispatch(actionCreators.updateProblem(1, stubUpdateMultipleChoiceProblemRequest));
+      await dispatch(
+        actionCreators.updateProblem(1, stubUpdateMultipleChoiceProblemRequest)
+      );
     } catch (err) {}
     const newState = store.getState();
     expect(newState.problemset.selectedProblem).toEqual(null);
@@ -340,7 +357,7 @@ describe('Problem', () => {
   });
 
   it('Test createProblem', async () => {
-    const stubProblem : a_interfaces.GetMultipleChoiceProblemResponse = {
+    const stubProblem: a_interfaces.GetMultipleChoiceProblemResponse = {
       id: 2,
       problemType: 'multiple-choice',
       problemSetID: 1,
@@ -350,14 +367,15 @@ describe('Problem', () => {
       content: 'content',
       solverIDs: [],
       choices: [],
-    }
-    const stubCreateProblemRequest : a_interfaces.CreateMultipleChoiceProblemRequest= {
-      problemType: 'multiple-choice',
-      problemSetID: 2,
-      problemNumber: 2,
-      content: 'stub_content',
-      choices: [],
-    }
+    };
+    const stubCreateProblemRequest: a_interfaces.CreateMultipleChoiceProblemRequest =
+      {
+        problemType: 'multiple-choice',
+        problemSetID: 2,
+        problemNumber: 2,
+        content: 'stub_content',
+        choices: [],
+      };
 
     spy = jest.spyOn(axios, 'post').mockImplementation(async () => {
       return {

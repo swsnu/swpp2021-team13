@@ -82,7 +82,7 @@ class ProblemSetCreate extends Component<Props, State> {
     let newProblem: CreateMultipleChoiceProblemInterface = {
       problemType: 'multiple-choice',
       problemSetID: 0,
-      problemNumber: index,
+      problemNumber: index + 1,
       content: 'problem here...',
       choices: ['', '', '', ''],
       solution: [],
@@ -111,14 +111,18 @@ class ProblemSetCreate extends Component<Props, State> {
   };
 
   submitProblemSetHandler = () => {
-    this.props.onCreateProblemSet(
-      this.state.title,
-      this.state.scope,
-      this.state.tag,
-      this.state.difficulty,
-      this.state.content,
-      this.state.problems
-    );
+    if (this.state.problems.length > 0) {
+      this.props.onCreateProblemSet(
+        this.state.title,
+        this.state.scope,
+        this.state.tag,
+        this.state.difficulty,
+        this.state.content,
+        this.state.problems
+      );
+    } else {
+      alert('You need to make at least 1 problem in your problem set.');
+    }
   };
 
   render() {
@@ -178,75 +182,75 @@ class ProblemSetCreate extends Component<Props, State> {
       );
     };
 
-    let tabContentImage = (currentProblem, index: number) => {
-      return (
-        <>
-          <Input
-            id="problemset-problem-content-input-file-button"
-            type="file"
-            accept="image/*"
-            onChange={(event) => {
-              if (!event.target.files) {
-                return;
-              }
-              const file = event.target.files[0];
+    // let tabContentImage = (currentProblem, index: number) => {
+    //   return (
+    //     <>
+    //       <Input
+    //         id="problemset-problem-content-input-file-button"
+    //         type="file"
+    //         accept="image/*"
+    //         onChange={(event) => {
+    //           if (!event.target.files) {
+    //             return;
+    //           }
+    //           const file = event.target.files[0];
 
-              const reader = new FileReader();
-              reader.onloadend = () => {
-                let editProblem: CreateProblemType;
-                if (currentProblem.problemType === 'multiple-choice') {
-                  let _currentProblem =
-                    currentProblem as CreateMultipleChoiceProblemInterface;
-                  editProblem = {
-                    problemType: _currentProblem.problemType,
-                    problemSetID: _currentProblem.problemSetID,
-                    problemNumber: _currentProblem.problemNumber,
-                    content: reader.result as string,
-                    choices: _currentProblem.choices,
-                    solution: _currentProblem.solution,
-                  };
-                } else {
-                  let _currentProblem =
-                    currentProblem as CreateSubjectiveProblemInterface;
-                  editProblem = {
-                    problemType: _currentProblem.problemType,
-                    problemSetID: _currentProblem.problemSetID,
-                    problemNumber: _currentProblem.problemNumber,
-                    content: reader.result as string,
-                    solutions: _currentProblem.solutions,
-                  };
-                }
+    //           const reader = new FileReader();
+    //           reader.onloadend = () => {
+    //             let editProblem: CreateProblemType;
+    //             if (currentProblem.problemType === 'multiple-choice') {
+    //               let _currentProblem =
+    //                 currentProblem as CreateMultipleChoiceProblemInterface;
+    //               editProblem = {
+    //                 problemType: _currentProblem.problemType,
+    //                 problemSetID: _currentProblem.problemSetID,
+    //                 problemNumber: _currentProblem.problemNumber,
+    //                 content: reader.result as string,
+    //                 choices: _currentProblem.choices,
+    //                 solution: _currentProblem.solution,
+    //               };
+    //             } else {
+    //               let _currentProblem =
+    //                 currentProblem as CreateSubjectiveProblemInterface;
+    //               editProblem = {
+    //                 problemType: _currentProblem.problemType,
+    //                 problemSetID: _currentProblem.problemSetID,
+    //                 problemNumber: _currentProblem.problemNumber,
+    //                 content: reader.result as string,
+    //                 solutions: _currentProblem.solutions,
+    //               };
+    //             }
 
-                const newProblem: CreateProblemType[] = [];
-                this.state.problems.forEach((problem) => {
-                  if (problem.problemNumber === index) {
-                    newProblem.push(editProblem);
-                  } else {
-                    newProblem.push(problem);
-                  }
-                });
-                this.setState({
-                  ...this.state,
-                  problems: newProblem,
-                });
-              };
-              reader.readAsDataURL(file);
-            }}
-          />
+    //             const newProblem: CreateProblemType[] = [];
+    //             this.state.problems.forEach((problem) => {
+    //               if (problem.problemNumber === index) {
+    //                 newProblem.push(editProblem);
+    //               } else {
+    //                 newProblem.push(problem);
+    //               }
+    //             });
+    //             this.setState({
+    //               ...this.state,
+    //               problems: newProblem,
+    //             });
+    //           };
+    //           reader.readAsDataURL(file);
+    //         }}
+    //       />
 
-          <Image
-            id="problemset-problem-content-input-file-preview"
-            src={
-              this.state.problems.filter(
-                (problem) => problem.problemNumber === index
-              )[0].content
-            }
-            alt=""
-            size="huge"
-          />
-        </>
-      );
-    };
+    //       <Image
+    //         id="problemset-problem-content-input-file-preview"
+    //         src={
+    //           this.state.problems.filter(
+    //             (problem) => problem.problemNumber === index
+    //           )[0].content
+    //         }
+    //         alt=""
+    //         size="huge"
+    //       />
+    //     </>
+    //   );
+    // };
 
     let createChoice = (
       currentProblem: CreateMultipleChoiceProblemInterface,
@@ -284,7 +288,7 @@ class ProblemSetCreate extends Component<Props, State> {
 
               const newProblem: CreateProblemType[] = [];
               this.state.problems.forEach((problem) => {
-                if (problem.problemNumber === index) {
+                if (problem.problemNumber === index + 1) {
                   newProblem.push(editProblem);
                 } else {
                   newProblem.push(problem);
@@ -371,8 +375,8 @@ class ProblemSetCreate extends Component<Props, State> {
                     menuItem: `Make content`,
                     render: () => (
                       <Tab.Pane id="qwerty">
-                        {(() => tabContentText(currentProblem, index))()}
-                        {(() => tabContentImage(currentProblem, index))()}
+                        {(() => tabContentText(currentProblem, index + 1))()}
+                        {/* {(() => tabContentImage(currentProblem, index + 1))()} */}
                       </Tab.Pane>
                     ),
                   },
@@ -421,7 +425,7 @@ class ProblemSetCreate extends Component<Props, State> {
 
                 const newProblem: CreateProblemType[] = [];
                 this.state.problems.forEach((problem) => {
-                  if (problem.problemNumber === index) {
+                  if (problem.problemNumber === index + 1) {
                     newProblem.push(editProblem);
                   } else {
                     newProblem.push(problem);
@@ -454,10 +458,10 @@ class ProblemSetCreate extends Component<Props, State> {
                 <div className="Solution">
                   <Form.Group grouped>
                     <label>Solution</label>
-                    {(() => createSolution(currentProblem, index, 1))()}
-                    {(() => createSolution(currentProblem, index, 2))()}
-                    {(() => createSolution(currentProblem, index, 3))()}
-                    {(() => createSolution(currentProblem, index, 4))()}
+                    {(() => createSolution(currentProblem, index + 1, 1))()}
+                    {(() => createSolution(currentProblem, index + 1, 2))()}
+                    {(() => createSolution(currentProblem, index + 1, 3))()}
+                    {(() => createSolution(currentProblem, index + 1, 4))()}
                   </Form.Group>
                 </div>
               </div>
@@ -493,7 +497,7 @@ class ProblemSetCreate extends Component<Props, State> {
 
                     const newProblem: CreateProblemType[] = [];
                     this.state.problems.forEach((problem) => {
-                      if (problem.problemNumber === index) {
+                      if (problem.problemNumber === index + 1) {
                         newProblem.push(editProblem);
                       } else {
                         newProblem.push(problem);
@@ -511,7 +515,7 @@ class ProblemSetCreate extends Component<Props, State> {
 
             <Button
               id="problemsetcreate-remove"
-              onClick={() => this.removeProblemHandler(index)}
+              onClick={() => this.removeProblemHandler(index + 1)}
             >
               Remove problem
             </Button>
