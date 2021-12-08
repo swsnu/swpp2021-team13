@@ -303,16 +303,18 @@ describe('<ProblemSetCreate />', () => {
     // inputType3.at(1).simulate('click');
     // inputType3.at(0).simulate('click');
 
-    let file2 = new File(['file contents'], 'foo.png', { type: 'image/png' });
-    const wrapper_content_image2 = component.find(
-      '.ProblemSetCreate #problemset-problem-content-input-file-button'
-    );
-    wrapper_content_image2.at(3).simulate('change', {
-      target: { files: [file2] },
-    });
-    const pauseFor2 = (milliseconds: number) =>
-      new Promise((resolve) => setTimeout(resolve, milliseconds));
-    await pauseFor2(100);
+    // ------------- NO image -------------
+    // let file2 = new File(['file contents'], 'foo.png', { type: 'image/png' });
+    // const wrapper_content_image2 = component.find(
+    //   '.ProblemSetCreate #problemset-problem-content-input-file-button'
+    // );
+    // wrapper_content_image2.at(3).simulate('change', {
+    //   target: { files: [file2] },
+    // });
+    // const pauseFor2 = (milliseconds: number) =>
+    //   new Promise((resolve) => setTimeout(resolve, milliseconds));
+    // await pauseFor2(100);
+    // ------------- NO image -------------
 
     const wrapper_statement2 = component
       .find('.ProblemSetCreate #problemset-problem-content-input')
@@ -423,22 +425,24 @@ describe('<ProblemSetCreate />', () => {
     // console.log('@@@@@@ret.length', ret.length);
     // ret.at(0).simulate('click');
 
-    let file3 = new File(['file contents'], 'foo.png', { type: 'image/png' });
+    // ------------- NO image -------------
+    // let file3 = new File(['file contents'], 'foo.png', { type: 'image/png' });
 
-    const wrapper_content_image3 = component.find(
-      '.ProblemSetCreate #problemset-problem-content-input-file-button'
-    );
+    // const wrapper_content_image3 = component.find(
+    //   '.ProblemSetCreate #problemset-problem-content-input-file-button'
+    // );
 
-    wrapper_content_image3.at(5).simulate('change', {
-      target: { files: '' },
-    });
-    wrapper_content_image3.at(5).simulate('change', {
-      target: { files: [file3] },
-    });
+    // wrapper_content_image3.at(5).simulate('change', {
+    //   target: { files: '' },
+    // });
+    // wrapper_content_image3.at(5).simulate('change', {
+    //   target: { files: [file3] },
+    // });
 
-    const pauseFor3 = (milliseconds: number) =>
-      new Promise((resolve) => setTimeout(resolve, milliseconds));
-    await pauseFor3(100);
+    // const pauseFor3 = (milliseconds: number) =>
+    //   new Promise((resolve) => setTimeout(resolve, milliseconds));
+    // await pauseFor3(100);
+    // ------------- NO image -------------
 
     const submitButton = component.find('#problemsetcreate-submit').at(0);
     submitButton.simulate('click');
