@@ -146,7 +146,7 @@ class ProblemSetSolve extends Component<
       arr.push(num);
     }
 
-    return arr.sort();
+    return arr.sort((a, b) => a - b);
   };
 
   onSelectChoice = (index: number) => {
