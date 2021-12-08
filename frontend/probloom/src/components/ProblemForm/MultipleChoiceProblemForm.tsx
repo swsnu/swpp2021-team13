@@ -16,7 +16,7 @@ const MultipleChoiceProblemForm = (props: MultipleChoiceProblemFormProps) => {
       index={index+1}
       choice={choice}
       isSolution={
-        props.problem.solution !== undefined && props.problem.solution.includes(index)
+        props.problem.solution !== undefined && props.problem.solution.includes(index+1)
       }
       editContent={props.editContent}
     />
