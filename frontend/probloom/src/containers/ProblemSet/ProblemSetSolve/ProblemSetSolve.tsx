@@ -243,42 +243,39 @@ class ProblemSetSolve extends Component<
                         </div>
                       ))}
                   </Form.Field>
-                  <Button.Group>
-                    {this.state.checkNum > 1 && (
+                  {this.state.checkNum > 1 && (
+                    <Button
+                      className="prevButton"
+                      onClick={() => this.onClickPrevButton()}
+                      icon
+                      labelPosition="left"
+                    >
+                      Prev
+                      <Icon className="left arrow" />
+                    </Button>
+                  )}
+                  <Button
+                    className="submitButton"
+                    onClick={() =>
+                      this.onClickSubmitButton(
+                        this.props.selectedProblem!.problemType === 'subjective'
+                      )
+                    }
+                    type="submit"
+                    content="Submit"
+                  />
+                  {this.state.checkNum > 0 &&
+                    this.state.checkNum < problemIDList.length && (
                       <Button
-                        className="prevButton"
-                        onClick={() => this.onClickPrevButton()}
+                        className="nextButton"
+                        onClick={() => this.onClickNextButton()}
                         icon
-                        labelPosition="left"
+                        labelPosition="right"
                       >
-                        Prev
-                        <Icon className="left arrow" />
+                        Skip
+                        <Icon className="right arrow" />
                       </Button>
                     )}
-                    <Button
-                      className="submitButton"
-                      onClick={() =>
-                        this.onClickSubmitButton(
-                          this.props.selectedProblem!.problemType ===
-                            'subjective'
-                        )
-                      }
-                      type="submit"
-                      content="Submit"
-                    />
-                    {this.state.checkNum > 0 &&
-                      this.state.checkNum < problemIDList.length && (
-                        <Button
-                          className="nextButton"
-                          onClick={() => this.onClickNextButton()}
-                          icon
-                          labelPosition="right"
-                        >
-                          Next
-                          <Icon className="right arrow" />
-                        </Button>
-                      )}
-                  </Button.Group>
                 </Form>
               </Grid.Column>
             </Grid>
