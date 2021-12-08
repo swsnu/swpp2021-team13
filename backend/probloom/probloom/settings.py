@@ -24,9 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ["PROBLOOM_SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = "PROBLOOM_DEPLOY" not in os.environ
 
-ALLOWED_HOSTS = ["3.34.29.178"]
+if DEBUG:
+    ALLOWED_HOSTS = []
+else:
+    ALLOWED_HOSTS = ["3.34.29.178"]
 
 
 # Application definition
