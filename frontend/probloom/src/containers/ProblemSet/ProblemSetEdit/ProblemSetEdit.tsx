@@ -88,8 +88,8 @@ class ProblemSetEdit extends Component<Props, State> {
         {
           ...newProblem,
           problemType: 'multiple-choice',
-          choices: ["new choice"],
-          solution: [],
+          choices: ["new choice 1", "new choice 2", "new choice 3", "new choice 4"],
+          solution: [1],
         };
       this.props.onCreateProblem(
         Number(this.props.match.params.id),
@@ -115,9 +115,9 @@ class ProblemSetEdit extends Component<Props, State> {
       case 'content':
         newProblem.content = content;
         break;
-      case 'add_choice':
-        newProblem.choices.push('new choice');
-        break;
+//      case 'add_choice':
+//        newProblem.choices.push('new choice');
+//        break;
       case 'choice_content':
         newProblem.choices[index-1] = content;
         break;
@@ -125,16 +125,20 @@ class ProblemSetEdit extends Component<Props, State> {
         newProblem.solution.push(index);
         break;
       case 'choice_not_solution':
-        newProblem.solution.splice(newProblem.solution.indexOf(index), 1);
-        break;
-      case 'choice_delete':
-        if (newProblem.choices.length === 1) {
-          alert("Multiple choice problem must have at least one choice");
+        if (newProblem.solution.length == 1) {
+          alert("Each multiple choice problems must have at least one solution");
           break;
         }
-        newProblem.choices.splice(index-1, 1);
         newProblem.solution.splice(newProblem.solution.indexOf(index), 1);
         break;
+//      case 'choice_delete':
+//        if (newProblem.choices.length === 1) {
+//          alert("Multiple choice problem must have at least one choice");
+//          break;
+//        }
+//        newProblem.choices.splice(index-1, 1);
+//        newProblem.solution.splice(newProblem.solution.indexOf(index), 1);
+//        break;
       case 'add_solution':
         newProblem.solutions.push('new solution');
         break;
@@ -143,7 +147,7 @@ class ProblemSetEdit extends Component<Props, State> {
         break;
       case 'solution_delete':
         if (newProblem.solutions.length === 1) {
-          alert("Subjective problem must have at least one solution");
+          alert("Each subjective problem must have at least one solution");
           break;
         }
         newProblem.solutions.splice(index-1, 1);
