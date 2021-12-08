@@ -2,18 +2,20 @@ import * as actionTypes from '../actions/actionTypes';
 import problemReducer, { ProblemSetState } from './problemReducer';
 import * as interfaces from './problemReducerInterface';
 import * as a_interfaces from '../actions/problemActionInterface';
+import { ProblemSetAction } from '../actions/problemSetActions';
 
 describe('Problem Reducer', () => {
   it('should return default state', () => {
     const stubInitialState = {
       problemSets: [],
       solvers: [],
+      selectedSolver: null,
       isRecommender: false,
       selectedProblemSet: null,
       selectedProblem: null,
     };
-    //    const newState = problemReducer(undefined, {});
-    //    expect(newState).toEqual(stubInitialState);
+    const newState = problemReducer(undefined, {} as ProblemSetAction);
+    expect(newState).toEqual(stubInitialState);
   });
 
   test('gets problemsets', () => {
