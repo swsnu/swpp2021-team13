@@ -234,7 +234,7 @@ class ProblemSetSolve extends Component<
                         <div className="Choice">
                           <Form.Field>
                             <Checkbox
-                              name="checkboxRadioGroup"
+                              name="checkbox"
                               checked={this.state.choiceChecker[index]}
                               onChange={() => this.onSelectChoice(index)}
                             ></Checkbox>
