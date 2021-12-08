@@ -161,12 +161,8 @@ class ProblemSetSolve extends Component<
       index + 1
     );
 
-    let new_checker = !this.state.choiceChecker[index];
-    let new_choiceChecker = this.state.choiceChecker.splice(
-      index,
-      1,
-      new_checker
-    );
+    let new_choiceChecker = this.state.choiceChecker;
+    new_choiceChecker[index] = !this.state.choiceChecker[index];
 
     this.setState({
       multipleChoiceSolution: new_multipleChoiceSolution,
