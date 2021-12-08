@@ -234,7 +234,7 @@ class ProblemSetSearch extends Component<
             title={prob.title}
             date={prob.createdTime}
             creator={prob.username}
-            solved={0} //{prob.solverIDs.length}
+            solved={prob.solvedNum}
             recommended={prob.recommendedNum}
             clickProb={() => this.onClickProbHandler(prob)}
           />
@@ -259,7 +259,7 @@ class ProblemSetSearch extends Component<
               <Table.HeaderCell>Title</Table.HeaderCell>
               <Table.HeaderCell>Created</Table.HeaderCell>
               <Table.HeaderCell>Author</Table.HeaderCell>
-              <Table.HeaderCell>Solved People</Table.HeaderCell>
+              <Table.HeaderCell>Solved</Table.HeaderCell>
               <Table.HeaderCell>Recommendations</Table.HeaderCell>
             </Table.Row>
           </Table.Header>

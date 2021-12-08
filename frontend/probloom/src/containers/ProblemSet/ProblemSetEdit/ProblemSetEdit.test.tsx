@@ -316,4 +316,17 @@ describe('<ProblemSetEdit />', () => {
     saveButton.simulate('click');
     expect(spyDeleteProblem).toHaveBeenCalled()
   })
+
+  it('should redirect to signin if not logged in', () => {
+    const component = mount(
+      <Provider store={getMockStore()}>
+        <ConnectedRouter history={history}>
+          <Route path="/" exact component={ProblemSetEdit} />
+        </ConnectedRouter>
+      </Provider>
+    );
+    const wrapper = component.find('Redirect');
+    expect(wrapper.length).toBe(1);
+  });
+
 });
