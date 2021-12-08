@@ -14,7 +14,7 @@ COPY build/ build/
 RUN apt update && apt install -y nginx
 COPY nginx.conf /etc/nginx/sites-enabled/nginx.conf
 RUN rm /etc/nginx/sites-enabled/default
-RUN ln -s /etc/nginx/sites-available/nginx.conf /etc/nginx/sites-enabled/nginx.conf
+RUN ln -s /etc/nginx/sites-enabled/nginx.conf /etc/nginx/sites-available/nginx.conf
 RUN mkdir -p /usr/share/nginx/html
 RUN cp -r build/* /usr/share/nginx/html/
 
