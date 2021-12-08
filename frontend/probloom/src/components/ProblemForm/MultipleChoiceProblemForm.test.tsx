@@ -20,11 +20,11 @@ describe('<MultipleChoiceProblemForm />', () => {
     const component = shallow(
       <MultipleChoiceProblemForm
         problem={multipleChoiceProblem}
-        editContent={(
-          target: string,
-          content?: any,
-          index?: any
-          )=>{{}}}/>);
+        editContent={()=>{{}}}
+        deleteProb={()=>{{}}}
+        saveProb={()=>{{}}}
+      />
+    );
     const wrapper = component.find('.MultipleChoiceProblemForm');
     expect(wrapper.length).toBe(1);
   });
