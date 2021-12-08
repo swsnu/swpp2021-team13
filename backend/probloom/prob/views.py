@@ -1304,9 +1304,8 @@ def solve_problem(request: HttpRequest, p_id: int) -> HttpResponse:
         raise BadRequest("solution should be an array or a string")
 
     solved = Solved.objects.get_or_create(solver_id=request.user.pk, problem_id=p_id)[0]
-    if solved.result is False:
-        solved.result = result
-        solved.save()
+    solved.result = result
+    solved.save()
     return JsonResponse({"result": result})
 
 
