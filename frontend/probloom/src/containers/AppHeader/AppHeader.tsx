@@ -12,7 +12,7 @@ export interface ProfileDropdownProps {
 }
 
 const ProfileDropdown = ({ user, onSignOut }: ProfileDropdownProps) => {
-  if (user === null) {
+  if (user === null || user.logged_in === false) {
     return null;
   }
   return (

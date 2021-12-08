@@ -27,7 +27,7 @@ import {
   getIsRecommender,
   updateRecommend,
 } from '../../../store/actions';
-import { tagOptions } from '../ProblemSetSearch/ProblemSetSearch';
+import { tagOptions1 } from '../ProblemSetSearch/ProblemSetSearch';
 import {
   scopeOptions,
   difficultyOptions,
@@ -112,7 +112,19 @@ class ProblemSetDetail extends Component<
   };
 
   onClickEditProblemSetButton = () => {
-    this.setState({ isProblemSetEdit: true });
+    this.setState({
+      ...this.state,
+      editProblemSetTitle: this.props.selectedProblemSet!.title,
+      editProblemSetDescription: this.props.selectedProblemSet!.content,
+      editProblemSetScope: this.props.selectedProblemSet!.isOpen
+        ? 'scope-public'
+        : 'scope-private',
+      editProblemSetDifficulty: String(
+        this.props.selectedProblemSet!.difficulty
+      ),
+      isProblemSetEdit: true,
+      //editProblemSetTag: this.props.selectedProblemSet.tag
+    });
   };
 
   onClickConfirmProblemSetEditButton = () => {
@@ -372,7 +384,7 @@ class ProblemSetDetail extends Component<
                   <Form.Dropdown
                     className="Tag"
                     item
-                    options={tagOptions}
+                    options={tagOptions1}
                     label="Tag"
                     //defaultValue={this.state.editProblemSetTag}
                     onChange={(_, { value }) => {

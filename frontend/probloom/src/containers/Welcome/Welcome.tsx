@@ -69,7 +69,7 @@ class Welcome extends Component<WelcomeProps, WelcomeState> {
   };
 
   render() {
-    if (this.props.selectedUser !== null) {
+    if (this.props.selectedUser !== null && this.props.selectedUser.logged_in) {
       return <Redirect to="/problem/search/" />;
     }
     return (

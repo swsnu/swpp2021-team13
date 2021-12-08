@@ -19,11 +19,11 @@ describe('<SubjectiveProblemForm />', () => {
     const component = shallow(
       <SubjectiveProblemForm
         problem={subjectiveProblem}
-        editContent={(
-          target: string,
-          content?: any,
-          index?: any
-          )=>{{}}}/>);
+        editContent={()=>{{}}}
+        deleteProb={()=>{{}}}
+        saveProb={()=>{{}}}
+      />
+    );
     const wrapper = component.find('.SubjectiveProblemForm');
     expect(wrapper.length).toBe(1);
   });

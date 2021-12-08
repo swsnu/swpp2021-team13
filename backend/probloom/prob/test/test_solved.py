@@ -367,7 +367,7 @@ class SolveProblemTestCase(TestCase):
             {"old": None, "new": True, "result": True},
             {"old": False, "new": False, "result": False},
             {"old": False, "new": True, "result": True},
-            {"old": True, "new": False, "result": True},
+            {"old": True, "new": False, "result": False},
             {"old": True, "new": True, "result": True},
         ]
 

@@ -3,11 +3,24 @@ import {
   SIGN_IN,
   SIGN_OUT,
   GET_USER_PROFILE,
+  GET_USER_STATISTICS,
   UPDATE_USER_INTRODUCTION,
 } from '../actions/actionTypes';
+import { UserAction } from '../actions/userActions';
 import userReducer, { UserProfile } from './userReducer';
 
 describe('User Reducer', () => {
+  it('should return default state', () => {
+    const stubInitialState = {
+      users: [],
+      selectedUser: null,
+      selectedUserProfile: null,
+      selectedUserStatistics: null,
+    };
+    const newState = userReducer(undefined, {} as UserAction);
+    expect(newState).toEqual(stubInitialState);
+  });
+
   it('sign in/up/out updates selected user', () => {
     const initialState = {
       users: [],
@@ -89,6 +102,40 @@ describe('User Reducer', () => {
       selectedUser: null,
       selectedUserProfile: newUserProfile,
       selectedUserStatistics: null,
+    });
+  });
+
+  it('gets user profile statistics', () => {
+    const oldUserProfile: UserProfile = {
+      userId: 42,
+      introduction: 'TEST_USER_PROFILE_INTRODUCTION_OLD',
+    };
+    const oldState = userReducer(undefined, {
+      type: GET_USER_PROFILE,
+      selectedUserProfile: oldUserProfile,
+    });
+    expect(oldState).toEqual({
+      users: [],
+      selectedUser: null,
+      selectedUserProfile: oldUserProfile,
+      selectedUserStatistics: null,
+    });
+    const userStatistics = {
+      userId: 1,
+      lastActiveDays: 2,
+      numberOfCreatedProblems: 3,
+      numberOfSolvedProblems: 4,
+      numberOfRecommendedProblems: 5,
+    };
+    const newState = userReducer(oldState, {
+      type: GET_USER_STATISTICS,
+      selectedUserStatistics: userStatistics,
+    });
+    expect(newState).toEqual({
+      users: [],
+      selectedUser: null,
+      selectedUserProfile: oldUserProfile,
+      selectedUserStatistics: userStatistics,
     });
   });
 

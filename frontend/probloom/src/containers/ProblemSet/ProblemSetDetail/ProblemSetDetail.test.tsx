@@ -8,7 +8,7 @@ import * as problemActions from '../../../store/actions/problemSetActions';
 import * as commentActions from '../../../store/actions/commentActions';
 import {
   Solver,
-  ProblemSetInterface,
+  ProblemSetWithProblemsInterface,
 } from '../../../store/reducers/problemReducerInterface';
 import { ProblemSetState } from '../../../store/reducers/problemReducer';
 import { Comment, CommentState } from '../../../store/reducers/commentReducer';
@@ -44,7 +44,7 @@ const solver1: Solver = {
   problems: [null],
 };
 
-const problemSet1: ProblemSetInterface = {
+const problemSet1: ProblemSetWithProblemsInterface = {
   id: 1,
   title: 'title1',
   createdTime: '2021-01-01',
@@ -268,7 +268,7 @@ describe('<ProblemSetDetail />', () => {
   });
 
   it('other cases: is_open===true and difficulty is not defined', () => {
-    const problemSet1: ProblemSetInterface = {
+    const problemSet1: ProblemSetWithProblemsInterface = {
       id: 1,
       title: 'title1',
       createdTime: '2021-01-01',

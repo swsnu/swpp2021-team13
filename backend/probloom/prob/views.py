@@ -72,7 +72,7 @@ class SignUpView(View):
             "id": new_user.pk,
             "username": new_user.username,
             "email": new_user.email,
-            "logged_in": True,
+            "logged_in": False,
         }
         return JsonResponse(res, status=201, safe=False)
 
@@ -1304,9 +1304,8 @@ def solve_problem(request: HttpRequest, p_id: int) -> HttpResponse:
         raise BadRequest("solution should be an array or a string")
 
     solved = Solved.objects.get_or_create(solver_id=request.user.pk, problem_id=p_id)[0]
-    if solved.result is False:
-        solved.result = result
-        solved.save()
+    solved.result = result
+    solved.save()
     return JsonResponse({"result": result})
 
 
@@ -1369,7 +1368,8 @@ def find_solvers(_: HttpRequest, ps_id: int) -> HttpResponse:
                 "problems": [None] * num_problems,
             }
         res_entry["problems"][record.number - 1] = record.result
-    res_entry["result"] = all(res_entry["problems"])
+    if res_entry != {}:
+        res_entry["result"] = all(res_entry["problems"])
     res.append(res_entry)
 
     return JsonResponse(res, safe=False)
@@ -1417,7 +1417,7 @@ def get_solver(_: HttpRequest, ps_id: int, u_id: int) -> HttpResponse:
         .order_by("number")
         .values("number", "result")
     )
-
+ 
     problems = [None] * num_problems
     for record in solved_query:
         problems[record["number"] - 1] = record["result"]

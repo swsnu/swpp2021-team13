@@ -14,6 +14,7 @@ import ProblemSetDetail from './containers/ProblemSet/ProblemSetDetail/ProblemSe
 import ProblemSetEdit from './containers/ProblemSet/ProblemSetEdit/ProblemSetEdit';
 import ProblemSetSearch from './containers/ProblemSet/ProblemSetSearch/ProblemSetSearch';
 import ProblemSetSolve from './containers/ProblemSet/ProblemSetSolve/ProblemSetSolve';
+import ProblemSetSolveResult from './containers/ProblemSet/ProblemSetSolve/ProblemSetSolveResult';
 import Profile from './containers/Profile/Profile';
 import SignUp from './containers/SignUp/SignUp';
 import Welcome from './containers/Welcome/Welcome';
@@ -60,6 +61,11 @@ class App extends Component<AppProps> {
               path="/problem/:id/solve/"
               exact
               component={ProblemSetSolve}
+            />
+            <Route
+              path="/problem/:id/solve/result/"
+              exact
+              component={ProblemSetSolveResult}
             />
             <Route path="/problem/:id/edit/" exact component={ProblemSetEdit} />
             <Route component={NotFound} />

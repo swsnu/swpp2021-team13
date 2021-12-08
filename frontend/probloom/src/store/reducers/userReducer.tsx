@@ -21,7 +21,10 @@ export interface UserStatisticsProblemSet {
 export interface UserStatistics {
   userId: number;
   lastActiveDays: number;
-  createdProblems: UserStatisticsProblemSet[];
+  numberOfCreatedProblems: number;
+  numberOfSolvedProblems: number;
+  numberOfRecommendedProblems: number;
+  // createdProblems: UserStatisticsProblemSet[];
   // solvedProblems: number[];
   // recommendedProblems: number[];
   // createdExplanations: number[];

@@ -5,11 +5,11 @@ describe('<Solution />', () => {
   it('Clicked component should render without errors', () => {
     const component = shallow(
       <Solution
-        index={0}
+        index={1}
         solution='solution'
         editContent={(target, content, index)=>{{}}}
       />);
-    const wrapper = component.find('.Solution');
+    const wrapper = component.find('.Solution1');
     expect(wrapper.length).toBe(1);
   });
 });

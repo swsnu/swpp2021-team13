@@ -1,14 +1,26 @@
 import { Component } from 'react';
 import { connect } from 'react-redux';
 import { returntypeof } from 'react-redux-typescript';
+import { Redirect } from 'react-router';
 
 import * as actionCreators from '../../../store/actions';
 import {
-  NewProblemSet,
-  ProblemSetCreateState,
+  CreateProblemType,
+  CreateMultipleChoiceProblemInterface,
+  CreateSubjectiveProblemInterface,
+  CreateProblemSetRequest,
 } from '../../../store/reducers/problemReducerInterface';
-import { Button, Container, Form, Header, Input } from 'semantic-ui-react';
-import { tagOptions } from '../ProblemSetSearch/ProblemSetSearch';
+import {
+  Button,
+  Container,
+  Divider,
+  Form,
+  Header,
+  Image,
+  Input,
+  Tab,
+} from 'semantic-ui-react';
+import { tagOptions1, tagOptions2 } from '../ProblemSetSearch/ProblemSetSearch';
 
 interface ProblemSetCreateProps {
   history: any;
@@ -19,18 +31,19 @@ interface StateFromProps {}
 interface DispatchFromProps {
   onCreateProblemSet: (
     title: string,
-    content: string,
     scope: string,
-    tag: string,
-    difficulty: string,
-    problems: NewProblemSet[]
+    tag: string[],
+    difficulty: number,
+    content: string,
+    problems: CreateProblemType[]
   ) => void;
 }
 
 type Props = ProblemSetCreateProps &
   typeof statePropTypes &
   typeof actionPropTypes;
-type State = ProblemSetCreateState;
+
+type State = CreateProblemSetRequest;
 
 export const scopeOptions = [
   { text: 'Private', value: 'scope-private' },
@@ -38,12 +51,18 @@ export const scopeOptions = [
 ];
 
 export const difficultyOptions = [
-  { key: 1, text: 'Basic', value: '1' },
-  { key: 2, text: 'Intermediate', value: '2' },
-  { key: 3, text: 'Advanced', value: '3' },
+  { key: 1, text: 'Everyone', value: 1 },
+  { key: 2, text: 'Elementary School', value: 2 },
+  { key: 3, text: 'Middle School', value: 3 },
+  { key: 4, text: 'High School', value: 4 },
+  { key: 5, text: 'Undergraduate', value: 5 },
+  { key: 6, text: 'Graduate', value: 6 },
 ];
 
-const typeOptions = [{ text: 'multiple choice', value: 'type-multiplechoice' }];
+const typeOptions = [
+  { text: 'multiple choice question', value: 'multiple-choice' },
+  { text: 'subjective question', value: 'subjective' },
+];
 
 class ProblemSetCreate extends Component<Props, State> {
   constructor(props: Props) {
@@ -51,83 +70,225 @@ class ProblemSetCreate extends Component<Props, State> {
 
     this.state = {
       title: '',
-      content: '',
       scope: 'scope-private',
-      tag: '',
-      difficulty: '1',
+      tag: ['tag-all', ''],
+      difficulty: 1,
+      content: '',
       problems: [],
-      numberOfProblems: 0,
     };
   }
 
   addProblemHandler = (index: number) => {
-    const newProblem = {
-      index: index,
-      problem_type: '',
-      problem_statement: 'problem here...',
-      choice: ['', '', '', ''],
-      solution: '',
-      explanation: 'explanation here...',
+    let newProblem: CreateMultipleChoiceProblemInterface = {
+      problemType: 'multiple-choice',
+      problemSetID: 0,
+      problemNumber: index + 1,
+      content: 'problem here...',
+      choices: ['', '', '', ''],
+      solution: [],
     };
 
     this.setState({
       ...this.state,
       problems: [...this.state.problems, newProblem],
-      numberOfProblems: this.state.numberOfProblems + 1,
     });
   };
 
-  // confirmProblemHandler = () => {
-  // };
   removeProblemHandler = (index: number) => {
     const deletedProblems = this.state.problems.filter((problem) => {
-      return problem.index !== index;
+      return problem.problemNumber !== index;
     });
     deletedProblems.forEach((element) => {
-      if (element.index > index) {
-        element.index -= 1;
+      if (element.problemNumber > index) {
+        element.problemNumber -= 1;
       }
     });
 
     this.setState({
       ...this.state,
       problems: deletedProblems,
-      numberOfProblems: this.state.numberOfProblems - 1,
     });
   };
 
   submitProblemSetHandler = () => {
-    this.props.onCreateProblemSet(
-      this.state.title,
-      this.state.content,
-      this.state.scope,
-      this.state.tag,
-      this.state.difficulty,
-      this.state.problems
-    );
+    if (this.state.problems.length > 0) {
+      this.props.onCreateProblemSet(
+        this.state.title,
+        this.state.scope,
+        this.state.tag,
+        this.state.difficulty,
+        this.state.content,
+        this.state.problems
+      );
+    } else {
+      alert('You need to make at least 1 problem in your problem set.');
+    }
   };
 
   render() {
-    const currentProblemSet = this.state.problems.map((problemSet, index) => {
+    if (!this.props.selectedUser) {
+      return <Redirect to="/" />;
+    }
+
+    const tabContentText = (
+      currentProblem: CreateProblemType,
+      index: number
+    ) => {
       return (
-        <div className="NewProblemSet" key={index.toString()}>
-          <Form.Dropdown
-            className="Type"
-            item
-            options={typeOptions}
-            label="Type"
-            onChange={(_, { value }) => {
-              const newProblem: NewProblemSet[] = [];
-              const editProblem: NewProblemSet = {
-                index: problemSet.index,
-                problem_type: value as string,
-                problem_statement: problemSet.problem_statement,
-                choice: problemSet.choice,
-                solution: problemSet.solution,
-                explanation: problemSet.explanation,
+        <Form.TextArea
+          id="problemset-problem-content-input"
+          label="Problem Content"
+          placeholder="Content : Explain your problem set"
+          onChange={(event) => {
+            let editProblem: any;
+            if (currentProblem.problemType === 'multiple-choice') {
+              let _currentProblem =
+                currentProblem as CreateMultipleChoiceProblemInterface;
+              editProblem = {
+                problemType: _currentProblem.problemType,
+                problemSetID: _currentProblem.problemSetID,
+                problemNumber: _currentProblem.problemNumber,
+                content: event.target.value,
+                choices: _currentProblem.choices,
+                solution: _currentProblem.solution,
               };
+            } else {
+              let _currentProblem =
+                currentProblem as CreateSubjectiveProblemInterface;
+              editProblem = {
+                problemType: _currentProblem.problemType,
+                problemSetID: _currentProblem.problemSetID,
+                problemNumber: _currentProblem.problemNumber,
+                content: event.target.value,
+                solutions: _currentProblem.solutions,
+              };
+            }
+
+            const newProblem: CreateProblemType[] = [];
+            this.state.problems.forEach((problem) => {
+              if (problem.problemNumber === index) {
+                newProblem.push(editProblem);
+              } else {
+                newProblem.push(problem);
+              }
+            });
+
+            this.setState({
+              ...this.state,
+              problems: newProblem,
+            });
+          }}
+        />
+      );
+    };
+
+    // let tabContentImage = (currentProblem, index: number) => {
+    //   return (
+    //     <>
+    //       <Input
+    //         id="problemset-problem-content-input-file-button"
+    //         type="file"
+    //         accept="image/*"
+    //         onChange={(event) => {
+    //           if (!event.target.files) {
+    //             return;
+    //           }
+    //           const file = event.target.files[0];
+
+    //           const reader = new FileReader();
+    //           reader.onloadend = () => {
+    //             let editProblem: CreateProblemType;
+    //             if (currentProblem.problemType === 'multiple-choice') {
+    //               let _currentProblem =
+    //                 currentProblem as CreateMultipleChoiceProblemInterface;
+    //               editProblem = {
+    //                 problemType: _currentProblem.problemType,
+    //                 problemSetID: _currentProblem.problemSetID,
+    //                 problemNumber: _currentProblem.problemNumber,
+    //                 content: reader.result as string,
+    //                 choices: _currentProblem.choices,
+    //                 solution: _currentProblem.solution,
+    //               };
+    //             } else {
+    //               let _currentProblem =
+    //                 currentProblem as CreateSubjectiveProblemInterface;
+    //               editProblem = {
+    //                 problemType: _currentProblem.problemType,
+    //                 problemSetID: _currentProblem.problemSetID,
+    //                 problemNumber: _currentProblem.problemNumber,
+    //                 content: reader.result as string,
+    //                 solutions: _currentProblem.solutions,
+    //               };
+    //             }
+
+    //             const newProblem: CreateProblemType[] = [];
+    //             this.state.problems.forEach((problem) => {
+    //               if (problem.problemNumber === index) {
+    //                 newProblem.push(editProblem);
+    //               } else {
+    //                 newProblem.push(problem);
+    //               }
+    //             });
+    //             this.setState({
+    //               ...this.state,
+    //               problems: newProblem,
+    //             });
+    //           };
+    //           reader.readAsDataURL(file);
+    //         }}
+    //       />
+
+    //       <Image
+    //         id="problemset-problem-content-input-file-preview"
+    //         src={
+    //           this.state.problems.filter(
+    //             (problem) => problem.problemNumber === index
+    //           )[0].content
+    //         }
+    //         alt=""
+    //         size="huge"
+    //       />
+    //     </>
+    //   );
+    // };
+
+    let createChoice = (
+      currentProblem: CreateMultipleChoiceProblemInterface,
+      index: number,
+      order: number
+    ) => {
+      return (
+        <>
+          <Form.Field
+            id={`problem-choice${order}-input`}
+            label={`choice ${order}`}
+            control="input"
+            placeholder={`choice ${order} here...`}
+            onChange={(event) => {
+              const editChoice = event.target.value;
+              const newChoice: string[] = [];
+              let _currentProblem =
+                currentProblem as CreateMultipleChoiceProblemInterface;
+              _currentProblem.choices.forEach((choice, index) => {
+                if (index === order - 1) {
+                  newChoice.push(editChoice);
+                } else {
+                  newChoice.push(choice);
+                }
+              });
+
+              const editProblem: CreateMultipleChoiceProblemInterface = {
+                problemType: _currentProblem.problemType,
+                problemSetID: _currentProblem.problemSetID,
+                problemNumber: _currentProblem.problemNumber,
+                content: _currentProblem.content,
+                choices: newChoice,
+                solution: _currentProblem.solution,
+              };
+
+              const newProblem: CreateProblemType[] = [];
               this.state.problems.forEach((problem) => {
-                if (problem.index === index) {
+                if (problem.problemNumber === index + 1) {
                   newProblem.push(editProblem);
                 } else {
                   newProblem.push(problem);
@@ -139,385 +300,244 @@ class ProblemSetCreate extends Component<Props, State> {
                 problems: newProblem,
               });
             }}
-          />
-
-          <div className="ProblemStatement">
-            <label>Problem statement</label>
-            <textarea
-              id="problemset-problem-statement-input"
-              rows={4}
-              placeholder={`${problemSet.problem_statement}`}
-              onChange={(event) => {
-                const newProblem: NewProblemSet[] = [];
-                const editProblem: NewProblemSet = {
-                  index: problemSet.index,
-                  problem_type: problemSet.problem_type,
-                  problem_statement: event.target.value,
-                  choice: problemSet.choice,
-                  solution: problemSet.solution,
-                  explanation: problemSet.explanation,
-                };
-                this.state.problems.forEach((problem) => {
-                  if (problem.index === index) {
-                    newProblem.push(editProblem);
-                  } else {
-                    newProblem.push(problem);
-                  }
-                });
-
-                this.setState({
-                  ...this.state,
-                  problems: newProblem,
-                });
-              }}
-            />
-          </div>
-          <label>Answer choice</label>
-          <div className="ProblemChoice1">
-            <label>choice 1</label>
-            <input
-              id="problemset-choice1-input"
-              placeholder="choice 1 here..."
-              onChange={(event) => {
-                const editChoice1 = event.target.value;
-                const newChoice1: string[] = [];
-                problemSet.choice.forEach((choice, index) => {
-                  if (index === 0) {
-                    newChoice1.push(editChoice1);
-                  } else {
-                    newChoice1.push(choice);
-                  }
-                });
-
-                const newProblem: NewProblemSet[] = [];
-                const editProblem: NewProblemSet = {
-                  index: problemSet.index,
-                  problem_type: problemSet.problem_type,
-                  problem_statement: problemSet.problem_statement,
-                  choice: newChoice1,
-                  solution: problemSet.solution,
-                  explanation: problemSet.explanation,
-                };
-                this.state.problems.forEach((problem) => {
-                  if (problem.index === index) {
-                    newProblem.push(editProblem);
-                  } else {
-                    newProblem.push(problem);
-                  }
-                });
-
-                this.setState({
-                  ...this.state,
-                  problems: newProblem,
-                });
-              }}
-            ></input>
-          </div>
-          <div className="ProblemChoice2">
-            <label>choice 2</label>
-            <input
-              id="problemset-choice2-input"
-              placeholder="choice 2 here..."
-              onChange={(event) => {
-                const editChoice1 = event.target.value;
-                const newChoice1: string[] = [];
-                problemSet.choice.forEach((choice, index) => {
-                  if (index === 1) {
-                    newChoice1.push(editChoice1);
-                  } else {
-                    newChoice1.push(choice);
-                  }
-                });
-
-                const newProblem: NewProblemSet[] = [];
-                const editProblem: NewProblemSet = {
-                  index: problemSet.index,
-                  problem_type: problemSet.problem_type,
-                  problem_statement: problemSet.problem_statement,
-                  choice: newChoice1,
-                  solution: problemSet.solution,
-                  explanation: problemSet.explanation,
-                };
-                this.state.problems.forEach((problem) => {
-                  if (problem.index === index) {
-                    newProblem.push(editProblem);
-                  } else {
-                    newProblem.push(problem);
-                  }
-                });
-
-                this.setState({
-                  ...this.state,
-                  problems: newProblem,
-                });
-              }}
-            ></input>
-          </div>
-          <div className="ProblemChoice3">
-            <label>choice 3</label>
-            <input
-              id="problemset-choice3-input"
-              placeholder="choice 3 here..."
-              onChange={(event) => {
-                const editChoice1 = event.target.value;
-                const newChoice1: string[] = [];
-                problemSet.choice.forEach((choice, index) => {
-                  if (index === 2) {
-                    newChoice1.push(editChoice1);
-                  } else {
-                    newChoice1.push(choice);
-                  }
-                });
-
-                const newProblem: NewProblemSet[] = [];
-                const editProblem: NewProblemSet = {
-                  index: problemSet.index,
-                  problem_type: problemSet.problem_type,
-                  problem_statement: problemSet.problem_statement,
-                  choice: newChoice1,
-                  solution: problemSet.solution,
-                  explanation: problemSet.explanation,
-                };
-                this.state.problems.forEach((problem) => {
-                  if (problem.index === index) {
-                    newProblem.push(editProblem);
-                  } else {
-                    newProblem.push(problem);
-                  }
-                });
-
-                this.setState({
-                  ...this.state,
-                  problems: newProblem,
-                });
-              }}
-            ></input>
-          </div>
-          <div className="ProblemChoice4">
-            <label>choice 4</label>
-            <input
-              id="problemset-choice4-input"
-              placeholder="choice 4 here..."
-              onChange={(event) => {
-                const editChoice1 = event.target.value;
-                const newChoice1: string[] = [];
-                problemSet.choice.forEach((choice, index) => {
-                  if (index === 3) {
-                    newChoice1.push(editChoice1);
-                  } else {
-                    newChoice1.push(choice);
-                  }
-                });
-
-                const newProblem: NewProblemSet[] = [];
-                const editProblem: NewProblemSet = {
-                  index: problemSet.index,
-                  problem_type: problemSet.problem_type,
-                  problem_statement: problemSet.problem_statement,
-                  choice: newChoice1,
-                  solution: problemSet.solution,
-                  explanation: problemSet.explanation,
-                };
-                this.state.problems.forEach((problem) => {
-                  if (problem.index === index) {
-                    newProblem.push(editProblem);
-                  } else {
-                    newProblem.push(problem);
-                  }
-                });
-
-                this.setState({
-                  ...this.state,
-                  problems: newProblem,
-                });
-              }}
-            ></input>
-          </div>
-          <div className="Solution">
-            <label>Solution</label>
-            <input
-              id="problemset-solution1-input"
-              type="radio"
-              name={`choice${problemSet.index}${index}`}
-              value="1"
-              checked={`${problemSet.solution}` === '1'}
-              onChange={(event) => {
-                const newProblem: NewProblemSet[] = [];
-                const editProblem: NewProblemSet = {
-                  index: problemSet.index,
-                  problem_type: problemSet.problem_type,
-                  problem_statement: problemSet.problem_statement,
-                  choice: problemSet.choice,
-                  solution: event.target.value,
-                  explanation: problemSet.explanation,
-                };
-                this.state.problems.forEach((problem) => {
-                  if (problem.index === index) {
-                    newProblem.push(editProblem);
-                  } else {
-                    newProblem.push(problem);
-                  }
-                });
-
-                this.setState({
-                  ...this.state,
-                  problems: newProblem,
-                });
-              }}
-            />
-            1
-            <input
-              id="problemset-solution2-input"
-              type="radio"
-              name={`choice${problemSet.index}${index}`}
-              value="2"
-              checked={`${problemSet.solution}` === '2'}
-              onChange={(event) => {
-                const newProblem: NewProblemSet[] = [];
-                const editProblem: NewProblemSet = {
-                  index: problemSet.index,
-                  problem_type: problemSet.problem_type,
-                  problem_statement: problemSet.problem_statement,
-                  choice: problemSet.choice,
-                  solution: event.target.value,
-                  explanation: problemSet.explanation,
-                };
-                this.state.problems.forEach((problem) => {
-                  if (problem.index === index) {
-                    newProblem.push(editProblem);
-                  } else {
-                    newProblem.push(problem);
-                  }
-                });
-
-                this.setState({
-                  ...this.state,
-                  problems: newProblem,
-                });
-              }}
-            />
-            2
-            <input
-              id="problemset-solution3-input"
-              type="radio"
-              name={`choice${problemSet.index}${index}`}
-              value="3"
-              checked={`${problemSet.solution}` === '3'}
-              onChange={(event) => {
-                const newProblem: NewProblemSet[] = [];
-                const editProblem: NewProblemSet = {
-                  index: problemSet.index,
-                  problem_type: problemSet.problem_type,
-                  problem_statement: problemSet.problem_statement,
-                  choice: problemSet.choice,
-                  solution: event.target.value,
-                  explanation: problemSet.explanation,
-                };
-                this.state.problems.forEach((problem) => {
-                  if (problem.index === index) {
-                    newProblem.push(editProblem);
-                  } else {
-                    newProblem.push(problem);
-                  }
-                });
-
-                this.setState({
-                  ...this.state,
-                  problems: newProblem,
-                });
-              }}
-            />
-            3
-            <input
-              id="problemset-solution4-input"
-              type="radio"
-              name={`choice${problemSet.index}${index}`}
-              value="4"
-              checked={`${problemSet.solution}` === '4'}
-              onChange={(event) => {
-                const newProblem: NewProblemSet[] = [];
-                const editProblem: NewProblemSet = {
-                  index: problemSet.index,
-                  problem_type: problemSet.problem_type,
-                  problem_statement: problemSet.problem_statement,
-                  choice: problemSet.choice,
-                  solution: event.target.value,
-                  explanation: problemSet.explanation,
-                };
-                this.state.problems.forEach((problem) => {
-                  if (problem.index === index) {
-                    newProblem.push(editProblem);
-                  } else {
-                    newProblem.push(problem);
-                  }
-                });
-
-                this.setState({
-                  ...this.state,
-                  problems: newProblem,
-                });
-              }}
-            />
-            4
-          </div>
-          <div className="SolutionExplanation">
-            <label>Solution explanation</label>
-            <textarea
-              id="problemset-solution-explanation-input"
-              rows={4}
-              placeholder={`${problemSet.explanation}`}
-              onChange={(event) => {
-                const newProblem: NewProblemSet[] = [];
-                const editProblem: NewProblemSet = {
-                  index: problemSet.index,
-                  problem_type: problemSet.problem_type,
-                  problem_statement: problemSet.problem_statement,
-                  choice: problemSet.choice,
-                  solution: problemSet.solution,
-                  explanation: event.target.value,
-                };
-                this.state.problems.forEach((problem) => {
-                  if (problem.index === index) {
-                    newProblem.push(editProblem);
-                  } else {
-                    newProblem.push(problem);
-                  }
-                });
-
-                this.setState({
-                  ...this.state,
-                  problems: newProblem,
-                });
-              }}
-            />
-          </div>
-          {/* <button onClick={() => this.confirmProblemHandler()}>
-            Confirm problem
-          </button> */}
-          <button
-            id="problemsetcreate-remove"
-            onClick={() => this.removeProblemHandler(problemSet.index)}
-          >
-            Remove problem
-          </button>
-        </div>
+          ></Form.Field>
+        </>
       );
-    });
+    };
+
+    let createSolution = (
+      currentProblem: CreateMultipleChoiceProblemInterface,
+      index: number,
+      order: number
+    ) => {
+      return (
+        <Form.Field
+          id={`problem-solution${order}-input`}
+          label={`${order}`}
+          control="input"
+          type="checkbox"
+          onChange={() => {
+            let _currentProblem =
+              currentProblem as CreateMultipleChoiceProblemInterface;
+            let newSolution;
+            if (_currentProblem.solution.includes(order)) {
+              let arr = _currentProblem.solution.filter(
+                (element) => element !== order
+              );
+              newSolution = [...Array.from(new Set([...arr]))];
+            } else {
+              newSolution = [
+                ...Array.from(new Set([..._currentProblem.solution, order])),
+              ];
+            }
+            const editProblem: CreateProblemType = {
+              problemType: _currentProblem.problemType,
+              problemSetID: _currentProblem.problemSetID,
+              problemNumber: _currentProblem.problemNumber,
+              content: _currentProblem.content,
+              choices: _currentProblem.choices,
+              solution: newSolution,
+            };
+
+            const newProblem: CreateProblemType[] = [];
+            this.state.problems.forEach((problem) => {
+              if (problem.problemNumber === index) {
+                newProblem.push(editProblem);
+              } else {
+                newProblem.push(problem);
+              }
+            });
+
+            this.setState({
+              ...this.state,
+              problems: newProblem,
+            });
+          }}
+        />
+      );
+    };
+
+    const newProblems = this.state.problems.map(
+      (currentProblem: CreateProblemType, index) => {
+        return (
+          <div className="NewProblem" key={index.toString()}>
+            <div>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              <Divider />
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            </div>
+
+            <div className="ProblemContent">
+              <Tab
+                id="asdfg"
+                panes={[
+                  {
+                    menuItem: `Make content`,
+                    render: () => (
+                      <Tab.Pane id="qwerty">
+                        {(() => tabContentText(currentProblem, index + 1))()}
+                        {/* {(() => tabContentImage(currentProblem, index + 1))()} */}
+                      </Tab.Pane>
+                    ),
+                  },
+                  // {
+                  //   menuItem: `Make content in IMAGE`,
+                  //   render: () => (
+                  //     <Tab.Pane id="qwerty2">
+                  //       {(() => tabContentImage(currentProblem, index))()}
+                  //     </Tab.Pane>
+                  //   ),
+                  // },
+                ]}
+              />
+            </div>
+
+            <Form.Dropdown
+              className="ProblemType"
+              item
+              options={typeOptions}
+              label="Type"
+              defaultValue="multiple-choice"
+              onChange={(_, { value }) => {
+                // Always change type
+                let editProblem: any;
+
+                if (value === 'multiple-choice') {
+                  // 1. from subjective to multiple-choice
+                  editProblem = {
+                    problemType: value,
+                    problemSetID: currentProblem.problemSetID,
+                    problemNumber: currentProblem.problemNumber,
+                    content: currentProblem.content,
+                    choices: ['', '', '', ''], // initialize with empty list
+                    solution: [], // initialize with empty list
+                  };
+                } else {
+                  // 2. from multiple-choice to subjective
+                  editProblem = {
+                    problemType: value,
+                    problemSetID: currentProblem.problemSetID,
+                    problemNumber: currentProblem.problemNumber,
+                    content: currentProblem.content,
+                    solutions: [], // initialize with empty list
+                  };
+                }
+
+                const newProblem: CreateProblemType[] = [];
+                this.state.problems.forEach((problem) => {
+                  if (problem.problemNumber === index + 1) {
+                    newProblem.push(editProblem);
+                  } else {
+                    newProblem.push(problem);
+                  }
+                });
+
+                this.setState({
+                  ...this.state,
+                  problems: newProblem,
+                });
+              }}
+            />
+
+            {currentProblem.problemType === 'multiple-choice' && (
+              <div>
+                <label>Choose the correct answer</label>
+                <div className="ProblemChoice1">
+                  {(() => createChoice(currentProblem, index, 1))()}
+                </div>
+                <div className="ProblemChoice2">
+                  {(() => createChoice(currentProblem, index, 2))()}
+                </div>
+                <div className="ProblemChoice3">
+                  {(() => createChoice(currentProblem, index, 3))()}
+                </div>
+                <div className="ProblemChoice4">
+                  {(() => createChoice(currentProblem, index, 4))()}
+                </div>
+
+                <div className="Solution">
+                  <Form.Group grouped>
+                    <label>Solution</label>
+                    {(() => createSolution(currentProblem, index + 1, 1))()}
+                    {(() => createSolution(currentProblem, index + 1, 2))()}
+                    {(() => createSolution(currentProblem, index + 1, 3))()}
+                    {(() => createSolution(currentProblem, index + 1, 4))()}
+                  </Form.Group>
+                </div>
+              </div>
+            )}
+
+            {currentProblem.problemType === 'subjective' && (
+              <div>
+                <Form.Field
+                  id="subjective-problem-answer-input"
+                  label="Subjective problem answer"
+                  control="input"
+                  placeholder="Write your answer here..."
+                  onChange={(event) => {
+                    const editAnswer: string = event.target.value;
+                    // const newAnswer: string[] = [];
+                    let _currentProblem =
+                      currentProblem as CreateSubjectiveProblemInterface;
+                    // _currentProblem.solutions.forEach((solution, index) => {
+                    //   if (index === 0) {
+                    //     newAnswer.push(editAnswer);
+                    //   } else {
+                    //     newAnswer.push(solution + '');
+                    //   }
+                    // });
+
+                    const editProblem: CreateProblemType = {
+                      problemType: _currentProblem.problemType,
+                      problemSetID: _currentProblem.problemSetID,
+                      problemNumber: _currentProblem.problemNumber,
+                      content: _currentProblem.content,
+                      solutions: [editAnswer],
+                    };
+
+                    const newProblem: CreateProblemType[] = [];
+                    this.state.problems.forEach((problem) => {
+                      if (problem.problemNumber === index + 1) {
+                        newProblem.push(editProblem);
+                      } else {
+                        newProblem.push(problem);
+                      }
+                    });
+
+                    this.setState({
+                      ...this.state,
+                      problems: newProblem,
+                    });
+                  }}
+                />
+              </div>
+            )}
+
+            <Button
+              id="problemsetcreate-remove"
+              onClick={() => this.removeProblemHandler(index + 1)}
+            >
+              Remove problem
+            </Button>
+          </div>
+        );
+      }
+    );
 
     // ------------ Just for debugging messages -----------------
     // console.log('this.state.title', this.state.title);
     // console.log('this.state.scope', this.state.scope);
     // console.log('this.state.tag', this.state.tag);
     // console.log('this.state.difficulty', this.state.difficulty);
+    // console.log('this.state.content', this.state.content);
     // console.log('this.state.problems', this.state.problems);
-    // console.log('this.state.numberOfProblems', this.state.numberOfProblems);
     // ------------ Just for debugging messages -----------------
 
     return (
       <div className="ProblemSetCreate">
         <Container>
           <Header as="h1">
-            New Problem
+            Create a New Problem Set
             <Button
               floated="right"
               id="problemsetcreate-back"
@@ -526,25 +546,25 @@ class ProblemSetCreate extends Component<Props, State> {
               Back
             </Button>
           </Header>
+          <Divider />
 
           <Form>
-            <Form.Field className="Title">
-              <label>Title</label>
-              <Input
-                id="input-title"
-                placeholder="Title"
-                value={this.state.title}
-                onChange={(event) => {
-                  this.setState({ title: event.target.value });
-                }}
-              />
-            </Form.Field>
+            <Form.Field
+              id="input-title"
+              label="Problem Set Title"
+              placeholder="Title"
+              control="input"
+              onChange={(event) => {
+                this.setState({ title: event.target.value });
+              }}
+            ></Form.Field>
 
             <Form.TextArea
-              id="input-content"
-              label="Content"
-              placeholder="Content"
+              id="input-content-text"
+              label="Problem Set Content"
+              placeholder="Content : Explain your problem set"
               value={this.state.content}
+              cols={50}
               onChange={(event) => {
                 this.setState({ content: event.target.value });
               }}
@@ -563,13 +583,24 @@ class ProblemSetCreate extends Component<Props, State> {
               />
 
               <Form.Dropdown
-                className="Tag"
+                className="Tag1"
                 item
-                options={tagOptions.slice(1)}
-                label="Tag"
-                defaultValue="tag-philosophy"
+                options={tagOptions1.slice(0)}
+                label="Tag1"
+                defaultValue="tag-all"
                 onChange={(_, { value }) => {
-                  this.setState({ tag: value as string });
+                  this.setState({ tag: [value as string, this.state.tag[1]] });
+                }}
+              />
+
+              <Form.Dropdown
+                className="Tag2"
+                item
+                options={tagOptions2[this.state.tag[0]].slice(0)}
+                label="Tag2"
+                defaultValue="tag-all"
+                onChange={(_, { value }) => {
+                  this.setState({ tag: [this.state.tag[0], value as string] });
                 }}
               />
 
@@ -578,25 +609,23 @@ class ProblemSetCreate extends Component<Props, State> {
                 item
                 options={difficultyOptions}
                 label="Difficulty"
-                defaultValue="1"
+                defaultValue={1}
                 onChange={(_, { value }) => {
-                  this.setState({ difficulty: value as string });
+                  this.setState({ difficulty: value as number });
                 }}
               />
             </Form.Group>
 
-            {currentProblemSet}
+            {newProblems}
 
+            <Divider />
             <Button
               secondary
               id="problemsetcreate-add"
-              onClick={() =>
-                this.addProblemHandler(this.state.numberOfProblems)
-              }
+              onClick={() => this.addProblemHandler(this.state.problems.length)}
             >
               Add problem
             </Button>
-
             <Button
               primary
               id="problemsetcreate-submit"
@@ -613,26 +642,26 @@ class ProblemSetCreate extends Component<Props, State> {
 }
 
 const mapStateToProps = (state: any) => {
-  return {};
+  return { selectedUser: state.user.selectedUser };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
     onCreateProblemSet: (
       title: string,
-      content: string,
       scope: string,
-      tag: string,
-      difficulty: string,
-      problems: NewProblemSet[]
+      tag: string[],
+      difficulty: number,
+      content: string,
+      problems: CreateProblemType[]
     ) => {
       dispatch(
         actionCreators.createProblemSet(
           title,
-          content,
           scope,
           tag,
           difficulty,
+          content,
           problems
         )
       );
