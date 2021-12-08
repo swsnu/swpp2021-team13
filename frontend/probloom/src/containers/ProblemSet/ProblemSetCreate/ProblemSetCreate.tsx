@@ -111,14 +111,18 @@ class ProblemSetCreate extends Component<Props, State> {
   };
 
   submitProblemSetHandler = () => {
-    this.props.onCreateProblemSet(
-      this.state.title,
-      this.state.scope,
-      this.state.tag,
-      this.state.difficulty,
-      this.state.content,
-      this.state.problems
-    );
+    if (this.state.problems.length > 0) {
+      this.props.onCreateProblemSet(
+        this.state.title,
+        this.state.scope,
+        this.state.tag,
+        this.state.difficulty,
+        this.state.content,
+        this.state.problems
+      );
+    } else {
+      alert('You need to make at least 1 problem in your problem set.');
+    }
   };
 
   render() {
@@ -526,7 +530,7 @@ class ProblemSetCreate extends Component<Props, State> {
     // console.log('this.state.tag', this.state.tag);
     // console.log('this.state.difficulty', this.state.difficulty);
     // console.log('this.state.content', this.state.content);
-    console.log('this.state.problems', this.state.problems);
+    // console.log('this.state.problems', this.state.problems);
     // ------------ Just for debugging messages -----------------
 
     return (

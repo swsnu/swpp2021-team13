@@ -169,6 +169,9 @@ describe('<ProblemSetCreate />', () => {
   it('simulate create inputs', async () => {
     const component = mount(problemSetCreate);
 
+    const submitButton1 = component.find('#problemsetcreate-submit').at(0);
+    submitButton1.simulate('click');
+
     // -------------------------- problem set --------------------------
     const inputTitle = component.find('.ProblemSetCreate #input-title').at(0);
     inputTitle.simulate('change', { target: { value: 'test-title1' } });
@@ -444,8 +447,8 @@ describe('<ProblemSetCreate />', () => {
     // await pauseFor3(100);
     // ------------- NO image -------------
 
-    const submitButton = component.find('#problemsetcreate-submit').at(0);
-    submitButton.simulate('click');
+    const submitButton2 = component.find('#problemsetcreate-submit').at(0);
+    submitButton2.simulate('click');
   });
 
   it('should render signin', () => {
