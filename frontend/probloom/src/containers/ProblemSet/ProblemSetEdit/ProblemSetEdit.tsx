@@ -2,8 +2,7 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 import { returntypeof } from 'react-redux-typescript';
 import { Redirect, RouteComponentProps } from 'react-router';
-import { NavLink } from 'react-router-dom';
-import { Container, Button, Header } from 'semantic-ui-react';
+import { Container, Button, Header, Menu } from 'semantic-ui-react';
 
 import * as actionCreators from '../../../store/actions';
 import * as r_interfaces from '../../../store/reducers/problemReducerInterface';
@@ -112,6 +111,7 @@ class ProblemSetEdit extends Component<Props, State> {
 
   editProblemHandler = (target: string, content?: any, index?: any) => {
     const newProblem: any = this.state.editingProblem;
+    index -= 1;
     switch (target) {
       case 'content':
         newProblem.content = content;
@@ -153,7 +153,7 @@ class ProblemSetEdit extends Component<Props, State> {
     this.setState({ editingProblem: newProblem });
   };
   
-  onClickSaveButton = (mode?: "cancel") => {
+  onClickSaveButton = () => {
     const currentProblem: any = this.state.editingProblem;
     const updateProblem: any = {
       problemType: currentProblem.problemType,
@@ -170,6 +170,10 @@ class ProblemSetEdit extends Component<Props, State> {
     this.setState({ editingProblem: null });
   };
 
+  onClickBackButton = () => {
+    this.props.history.push(`/problem/${this.props.match.params.id}/detail/`);
+  }
+
   render() {
     if (!this.props.selectedUser) {
       return <Redirect to="/" />;
@@ -177,15 +181,13 @@ class ProblemSetEdit extends Component<Props, State> {
 
     const problemNumberButtons = this.props.selectedProblemSet.problems.map(
       (_, index) => (
-        <Button
+        <Menu.Item
           key={index}
-          primary
-          size="mini"
           className={`P${index}Button`}
           onClick={() => this.onClickProblemNumberButton(index)}
         >
           {index+1}
-        </Button>
+        </Menu.Item>
       )
     );
 
@@ -196,69 +198,58 @@ class ProblemSetEdit extends Component<Props, State> {
       const editingProblem: any = this.state.editingProblem;
       currentProblem = (
         <div>
-          <Button
-            primary
-            size="small"
-            className="DeleteButton"
-            onClick={() => this.onClickDeleteButton()}
-          >
-            Delete
-          </Button>
           {editingProblem.problemType === 'multiple-choice' ? (
             <MultipleChoiceProblemForm
               problem={this.state.editingProblem}
               editContent={this.editProblemHandler}
+              deleteProb={() => this.onClickDeleteButton()}
+              saveProb={() => this.onClickSaveButton()}
             />
           ) : (
             <SubjectiveProblemForm
               problem={this.state.editingProblem}
               editContent={this.editProblemHandler}
+              deleteProb={() => this.onClickDeleteButton()}
+              saveProb={() => this.onClickSaveButton()}
             />
           )}
-          <Button
-            primary
-            size="small"
-            className="SaveButton"
-            onClick={() => this.onClickSaveButton()}
-          >
-            Save
-          </Button>
         </div>
       );
     }
 
     return (
       <div className="ProblemSetEdit">
-        <Container>
+        <Container text>
           <Header as="h1">ProblemSetEdit Page</Header>
-
-          <NavLink
-            id="problemsetedit-back"
-            to={`/problem/${this.props.match.params.id}/detail/`}
-          >
-            Back to problem set detail
-          </NavLink>
-
-          <div>
-            <Button
-              primary
-              size="small"
-              className="NewMCPButton"
-              onClick={() => this.onClickNewProblemButton('multiple-choice')}
-            >
-              new multiple choice problem
-            </Button>
-            <Button
-              primary
-              size="small"
-              className="NewSPButton"
-              onClick={() => this.onClickNewProblemButton('subjective')}
-            >
-              new subjective problem
-            </Button>
-          </div>
-
-          {currentProblem ? currentProblem : problemNumberButtons}
+          {currentProblem ? (
+            currentProblem 
+          ) : (
+            <div>
+              <Menu>
+                <Menu.Item
+                  className="NewMCPButton"
+                  onClick={() => this.onClickNewProblemButton('multiple-choice')}
+                >
+                  new multiple choice
+                </Menu.Item>
+                <Menu.Item
+                  className="NewSPButton"
+                  onClick={() => this.onClickNewProblemButton('subjective')}
+                >
+                  new subjective
+                </Menu.Item>
+                {problemNumberButtons}
+              </Menu>
+              <Button
+                secondary
+                size="small"
+                className="BackButton"
+                onClick={() => this.onClickBackButton()}
+              >
+                Back
+              </Button>
+            </div>
+          )}
         </Container>
       </div>
     );

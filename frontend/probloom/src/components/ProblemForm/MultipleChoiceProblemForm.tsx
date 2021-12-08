@@ -1,17 +1,19 @@
 import Choice from './Choice';
 import { GetMultipleChoiceProblemResponse } from '../../store/actions/problemActionInterface';
-import { Button, TextArea } from 'semantic-ui-react';
+import { Button, Form, Grid } from 'semantic-ui-react';
 
 interface MultipleChoiceProblemFormProps {
   problem: GetMultipleChoiceProblemResponse;
   editContent: (target: string, content?: any, index?: any) => void;
+  deleteProb: () => void;
+  saveProb: () => void;
 }
 
 const MultipleChoiceProblemForm = (props: MultipleChoiceProblemFormProps) => {
   const choices = props.problem.choices.map((choice, index) => (
     <Choice
       key={index}
-      index={index}
+      index={index+1}
       choice={choice}
       isSolution={
         props.problem.solution !== undefined && props.problem.solution.includes(index)
@@ -21,24 +23,55 @@ const MultipleChoiceProblemForm = (props: MultipleChoiceProblemFormProps) => {
   ));
   return (
     <div className="MultipleChoiceProblemForm">
-      <div>
-        <TextArea
-          className="MCPTextarea"
-          rows={4}
-          placeholder="content"
-          value={`${props.problem.content}`}
-          onChange={(event) => props.editContent('content', event.target.value)}
-        />
-      </div>
-      <Button
-        primary
-        size="small"
-        className="AddChoiceButton"
-        onClick={() => props.editContent('add_choice')}
-      >
-        New
-      </Button>
-      {choices}
+      <Grid>
+        <Grid.Row>
+          <Grid.Column>
+            <Form>
+              <label>Problem Content</label>
+              <Form.TextArea
+                className="MCPTextarea"
+                rows={4}
+                placeholder="content"
+                value={`${props.problem.content}`}
+                onChange={(event) => props.editContent('content', event.target.value)}
+              />
+            </Form>
+          </Grid.Column>
+        </Grid.Row>
+        <Grid.Row>
+          <Grid.Column>
+            <Button
+              primary
+              size="small"
+              className="AddChoiceButton"
+              onClick={() => props.editContent('add_choice')}
+            >
+              New choice
+            </Button>
+          </Grid.Column>
+        </Grid.Row>
+        {choices}
+        <Grid.Row>
+          <Grid.Column textAlign="right">
+            <Button
+              secondary
+              size="small"
+              className="DeleteButton"
+              onClick={props.deleteProb}
+            >
+              Delete
+            </Button>
+            <Button
+              primary
+              size="small"
+              className="SaveButton"
+              onClick={props.saveProb}
+            >
+              Save
+            </Button>
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
     </div>
   );
 };
