@@ -79,12 +79,22 @@ WSGI_APPLICATION = "probloom.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
+if DEBUG:
+    default_database = {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
     }
-}
+else:
+    default_database = {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "probloomdb",
+        "USER": os.environ["USER"],
+        "PASSWORD": os.environ["PROBLOOM_DB_PASSWORD"],
+        "HOST": "localhost",
+        "PORT": "",
+    }
+
+DATABASES = {"default": default_database}
 
 
 # User model
@@ -116,7 +126,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "Asia/Seoul"
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -129,6 +139,7 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = "/static/"
+STATIC_ROOT = "/var/www/static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
