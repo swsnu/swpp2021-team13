@@ -11,10 +11,17 @@ export {
   getAllProblemSets,
   getProblemSet,
   getAllSolvers,
+  getSolver,
+  getIsRecommender,
+  updateRecommend,
   createProblemSet,
-  editProblemSet,
   deleteProblemSet,
-} from './problemActions';
+  createProblem,
+  getProblem,
+  updateProblem,
+  deleteProblem,
+  updateProblemSet,
+} from './problemSetActions';
 
 export {
   getCommentsOfProblemSet,

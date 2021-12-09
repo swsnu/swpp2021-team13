@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,17 +21,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-1(%62=%6cx5iecishlhd+(*^c@decmumpx+x_e%wt*9b-63ye1"
+SECRET_KEY = os.environ["PROBLOOM_SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = "PROBLOOM_DEPLOY" not in os.environ
 
-ALLOWED_HOSTS = []
+if DEBUG:
+    ALLOWED_HOSTS = []
+else:
+    ALLOWED_HOSTS = ["3.34.29.178"]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    "polymorphic",
     "prob.apps.ProbConfig",
     "django.contrib.admin",
     "django.contrib.auth",

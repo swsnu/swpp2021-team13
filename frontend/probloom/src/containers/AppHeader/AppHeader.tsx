@@ -12,15 +12,15 @@ export interface ProfileDropdownProps {
 }
 
 const ProfileDropdown = ({ user, onSignOut }: ProfileDropdownProps) => {
-  if (user === null) {
+  if (user === null || user.logged_in === false) {
     return null;
   }
   return (
     <Menu.Menu position="right">
       <Dropdown pointing item text={user.username}>
         <Dropdown.Menu>
-          <Dropdown.Item>
-            <NavLink to={`/user/${user.id}/summary`}>View Profile</NavLink>
+          <Dropdown.Item as={NavLink} to={`/user/${user.id}/summary`}>
+            View Profile
           </Dropdown.Item>
           <Dropdown.Item onClick={async () => onSignOut(user)}>
             Sign Out

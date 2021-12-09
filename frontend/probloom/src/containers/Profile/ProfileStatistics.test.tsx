@@ -67,6 +67,9 @@ describe('<ProfileStatistics />', () => {
     spyGet = jest.spyOn(axios, 'get').mockImplementation(async () => ({
       userId: 1,
       lastActiveDays: 1,
+      numberOfCreatedProblems: 1,
+      numberOfSolvedProblems: 2,
+      numberOfRecommendedProblems: 3,
       // createdProblems: [1, 2],
       // solvedProblems: [1, 2, 3],
       // recommendedProblems: [1],

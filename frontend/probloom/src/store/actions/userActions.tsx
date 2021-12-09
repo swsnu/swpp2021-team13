@@ -103,6 +103,28 @@ export const signUp = (request: SignUpRequest) => {
   };
 };
 
+export const getCurrentUser: () => ThunkAction<
+  void,
+  RootState,
+  null,
+  SignInAction
+> = () => {
+  return async (dispatch: AppDispatch) => {
+    try {
+      const { data } = await axios.get<User>(`/api/user/current/`);
+      dispatch(signInSuccess(data));
+    } catch (error) {
+      const pass =
+        axios.isAxiosError(error) &&
+        error.response &&
+        error.response.status === 404;
+      if (!pass) {
+        throw error;
+      }
+    }
+  };
+};
+
 export interface GetUserStatisticsAction {
   type: typeof actionTypes.GET_USER_STATISTICS;
   selectedUserStatistics: UserStatistics;

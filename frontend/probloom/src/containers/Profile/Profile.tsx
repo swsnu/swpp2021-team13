@@ -1,10 +1,10 @@
-import { RouteComponentProps, withRouter } from 'react-router';
+import { Redirect, RouteComponentProps, withRouter } from 'react-router';
 
 import './Profile.css';
 import NotFound from '../../components/NotFound/NotFound';
 import ProfileSummary from './ProfileSummary';
 import ProfileStatistics from './ProfileStatistics';
-import { Container, Tab, TabProps } from 'semantic-ui-react';
+import { Button, Container, Header, Tab, TabProps } from 'semantic-ui-react';
 import { Component } from 'react';
 import { RootState } from '../../store/store';
 import { connect, ConnectedProps } from 'react-redux';
@@ -39,6 +39,10 @@ class Profile extends Component<
   };
 
   render() {
+    if (this.props.selectedUser === null) {
+      return <Redirect to="/" />;
+    }
+
     const userId = parseInt(this.props.match.params.id, 10);
     if (isNaN(userId)) {
       console.warn(`"${this.props.match.params.id}" is not a valid user id`);
@@ -60,16 +64,18 @@ class Profile extends Component<
 
     return (
       <Container text>
-        <h2>{this.props.selectedUser?.username}</h2>
-        <h3>{this.props.selectedUser?.email}</h3>
+        <Header as="h2">
+          {this.props.selectedUser?.username}
+          <Header.Subheader>{this.props.selectedUser?.email}</Header.Subheader>
+        </Header>
         <Tab
           panes={panes}
           activeIndex={activeIndex}
           onTabChange={this.handleTabChange}
         />
-        <button onClick={() => this.onClickBackButton()}>
+        <Button onClick={() => this.onClickBackButton()}>
           Back to problem search
-        </button>
+        </Button>
       </Container>
     );
   }

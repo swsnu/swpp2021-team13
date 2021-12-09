@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { MemoryRouter, Route } from 'react-router';
-import { getMockStoreWithRouter } from '../../mocks';
-import * as actionTypes from '../../store/actions/actionTypes';
+
+import { signInSuccess } from '../../store/actions/userActions';
 import { User } from '../../store/reducers/userReducer';
 import store from '../../store/store';
 
@@ -23,6 +23,13 @@ jest.mock('../../components/NotFound/NotFound', () => ({
   default: () => <div>TEST_NOT_FOUND</div>,
 }));
 
+const stubUser: User = {
+  id: 1,
+  username: 'turing',
+  email: 'turing@example.com',
+  logged_in: true,
+};
+
 describe('<Profile />', () => {
   describe('given valid user id and active tab name', () => {
     it('renders summary tab', async () => {
@@ -33,6 +40,7 @@ describe('<Profile />', () => {
           </MemoryRouter>
         </Provider>
       );
+      store.dispatch(signInSuccess(stubUser));
       render(app);
       expect(screen.getByText('TEST_PROFILE_SUMMARY')).toBeInTheDocument();
       expect(
@@ -48,6 +56,7 @@ describe('<Profile />', () => {
           </MemoryRouter>
         </Provider>
       );
+      store.dispatch(signInSuccess(stubUser));
       render(app);
       expect(screen.getByText('TEST_PROFILE_STATISTICS')).toBeInTheDocument();
       expect(
@@ -63,6 +72,7 @@ describe('<Profile />', () => {
           </MemoryRouter>
         </Provider>
       );
+      store.dispatch(signInSuccess(stubUser));
       render(app);
       fireEvent.click(screen.getByText(/statistics/i));
       expect(screen.getByText('TEST_PROFILE_STATISTICS')).toBeInTheDocument();
@@ -82,6 +92,7 @@ describe('<Profile />', () => {
           </MemoryRouter>
         </Provider>
       );
+      store.dispatch(signInSuccess(stubUser));
       render(app);
       const backButton = screen.getByRole('button', { name: /back/i });
       expect(backButton).toBeInTheDocument();
@@ -90,13 +101,6 @@ describe('<Profile />', () => {
     });
 
     it('renders username and email', async () => {
-      const store = getMockStoreWithRouter();
-      const stubUser: User = {
-        id: 123,
-        username: 'TEST_USERNAME',
-        email: 'test.email@example.com',
-        logged_in: true,
-      };
       const app = (
         <Provider store={store}>
           <MemoryRouter initialEntries={['/user/0/statistics']}>
@@ -104,10 +108,23 @@ describe('<Profile />', () => {
           </MemoryRouter>
         </Provider>
       );
+      store.dispatch(signInSuccess(stubUser));
       render(app);
-      store.dispatch({ type: actionTypes.SIGN_IN, target: stubUser });
-      expect(screen.getByText('TEST_USERNAME')).toBeInTheDocument();
-      expect(screen.getByText('test.email@example.com')).toBeInTheDocument();
+      expect(screen.getByText('turing')).toBeInTheDocument();
+      expect(screen.getByText('turing@example.com')).toBeInTheDocument();
+    });
+
+    it('redirects anonymous users', async () => {
+      const app = (
+        <Provider store={store}>
+          <MemoryRouter initialEntries={['/user/0/statistics']}>
+            <Route path="/user/:id/:active" exact component={Profile} />
+            <Route render={() => <div>MAIN_PAGE</div>} />
+          </MemoryRouter>
+        </Provider>
+      );
+      render(app);
+      expect(screen.getByText('MAIN_PAGE')).toBeInTheDocument();
     });
   });
 
@@ -125,6 +142,7 @@ describe('<Profile />', () => {
           </MemoryRouter>
         </Provider>
       );
+      store.dispatch(signInSuccess(stubUser));
       render(app);
     });
 

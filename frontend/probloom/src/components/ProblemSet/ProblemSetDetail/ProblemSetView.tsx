@@ -5,11 +5,30 @@ const ProblemSetView = (props) => {
   return (
     <div className="ProblemSetView">
       <div className="ProblemSetBox">
-        <Header as="h1">
-          {props.title}
-          <Header.Subheader>By {props.creator}</Header.Subheader>
-        </Header>
-        <p className="content">{props.content}</p>
+        <Grid columns="equal">
+          <Header as="h1">
+            {props.title}
+            <Header.Subheader>
+              {props.creator}'s {props.scope ? 'public' : 'private'} problems
+            </Header.Subheader>
+            <Header.Subheader>Tag: {props.tag}</Header.Subheader>
+            <Header.Subheader>Difficulty: {props.difficulty}</Header.Subheader>
+            <Header.Subheader>
+              Recommend: {props.recommendedNum}
+            </Header.Subheader>
+            <Header.Subheader>Solve: {props.solvedNum}</Header.Subheader>
+          </Header>
+          <Grid.Column textAlign="right">
+            <Header as="h6" textAlign="right">
+              Create: {props.createdTime} <br></br>
+              {props.modifiedTime !== props.createdTime &&
+                `Modify: ${props.modifiedTime}`}
+            </Header>
+          </Grid.Column>
+        </Grid>
+        <Grid>
+          <p className="content">{props.content}</p>
+        </Grid>
         <Grid columns="equal">
           <Grid.Column>
             <Button
@@ -17,18 +36,38 @@ const ProblemSetView = (props) => {
               className="solveButton"
               onClick={() => props.onClickSolveProblemButton()}
             >
-              Solve Problem
+              Solve Problems
             </Button>
-            {(props.isCreator || props.isSolver) && (
+            {!props.isRecommender && (props.isCreator || props.isSolver) && (
               <Button
                 secondary
-                className="explanationButton"
-                onClick={() => props.onClickExplanationButton()}
+                className="recommendationButton"
+                onClick={() => props.onClickRecommendationButton()}
               >
-                Explanations
+                Recommendation
               </Button>
             )}
           </Grid.Column>
+          <Grid.Column textAlign="right">
+            {props.isCreator && (
+              <Button
+                className="editProblemButton"
+                onClick={() => props.onClickEditProblemButton()}
+              >
+                Edit Problems
+              </Button>
+            )}
+            {props.isCreator && (
+              <Button
+                className="editProblemSetButton"
+                onClick={() => props.onClickEditProblemSetButton()}
+              >
+                Edit Problem set
+              </Button>
+            )}
+          </Grid.Column>
+        </Grid>
+        <Grid columns="equal">
           <Grid.Column textAlign="right">
             <Button
               className="backButton"
@@ -36,14 +75,6 @@ const ProblemSetView = (props) => {
             >
               Back
             </Button>
-            {props.isCreator && (
-              <Button
-                className="editButton"
-                onClick={() => props.onClickEditProblemButton()}
-              >
-                Edit
-              </Button>
-            )}
             {props.isCreator && (
               <Button
                 negative

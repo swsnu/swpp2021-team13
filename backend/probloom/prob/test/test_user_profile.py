@@ -7,26 +7,27 @@ import textwrap
 class UserProfileTestCase(TestCase):
     not_pk = 1399  # This number should not match any of the IDs
 
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         User.objects.create_user(username="dummy", password="dummy")
-        self.turing = User.objects.create_user(username="turing", password="turing")
-        self.meitner = User.objects.create_user(username="meitner", password="meitner")
+        cls.turing = User.objects.create_user(username="turing", password="turing")
+        cls.meitner = User.objects.create_user(username="meitner", password="meitner")
 
         # Since turing is the second user, self.turing.pk != self.turing_profile.pk
         # if UserProfile has its own primary key
-        self.turing_profile = UserProfile.objects.create(
-            user=self.turing, introduction="I love SWPP!"
+        cls.turing_profile = UserProfile.objects.create(
+            user=cls.turing, introduction="I love SWPP!"
         )
-        self.meitner_profile = UserProfile.objects.create(
-            user=self.meitner, introduction="I love SWPP too!"
+        cls.meitner_profile = UserProfile.objects.create(
+            user=cls.meitner, introduction="I love SWPP too!"
         )
+
+    def setUp(self):
         self.client = Client()
         self.client.login(username="turing", password="turing")
 
     def tearDown(self):
         self.client.logout()
-        UserProfile.objects.all().delete()
-        User.objects.all().delete()
 
     def test_default_introduction_is_empty(self):
         temp_user = User.objects.create_user(username="fermi", password="fermi")

@@ -2,9 +2,9 @@ import { Component } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
 import './ProfileStatistics.css';
-import * as actionCreators from '../../store/actions/index';
+import * as actionCreators from '../../store/actions';
 import { AppDispatch, RootState } from '../../store/store';
-import { UserStatisticsProblemSet } from '../../store/reducers/userReducer';
+// import { UserStatisticsProblemSet } from '../../store/reducers/userReducer';
 
 export interface ProfileStatisticsProps extends PropsFromRedux {
   userId: number;
@@ -18,8 +18,14 @@ class ProfileStatistics extends Component<ProfileStatisticsProps> {
   render() {
     const lastActiveDays: number =
       this.props.selectedUserStatistics?.lastActiveDays ?? 0;
-    const _createdProblems: UserStatisticsProblemSet[] =
-      this.props.selectedUserStatistics?.createdProblems ?? [];
+    const numberOfCreatedProblems: number =
+      this.props.selectedUserStatistics?.numberOfCreatedProblems ?? 0;
+    const numberOfSolvedProblems: number =
+      this.props.selectedUserStatistics?.numberOfSolvedProblems ?? 0;
+    const numberOfRecommendedProblems: number =
+      this.props.selectedUserStatistics?.numberOfRecommendedProblems ?? 0;
+    // const _createdProblems: UserStatisticsProblemSet[] =
+    //   this.props.selectedUserStatistics?.createdProblems ?? [];
     // const solvedProblems: number[] = this.props.selectedUserStatistics
     //   ?.solvedProblems ?? [0];
     // const recommendedProblems: number[] = this.props.selectedUserStatistics
@@ -28,18 +34,21 @@ class ProfileStatistics extends Component<ProfileStatisticsProps> {
     //   ?.createdExplanations ?? [0];
     // const recommendedExplanations: number[] = this.props.selectedUserStatistics
     //   ?.recommendedExplanations ?? [0];
-    const createdProblems = _createdProblems.map((createdProblem) => {
-      return (
-        <div>
-          <h3>{createdProblem.title}</h3>
-          <h3>{createdProblem.content}</h3>
-          <h3>{createdProblem.created_time}</h3>
-          <h3>{createdProblem.scope}</h3>
-          <h3>{createdProblem.tag}</h3>
-          <h3>{createdProblem.difficulty}</h3>
-        </div>
-      );
-    });
+
+    // TODO : remove
+    // const createdProblems = _createdProblems.map((createdProblem) => {
+    //   return (
+    //     <div>
+    //       <h3>{createdProblem.title}</h3>
+    //       <h3>{createdProblem.content}</h3>
+    //       <h3>{createdProblem.created_time}</h3>
+    //       <h3>{createdProblem.scope}</h3>
+    //       <h3>{createdProblem.tag}</h3>
+    //       <h3>{createdProblem.difficulty}</h3>
+    //     </div>
+    //   );
+    // });
+
     // console.log(
     //   '@@@ this.props.selectedUserStatistics',
     //   this.props.selectedUserStatistics?.createdProblems
@@ -52,11 +61,23 @@ class ProfileStatistics extends Component<ProfileStatisticsProps> {
           <h1>Last Active</h1>
           {lastActiveDays} days ago
         </div>
-        <div className="created-problems">
+        <div className="number-of-created-problems">
+          <h1>Created Problems</h1>
+          {numberOfCreatedProblems}
+        </div>
+        <div className="number-of-solved-problems">
+          <h1>Solved Problems</h1>
+          {numberOfSolvedProblems}
+        </div>
+        <div className="number-of-recommended-problems">
+          <h1>Recommended Problems</h1>
+          {numberOfRecommendedProblems}
+        </div>
+        {/* <div className="created-problems">
           <h1>Created Problems</h1>
           {createdProblems}
         </div>
-        {/* <div className="solved-problems">
+        <div className="solved-problems">
           <h1>Solved Problems</h1>
           {solvedProblems}
         </div>
