@@ -2,7 +2,7 @@
 dist: bionic
 
 env:
-  - PROBLOOM_SECRET_KEY: ""
+  - PROBLOOM_SECRET_KEY: "django-insecure-1(%62=%6cx5iecishlhd+(*^c@decmumpx+x_e%wt*9b-63ye1"
 
 # Job Configurations
 jobs:
