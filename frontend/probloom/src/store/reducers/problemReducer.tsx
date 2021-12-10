@@ -37,8 +37,16 @@ const problemReducer: ProblemReducer = (state = initialState, action) => {
     case actionTypes.GET_SOLVER:
       return { ...state, selectedSolver: action.solver };
     case actionTypes.GET_IS_RECOMMENDER:
-    case actionTypes.UPDATE_RECOMMEND:
       return { ...state, isRecommender: action.isRecommender };
+    case actionTypes.UPDATE_RECOMMEND:
+      if (state.selectedProblemSet === null) {
+        break;
+      }
+      const recommendedProblemSet = {
+        ...state.selectedProblemSet,
+        recommendedNum: state.selectedProblemSet.recommendedNum + 1,
+      }
+      return { ...state, selectedProblemSet: recommendedProblemSet, isRecommender: action.isRecommender };
     case actionTypes.CREATE_PROBLEM_SET:
       return {
         ...state,

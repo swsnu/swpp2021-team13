@@ -15,7 +15,7 @@ describe('Out of all comment action creators', () => {
   it('get comments of problem set', async () => {
     const stubComment: Comment = {
       id: 1,
-      date: 'TEST_DATE',
+      createdTime: 'TEST_DATE',
       content: 'TEST_CONTENT',
       userID: 1,
       username: 'TEST_USERNAME',
@@ -41,7 +41,7 @@ describe('Out of all comment action creators', () => {
   it('create a new comment', async () => {
     const stubComment: Comment = {
       id: 1,
-      date: 'TEST_DATE',
+      createdTime: 'TEST_DATE',
       content: 'TEST_CONTENT',
       userID: 1,
       username: 'TEST_USERNAME',
@@ -57,15 +57,14 @@ describe('Out of all comment action creators', () => {
       await dispatch(actionCreators.createComment(stubComment));
     } catch (err) {}
     const newState = store.getState();
-
-    expect(newState.comment.selectedComment).toEqual(stubComment);
+    expect(newState.comment.comments).toEqual([stubComment]);
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
   it('update a comment', async () => {
     const stubComment: Comment = {
       id: 1,
-      date: 'TEST_DATE',
+      createdTime: 'TEST_DATE',
       content: 'TEST_CONTENT',
       userID: 1,
       username: 'TEST_USERNAME',
@@ -87,18 +86,9 @@ describe('Out of all comment action creators', () => {
   });
 
   it('delete a comment', async () => {
-    const stubComment: Comment = {
-      id: 1,
-      date: 'TEST_DATE',
-      content: 'TEST_CONTENT',
-      userID: 1,
-      username: 'TEST_USERNAME',
-      problemSetID: 1,
-    };
-
     spy = jest.spyOn(axios, 'delete').mockImplementation(async (_) => ({
       status: 200,
-      data: stubComment,
+      data: 1,
     }));
 
     try {
