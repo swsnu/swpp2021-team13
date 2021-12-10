@@ -34,7 +34,7 @@ jobs:
         - yarn test --coverage --watchAll=false
         - coveralls-lcov -v -n coverage/lcov.info > coverage.json  
         - cd ../../backend/probloom
-        - poetry install
+        - poetry install --no-ansi
         - poetry run pylint -E **/*.py --load-plugins pylint_django
         - poetry run coverage run
         - poetry run coverage xml
