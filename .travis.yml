@@ -2,7 +2,7 @@
 dist: bionic
 
 env:
-  - PROBLOOM_SECRET_KEY: "django-insecure-1(%62=%6cx5iecishlhd+(*^c@decmumpx+x_e%wt*9b-63ye1"
+  - PROBLOOM_SECRET_KEY: '''django-insecure-1(%62=%6cx5iecishlhd+(*^c@decmumpx+x_e%wt*9b-63ye1'''
 
 # Job Configurations
 jobs:
@@ -10,6 +10,10 @@ jobs:
     - language: node_js
       node_js: 16
       python: "3.8"
+      cache:
+        yarn: true
+        directories:
+          - ~/.cache/pypoetry
       addons:
         sonarcloud:
           organization: swsnu
