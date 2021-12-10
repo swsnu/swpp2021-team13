@@ -5,6 +5,7 @@ import {
   CreateProblemSetRequest,
   ProblemSetInterface,
   ProblemSetWithProblemsInterface,
+  Solver,
 } from '../reducers/problemReducerInterface';
 import * as a_interfaces from './problemActionInterface';
 import store, { AppDispatch } from '../store';
@@ -375,6 +376,7 @@ describe('Problem', () => {
         problemNumber: 2,
         content: 'stub_content',
         choices: [],
+        solution: [],
       };
 
     spy = jest.spyOn(axios, 'post').mockImplementation(async () => {
@@ -405,6 +407,60 @@ describe('Problem', () => {
     const newState = store.getState();
     expect(newState.problemset.selectedProblemSet?.problems).toEqual([1]);
     expect(newState.problemset.selectedProblem).toEqual(null);
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('Test getSolver', async () => {
+    const solver: Solver = {
+      userID: 1,
+      username: 'username',
+      result: false,
+      problems: [],
+    }
+
+    spy = jest.spyOn(axios, 'get').mockImplementation(async () => {
+      return {
+        status: 200,
+        data: solver
+      };
+    });
+
+    try {
+      await dispatch(actionCreators.getSolver(1));
+    } catch (err) {}
+    const newState = store.getState();
+    expect(newState.problemset.selectedSolver).toEqual(solver);
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('Test getIsRecommender', async () => {
+    spy = jest.spyOn(axios, 'get').mockImplementation(async () => {
+      return {
+        status: 200,
+        data: true
+      };
+    });
+
+    try {
+      await dispatch(actionCreators.getIsRecommender(1));
+    } catch (err) {}
+    const newState = store.getState();
+    expect(newState.problemset.isRecommender).toEqual(true);
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('Test updateRecommend', async () => {
+    spy = jest.spyOn(axios, 'put').mockImplementation(async () => {
+      return {
+        status: 200,
+      };
+    });
+
+    try {
+      await dispatch(actionCreators.updateRecommend(1));
+    } catch (err) {}
+    const newState = store.getState();
+    expect(newState.problemset.isRecommender).toEqual(true);
     expect(spy).toHaveBeenCalledTimes(1);
   });
 });

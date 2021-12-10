@@ -57,7 +57,7 @@ describe('Out of all comment action creators', () => {
       await dispatch(actionCreators.createComment(stubComment));
     } catch (err) {}
     const newState = store.getState();
-    expect(newState.comment.comments).toEqual([stubComment]);
+    expect(newState.comment.comments).toEqual([stubComment, stubComment]);
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
@@ -81,11 +81,20 @@ describe('Out of all comment action creators', () => {
     } catch (err) {}
     const newState = store.getState();
 
-    expect(newState.comment.comments).toEqual([stubComment]);
+    expect(newState.comment.comments).toEqual([stubComment, stubComment]);
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
   it('delete a comment', async () => {
+    const stubComment: Comment = {
+      id: 1,
+      createdTime: 'TEST_DATE',
+      content: 'TEST_CONTENT',
+      userID: 1,
+      username: 'TEST_USERNAME',
+      problemSetID: 1,
+    };
+    
     spy = jest.spyOn(axios, 'delete').mockImplementation(async (_) => ({
       status: 200,
       data: 1,
@@ -96,7 +105,7 @@ describe('Out of all comment action creators', () => {
     } catch (err) {}
     const newState = store.getState();
 
-    expect(newState.comment.comments).toEqual([]);
+    expect(newState.comment.comments).toEqual([stubComment, stubComment]);
     expect(spy).toHaveBeenCalledTimes(1);
   });
 });
