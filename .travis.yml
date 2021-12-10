@@ -2,7 +2,7 @@
 dist: bionic
 
 env:
-  - PROBLOOM_SECRET_KEY = ""
+  - PROBLOOM_SECRET_KEY: ""
 
 # Job Configurations
 jobs:
