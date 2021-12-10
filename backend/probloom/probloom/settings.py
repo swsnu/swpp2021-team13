@@ -87,7 +87,7 @@ if is_deploy_machine:
         "NAME": "probloomdb",
         "USER": os.environ["USER"],
         "PASSWORD": os.environ["PROBLOOM_DB_PASSWORD"],
-        "HOST": "127.0.0.1",
+        "HOST": "db.probloom.xyz",
         "PORT": "",
     }
 else:
@@ -97,6 +97,10 @@ else:
     }
 
 DATABASES = {"default": default_database}
+
+if is_deploy_machine:
+    DATABASES["localhost"] = dict(DATABASES["default"])
+    DATABASES["localhost"]["HOST"] = "localhost"
 
 
 # User model
