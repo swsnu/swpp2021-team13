@@ -24,12 +24,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ["PROBLOOM_SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = "PROBLOOM_DEPLOY" not in os.environ
+is_deploy_machine = "PROBLOOM_DEPLOY" in os.environ
+# DEBUG = not is_deploy_machine
+DEBUG = True
 
-if DEBUG:
-    ALLOWED_HOSTS = []
+if is_deploy_machine:
+    ALLOWED_HOSTS = ["api.probloom.xyz"]
 else:
-    ALLOWED_HOSTS = ["3.34.29.178"]
+    ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -79,12 +81,26 @@ WSGI_APPLICATION = "probloom.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
+if is_deploy_machine:
+    default_database = {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "probloomdb",
+        "USER": os.environ["USER"],
+        "PASSWORD": os.environ["PROBLOOM_DB_PASSWORD"],
+        "HOST": "db.probloom.xyz",
+        "PORT": "",
+    }
+else:
+    default_database = {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
     }
-}
+
+DATABASES = {"default": default_database}
+
+if is_deploy_machine:
+    DATABASES["localhost"] = dict(DATABASES["default"])
+    DATABASES["localhost"]["HOST"] = "localhost"
 
 
 # User model
@@ -116,7 +132,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "Asia/Seoul"
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -129,6 +145,10 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = "/static/"
+STATIC_ROOT = "/var/www/static/probloom/"
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = "/var/opt/probloom/media/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
