@@ -132,6 +132,7 @@ class ProblemSetSolve extends Component<
 
     if (this.state.checkNum === problemIDList.length) {
       this.setState({ isFinalSubmit: true });
+      return;
     }
 
     this.onClickNextButton();
