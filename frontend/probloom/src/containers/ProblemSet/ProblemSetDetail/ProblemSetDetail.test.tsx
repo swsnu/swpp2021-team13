@@ -242,7 +242,6 @@ describe('<ProblemSetDetail />', () => {
 
     const wrapper_inputTag = component.find({ label: 'Tag' });
     const inputTag = wrapper_inputTag.find('DropdownItem');
-    inputTag.at(1).simulate('click');
 
     const wrapper_inputDifficulty = component.find({ label: 'Difficulty' });
     const inputDifficulty = wrapper_inputDifficulty.find('DropdownItem');
