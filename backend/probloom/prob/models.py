@@ -165,9 +165,8 @@ class ProblemSet(Model):
                         - Count("problem_set")
                     )
                 )
-                .filter(unsolved_problems__lte=0)
-                .values("problem_set", solved_num=Count("solver", distinct=True))
-                .get(problem_set=self.pk)["solved_num"]
+                .filter(unsolved_problems__lte=0, problem_set=self.pk)
+                .count()
             )
         except ObjectDoesNotExist:
             solved_num = 0

@@ -1,22 +1,23 @@
-FROM node:16
+# FROM node:16 AS builder
 
-WORKDIR /usr/app
+# WORKDIR /usr/app
 
-COPY package.json .
-COPY tsconfig.json .
-COPY yarn.lock .
-COPY src/ src/
-COPY public/ public/
-COPY build/ build/
-# RUN yarn install
+# COPY package.json .
+# COPY tsconfig.json .
+# COPY yarn.lock .
+# COPY src/ src/
+# COPY public/ public/
+# RUN yarn --frozen-lockfile
 # RUN yarn build
 
-RUN apt update && apt install -y nginx
-COPY nginx.conf /etc/nginx/sites-enabled/nginx.conf
-RUN rm /etc/nginx/sites-enabled/default
-RUN ln -s /etc/nginx/sites-enabled/nginx.conf /etc/nginx/sites-available/nginx.conf
-RUN mkdir -p /usr/share/nginx/html
-RUN cp -r build/* /usr/share/nginx/html/
+FROM nginx:1.20
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+# COPY --from=builder build/* /usr/share/nginx/html/
+COPY build/ /usr/share/nginx/html/
+
+EXPOSE 80
+EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]
 
