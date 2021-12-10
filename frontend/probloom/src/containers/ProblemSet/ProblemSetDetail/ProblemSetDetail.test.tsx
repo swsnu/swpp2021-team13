@@ -63,6 +63,7 @@ const problemSet1: ProblemSetWithProblemsInterface = {
 const ProblemSetStateTest: ProblemSetState = {
   problemSets: [problemSet1],
   solvers: [solver1],
+  selectedSolver: null,
   isRecommender: false,
   selectedProblemSet: problemSet1,
   selectedProblem: null,
@@ -79,7 +80,6 @@ const comment1: Comment = {
 
 const CommentStateTest: CommentState = {
   comments: [comment1],
-  selectedComment: null,
 };
 
 const mockStore = getMockStore(
@@ -183,6 +183,7 @@ describe('<ProblemSetDetail />', () => {
       problemSets: [problemSet1],
       solvers: [solver1],
       isRecommender: false,
+      selectedSolver: null,
       selectedProblemSet: null,
       selectedProblem: null,
     };
@@ -285,6 +286,7 @@ describe('<ProblemSetDetail />', () => {
     const ProblemSetStateTest: ProblemSetState = {
       problemSets: [problemSet1],
       solvers: [solver1],
+      selectedSolver: null,
       isRecommender: false,
       selectedProblemSet: problemSet1,
       selectedProblem: null,
@@ -366,7 +368,6 @@ describe('<ProblemSetDetail />', () => {
     const wrapper_edit = wrapper_action.find('CommentAction.deleteButton');
     wrapper_edit.simulate('click');
     expect(spyDeleteComment).toBeCalledTimes(1);
-    expect(spyGetComments).toBeCalledTimes(2);
     history.push('/');
   });
 

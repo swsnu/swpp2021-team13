@@ -88,21 +88,21 @@ export interface DeleteCommentAction {
   targetID: number;
 }
 
-export const deleteComment_: (comment: Comment) => DeleteCommentAction = (
-  comment
+export const deleteComment_: (id: number) => DeleteCommentAction = (
+  id
 ) => ({
   type: actionTypes.DELETE_COMMENT,
-  targetID: comment.id,
+  targetID: id,
 });
 
 export const deleteComment: (
   idList: any
 ) => ThunkAction<void, RootState, null, DeleteCommentAction> = (idList) => {
   return async (dispatch: AppDispatch) => {
-    const { data }: { data: Comment } = await axios.delete(
+    await axios.delete(
       `/api/problem_set/${idList.problemSetID}/comment/${idList.id}/`
     );
-    dispatch(deleteComment_(data));
+    dispatch(deleteComment_(idList.id));
   };
 };
 

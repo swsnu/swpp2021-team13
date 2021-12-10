@@ -158,7 +158,6 @@ class ProblemSetDetail extends Component<
   onClickDeleteCommentButton = (comment: CommentData) => {
     let idList = { id: comment.id, problemSetID: comment.problemSetID };
     this.props.onDeleteComment(idList);
-    this.props.onGetCommentsOfProblemSet(parseInt(this.props.match.params.id));
     this.setState({
       commentContent: '',
       isCommentEdit: false,
@@ -187,7 +186,6 @@ class ProblemSetDetail extends Component<
       this.props.onCreateComment(comment);
       this.setState({ commentContent: '' });
     }
-    this.props.onGetCommentsOfProblemSet(parseInt(this.props.match.params.id));
   };
 
   onClickRecommendationButton = () => {
@@ -411,7 +409,6 @@ const mapStateToProps = (state: RootState) => {
     isRecommender: state.problemset.isRecommender,
     solvers: state.problemset.solvers,
     comments: state.comment.comments,
-    selectedComment: state.comment.selectedComment,
   };
 };
 
