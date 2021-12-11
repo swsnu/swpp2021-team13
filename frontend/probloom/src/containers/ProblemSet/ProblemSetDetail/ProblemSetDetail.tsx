@@ -27,7 +27,6 @@ import {
   getIsRecommender,
   updateRecommend,
 } from '../../../store/actions';
-import { tagOptions1 } from '../ProblemSetSearch/ProblemSetSearch';
 import {
   scopeOptions,
   difficultyOptions,
@@ -52,7 +51,6 @@ interface ProblemSetDetailState {
   editProblemSetDescription: string;
   editProblemSetScope: string;
   editProblemSetDifficulty: string;
-  editProblemSetTag: string;
 }
 
 class ProblemSetDetail extends Component<
@@ -71,7 +69,6 @@ class ProblemSetDetail extends Component<
       editProblemSetDescription: '',
       editProblemSetScope: '',
       editProblemSetDifficulty: '',
-      editProblemSetTag: '',
     };
   }
 
@@ -92,7 +89,6 @@ class ProblemSetDetail extends Component<
         editProblemSetDifficulty: String(
           this.props.selectedProblemSet.difficulty
         ),
-        //editProblemSetTag: this.props.selectedProblemSet.tag
       });
     }
   }
@@ -123,7 +119,6 @@ class ProblemSetDetail extends Component<
         this.props.selectedProblemSet!.difficulty
       ),
       isProblemSetEdit: true,
-      //editProblemSetTag: this.props.selectedProblemSet.tag
     });
   };
 
@@ -134,7 +129,6 @@ class ProblemSetDetail extends Component<
       content: this.state.editProblemSetDescription,
       isOpen: this.state.editProblemSetScope === 'scope-public' ? true : false,
       difficulty: parseInt(this.state.editProblemSetDifficulty),
-      /////////////////////////////////tag:
     };
 
     this.props.onUpdateProblemSet(problemSet);
@@ -164,7 +158,6 @@ class ProblemSetDetail extends Component<
   onClickDeleteCommentButton = (comment: CommentData) => {
     let idList = { id: comment.id, problemSetID: comment.problemSetID };
     this.props.onDeleteComment(idList);
-    this.props.onGetCommentsOfProblemSet(parseInt(this.props.match.params.id));
     this.setState({
       commentContent: '',
       isCommentEdit: false,
@@ -193,11 +186,12 @@ class ProblemSetDetail extends Component<
       this.props.onCreateComment(comment);
       this.setState({ commentContent: '' });
     }
-    this.props.onGetCommentsOfProblemSet(parseInt(this.props.match.params.id));
   };
 
   onClickRecommendationButton = () => {
     this.props.onUpdateRecommend(parseInt(this.props.match.params.id));
+
+    this.props.onGetProblemSet(parseInt(this.props.match.params.id));
   };
 
   formatTime = (text: string) => {
@@ -214,7 +208,6 @@ class ProblemSetDetail extends Component<
 
     let isCreator = false;
     let isSolver = false;
-    let tag = '';
     let difficulty = '';
     let createdTime = '';
     let modifiedTime = '';
@@ -228,7 +221,6 @@ class ProblemSetDetail extends Component<
 
       isSolver = solver !== undefined;
 
-      //tag = this.props.selectedProblemSet.tag.split('-')[1];
       let dict = difficultyOptions.find(
         (dict_ele) =>
           dict_ele['key'] === this.props.selectedProblemSet?.difficulty
@@ -254,7 +246,6 @@ class ProblemSetDetail extends Component<
               modifiedTime={modifiedTime}
               difficulty={difficulty}
               scope={this.props.selectedProblemSet.isOpen}
-              tag={tag}
               recommendedNum={this.props.selectedProblemSet.recommendedNum}
               solvedNum={this.props.selectedProblemSet.solvedNum}
               isCreator={isCreator}
@@ -382,17 +373,6 @@ class ProblemSetDetail extends Component<
                   />
 
                   <Form.Dropdown
-                    className="Tag"
-                    item
-                    options={tagOptions1}
-                    label="Tag"
-                    //defaultValue={this.state.editProblemSetTag}
-                    onChange={(_, { value }) => {
-                      this.setState({ editProblemSetTag: value as string });
-                    }}
-                  />
-
-                  <Form.Dropdown
                     className="Difficulty"
                     item
                     options={difficultyOptions}
@@ -429,7 +409,6 @@ const mapStateToProps = (state: RootState) => {
     isRecommender: state.problemset.isRecommender,
     solvers: state.problemset.solvers,
     comments: state.comment.comments,
-    selectedComment: state.comment.selectedComment,
   };
 };
 

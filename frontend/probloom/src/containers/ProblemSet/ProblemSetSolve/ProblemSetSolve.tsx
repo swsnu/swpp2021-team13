@@ -132,6 +132,7 @@ class ProblemSetSolve extends Component<
 
     if (this.state.checkNum === problemIDList.length) {
       this.setState({ isFinalSubmit: true });
+      return;
     }
 
     this.onClickNextButton();
@@ -227,7 +228,7 @@ class ProblemSetSolve extends Component<
                     )}
                     {problem.problemType === 'multiple-choice' &&
                       problem.choices.map((content, index) => (
-                        <div className="Choice">
+                        <div className="Choice" key={index}>
                           <Form.Field>
                             <Checkbox
                               name="checkbox"

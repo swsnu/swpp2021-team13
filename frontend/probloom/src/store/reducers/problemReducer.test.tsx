@@ -461,4 +461,128 @@ describe('Problem Reducer', () => {
       selectedProblem: null,
     });
   });
+
+  it('should GET_SOLVER', () => {
+    const solver: interfaces.Solver = {
+      userID: 1,
+      username: 'username',
+      result: false,
+      problems: [],
+    }
+    const stubInitialState: ProblemSetState = {
+      problemSets: [],
+      solvers: [],
+      selectedSolver: null,
+      isRecommender: false,
+      selectedProblemSet: null,
+      selectedProblem: null,
+    };
+    let newState = problemReducer(stubInitialState, {
+      type: actionTypes.GET_SOLVER,
+      solver: solver,
+    });
+    expect(newState).toEqual({
+      problemSets: [],
+      solvers: [],
+      selectedSolver: solver,
+      isRecommender: false,
+      selectedProblemSet: null,
+      selectedProblem: null,
+    });
+  });
+
+  it('should GET_iSSRECOMMENDER', () => {
+    const stubInitialState: ProblemSetState = {
+      problemSets: [],
+      solvers: [],
+      selectedSolver: null,
+      isRecommender: false,
+      selectedProblemSet: null,
+      selectedProblem: null,
+    };
+    let newState = problemReducer(stubInitialState, {
+      type: actionTypes.GET_IS_RECOMMENDER,
+      isRecommender: true,
+    });
+    expect(newState).toEqual({
+      problemSets: [],
+      solvers: [],
+      selectedSolver: null,
+      isRecommender: true,
+      selectedProblemSet: null,
+      selectedProblem: null,
+    });
+  });
+
+  it('should UPDATE_RECOMMEND', () => {
+    const stubInitialState: ProblemSetState = {
+      problemSets: [],
+      solvers: [],
+      selectedSolver: null,
+      isRecommender: false,
+      selectedProblemSet: null,
+      selectedProblem: null,
+    };
+    let newState = problemReducer(stubInitialState, {
+      type: actionTypes.UPDATE_RECOMMEND,
+    });
+    expect(newState).toEqual({
+      problemSets: [],
+      solvers: [],
+      selectedSolver: null,
+      isRecommender: false,
+      selectedProblemSet: null,
+      selectedProblem: null,
+    });
+
+    const stubProblemSet1: interfaces.ProblemSetWithProblemsInterface = {
+      id: 1,
+      title: 'title1',
+      createdTime: 'create_time1',
+      modifiedTime: 'modified_time1',
+      isOpen: false,
+      tag: [['math']],
+      difficulty: 1,
+      content: 'content1',
+      userID: 1,
+      username: 'creator1',
+      solvedNum: 1,
+      recommendedNum: 1,
+      problems: []
+    };
+    const stubProblemSet2: interfaces.ProblemSetWithProblemsInterface = {
+      id: 1,
+      title: 'title1',
+      createdTime: 'create_time1',
+      modifiedTime: 'modified_time1',
+      isOpen: false,
+      tag: [['math']],
+      difficulty: 1,
+      content: 'content1',
+      userID: 1,
+      username: 'creator1',
+      solvedNum: 1,
+      recommendedNum: 2,
+      problems: []
+    };
+    const stubInitialState2: ProblemSetState = {
+      problemSets: [],
+      solvers: [],
+      selectedSolver: null,
+      isRecommender: false,
+      selectedProblemSet: stubProblemSet1,
+      selectedProblem: null,
+    };
+    let newState2 = problemReducer(stubInitialState2, {
+      type: actionTypes.UPDATE_RECOMMEND,
+    });
+    expect(newState2).toEqual({
+      problemSets: [],
+      solvers: [],
+      selectedSolver: null,
+      isRecommender: true,
+      selectedProblemSet: stubProblemSet2,
+      selectedProblem: null,
+    });
+  });
 });
