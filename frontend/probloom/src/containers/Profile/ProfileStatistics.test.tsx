@@ -69,7 +69,7 @@ describe('<ProfileStatistics />', () => {
       lastActiveDays: 1,
       numberOfCreatedProblems: 1,
       numberOfSolvedProblems: 2,
-      numberOfRecommendedProblems: 3,
+      numberOfRecommendedProblemSets: 3,
       // createdProblems: [1, 2],
       // solvedProblems: [1, 2, 3],
       // recommendedProblems: [1],

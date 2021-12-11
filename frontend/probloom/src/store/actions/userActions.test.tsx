@@ -3,6 +3,7 @@ import { getUserProfile, updateUserIntroduction } from '.';
 import { User, UserStatistics, UserProfile } from '../reducers/userReducer';
 import store, { AppDispatch } from '../store';
 import * as actionCreators from './userActions';
+import { SignInRequest, SignUpRequest } from './userActions';
 
 const dispatch = store.dispatch as AppDispatch;
 
@@ -17,9 +18,9 @@ describe('Out of all action creators', () => {
     const stubUserStatistics: UserStatistics = {
       userId: 1,
       lastActiveDays: 1,
-      // createdProblems: [1, 2],
-      // solvedProblems: [1, 2, 3],
-      // recommendedProblems: [1],
+      numberOfCreatedProblems: 1,
+      numberOfSolvedProblems: 2,
+      numberOfRecommendedProblemSets: 3,
       // createdExplanations: [7, 8],
       // recommendedExplanations: [7],
     };
@@ -46,6 +47,10 @@ describe('Out of all action creators', () => {
       email: 'Test_Email',
       logged_in: true,
     };
+    const stubRequest: SignInRequest = {
+      id: '1',
+      password: 'pwd',
+    }
 
     spy = jest.spyOn(axios, 'post').mockImplementation(async (_) => ({
       status: 200,
@@ -53,7 +58,7 @@ describe('Out of all action creators', () => {
     }));
 
     try {
-      await dispatch(actionCreators.signIn(stubUser));
+      await dispatch(actionCreators.signIn(stubRequest));
     } catch (err) {}
     const newState = store.getState();
 
@@ -62,17 +67,21 @@ describe('Out of all action creators', () => {
   });
 
   it('signIn fail', async () => {
-    const stubUser: User = {
-      id: 1,
-      username: 'Test_User',
-      email: 'Test_Email',
-      logged_in: true,
-    };
+    // const stubUser: User = {
+    //   id: 1,
+    //   username: 'Test_User',
+    //   email: 'Test_Email',
+    //   logged_in: true,
+    // };
+    const stubRequest: SignInRequest = {
+      id: '1',
+      password: 'pwd',
+    }
 
     spy = jest.spyOn(axios, 'post').mockRejectedValue(new Error('some error'));
 
     try {
-      await dispatch(actionCreators.signIn(stubUser));
+      await dispatch(actionCreators.signIn(stubRequest));
     } catch (err) {}
     const newState = store.getState();
 
@@ -87,6 +96,11 @@ describe('Out of all action creators', () => {
       email: 'Test_Email',
       logged_in: true,
     };
+    const stubRequest: SignUpRequest = {
+      username: '1',
+      email: 'test-email',
+      password: 'pwd',
+    }
 
     spy = jest.spyOn(axios, 'post').mockImplementation(async (_) => ({
       status: 200,
@@ -94,7 +108,7 @@ describe('Out of all action creators', () => {
     }));
 
     try {
-      await dispatch(actionCreators.signUp(stubUser));
+      await dispatch(actionCreators.signUp(stubRequest));
     } catch (err) {}
     const newState = store.getState();
 
@@ -109,11 +123,16 @@ describe('Out of all action creators', () => {
       email: 'Test_Email',
       logged_in: true,
     };
+    const stubRequest: SignUpRequest = {
+      username: '1',
+      email: 'test-email',
+      password: 'pwd',
+    }
 
     spy = jest.spyOn(axios, 'post').mockRejectedValue(new Error('some error'));
 
     try {
-      await dispatch(actionCreators.signUp(stubUser));
+      await dispatch(actionCreators.signUp(stubRequest));
     } catch (err) {}
     const newState = store.getState();
 
