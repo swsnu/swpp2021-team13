@@ -93,6 +93,31 @@ class SolvedTestCase(TestCase):
             solution="",
         )
 
+        cls.problem_set3 = ProblemSet.objects.create(
+            pk=3,
+            title="Turing's another problem set",
+            is_open=True,
+            difficulty=1,
+            description="This is Turing's another problem set.",
+            creator_id=cls.turing.pk,
+        )
+        cls.problem3_1 = MultipleChoiceProblem.objects.create(
+            pk=5,
+            problem_set=cls.problem_set3,
+            number=1,
+            content=Content.objects.create(text="This is problem 3-1."),
+            creator_id=cls.turing.pk,
+            solution="",
+        )
+        cls.problem3_2 = MultipleChoiceProblem.objects.create(
+            pk=6,
+            problem_set=cls.problem_set3,
+            number=1,
+            content=Content.objects.create(text="This is problem 3-2."),
+            creator_id=cls.turing.pk,
+            solution="",
+        )
+
         Solved.objects.create(
             solver_id=cls.turing.pk, problem=cls.problem1_1, result=True
         )
@@ -103,10 +128,24 @@ class SolvedTestCase(TestCase):
             solver_id=cls.meitner.pk, problem=cls.problem1_1, result=True
         )
         Solved.objects.create(
-            solver_id=cls.meitner.pk, problem=cls.problem1_2, result=False
+            solver_id=cls.meitner.pk, problem=cls.problem1_2, result=True
+        )
+
+        Solved.objects.create(
+            solver_id=cls.turing.pk, problem=cls.problem2_1, result=True
         )
         Solved.objects.create(
-            solver_id=cls.turing.pk, problem=cls.problem2_1, result=False
+            solver_id=cls.turing.pk, problem=cls.problem2_2, result=True
+        )
+        Solved.objects.create(
+            solver_id=cls.meitner.pk, problem=cls.problem2_1, result=True
+        )
+        Solved.objects.create(
+            solver_id=cls.meitner.pk, problem=cls.problem2_2, result=False
+        )
+
+        Solved.objects.create(
+            solver_id=cls.turing.pk, problem=cls.problem3_1, result=False
         )
 
     def setUp(self):
@@ -121,14 +160,17 @@ class SolvedTestCase(TestCase):
         self.assertEqual(response.status_code, http.HTTPStatus.OK)
         response_json = response.json()
         self.assertEqual(response_json[0]["id"], 1)
-        self.assertEqual(response_json[0]["solvedNum"], 1)
+        self.assertEqual(response_json[0]["solvedNum"], 2)
         self.assertEqual(response_json[1]["id"], 2)
-        self.assertEqual(response_json[1]["solvedNum"], 0)
+        self.assertEqual(response_json[1]["solvedNum"], 1)
+        self.assertEqual(response_json[2]["id"], 3)
+        self.assertEqual(response_json[2]["solvedNum"], 0)
 
     def test_problem_set_info_get(self):
         test_cases = [
-            {"ps_id": 1, "solvedNum": 1},
-            {"ps_id": 2, "solvedNum": 0},
+            {"ps_id": 1, "solvedNum": 2},
+            {"ps_id": 2, "solvedNum": 1},
+            {"ps_id": 3, "solvedNum": 0},
         ]
         for test_case in test_cases:
             with self.subTest(**test_case):
@@ -140,8 +182,8 @@ class SolvedTestCase(TestCase):
     def test_problem_info_get(self):
         test_cases = [
             {"p_id": 1, "solverIDs": [1, 2]},
-            {"p_id": 3, "solverIDs": [1]},
-            {"p_id": 4, "solverIDs": []},
+            {"p_id": 5, "solverIDs": [1]},
+            {"p_id": 6, "solverIDs": []},
         ]
         for test_case in test_cases:
             with self.subTest(**test_case):
@@ -187,10 +229,20 @@ class SolvedTestCase(TestCase):
         self.assertEqual(response_turing["problems"], [True, True])
         self.assertEqual(response_turing["result"], True)
         response_meitner = find_by_solver(response_json, "meitner")
+        self.assertEqual(response_meitner["problems"], [True, True])
+        self.assertEqual(response_meitner["result"], True)
+
+        response = self.client.get("/api/problem_set/2/solvers/")
+        self.assertEqual(response.status_code, http.HTTPStatus.OK)
+        response_json = response.json()
+        response_turing = find_by_solver(response_json, "turing")
+        self.assertEqual(response_turing["problems"], [True, True])
+        self.assertEqual(response_turing["result"], True)
+        response_meitner = find_by_solver(response_json, "meitner")
         self.assertEqual(response_meitner["problems"], [True, False])
         self.assertEqual(response_meitner["result"], False)
 
-        response = self.client.get("/api/problem_set/2/solvers/")
+        response = self.client.get("/api/problem_set/3/solvers/")
         self.assertEqual(response.status_code, http.HTTPStatus.OK)
         response_json = response.json()
         response_turing = find_by_solver(response_json, "turing")
@@ -209,7 +261,7 @@ class SolvedTestCase(TestCase):
         for test_case in test_cases:
             with self.subTest(userID=test_case["userID"]):
                 response = self.client.get(
-                    f"/api/problem_set/1/solvers/{test_case['userID']}/"
+                    f"/api/problem_set/2/solvers/{test_case['userID']}/"
                 )
                 self.assertEqual(response.status_code, http.HTTPStatus.OK)
                 response_json = response.json()

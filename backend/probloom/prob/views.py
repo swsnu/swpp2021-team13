@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required as login_required_
 from django.contrib.auth.mixins import LoginRequiredMixin as LoginRequiredMixin_
 from django.core.exceptions import BadRequest, PermissionDenied
 from django.db.models.aggregates import Count, Max
-from django.db.models.expressions import F, OuterRef, Subquery, Value
+from django.db.models.expressions import F, OuterRef, Subquery, Value, Window
 from django.db.models.functions import Coalesce
 from django.http import (
     HttpResponse,
@@ -366,9 +366,14 @@ class ProblemSetListView(LoginRequiredMixin, View):
                     - Count("problem_set")
                 )
             )
-            .filter(unsolved_problems__lte=0)
-            .values("problem_set", solvedNum=Count("solver", distinct=True))
-            .filter(problem_set=OuterRef("pk"))
+            .filter(unsolved_problems__lte=0, problem_set=OuterRef("pk"))
+            .values(
+                "problem_set",
+                solvedNum=Window(
+                    expression=Count("solver"), partition_by=[F("problem_set")]
+                ),
+            )
+            .distinct()
         )
         res = (
             ProblemSet.objects.select_related("creator__user")
@@ -1417,7 +1422,7 @@ def get_solver(_: HttpRequest, ps_id: int, u_id: int) -> HttpResponse:
         .order_by("number")
         .values("number", "result")
     )
- 
+
     problems = [None] * num_problems
     for record in solved_query:
         problems[record["number"] - 1] = record["result"]
