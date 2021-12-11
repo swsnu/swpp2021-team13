@@ -11,7 +11,6 @@ const ProblemSetView = (props) => {
             <Header.Subheader>
               {props.creator}'s {props.scope ? 'public' : 'private'} problems
             </Header.Subheader>
-            <Header.Subheader>Tag: {props.tag}</Header.Subheader>
             <Header.Subheader>Difficulty: {props.difficulty}</Header.Subheader>
             <Header.Subheader>
               Recommend: {props.recommendedNum}

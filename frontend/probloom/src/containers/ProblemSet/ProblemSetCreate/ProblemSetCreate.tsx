@@ -16,11 +16,9 @@ import {
   Divider,
   Form,
   Header,
-  Image,
-  Input,
   Tab,
 } from 'semantic-ui-react';
-import { tagOptions1, tagOptions2 } from '../ProblemSetSearch/ProblemSetSearch';
+// import { tagOptions1, tagOptions2 } from '../ProblemSetSearch/ProblemSetSearch';
 
 interface ProblemSetCreateProps {
   history: any;
@@ -181,76 +179,6 @@ class ProblemSetCreate extends Component<Props, State> {
         />
       );
     };
-
-    // let tabContentImage = (currentProblem, index: number) => {
-    //   return (
-    //     <>
-    //       <Input
-    //         id="problemset-problem-content-input-file-button"
-    //         type="file"
-    //         accept="image/*"
-    //         onChange={(event) => {
-    //           if (!event.target.files) {
-    //             return;
-    //           }
-    //           const file = event.target.files[0];
-
-    //           const reader = new FileReader();
-    //           reader.onloadend = () => {
-    //             let editProblem: CreateProblemType;
-    //             if (currentProblem.problemType === 'multiple-choice') {
-    //               let _currentProblem =
-    //                 currentProblem as CreateMultipleChoiceProblemInterface;
-    //               editProblem = {
-    //                 problemType: _currentProblem.problemType,
-    //                 problemSetID: _currentProblem.problemSetID,
-    //                 problemNumber: _currentProblem.problemNumber,
-    //                 content: reader.result as string,
-    //                 choices: _currentProblem.choices,
-    //                 solution: _currentProblem.solution,
-    //               };
-    //             } else {
-    //               let _currentProblem =
-    //                 currentProblem as CreateSubjectiveProblemInterface;
-    //               editProblem = {
-    //                 problemType: _currentProblem.problemType,
-    //                 problemSetID: _currentProblem.problemSetID,
-    //                 problemNumber: _currentProblem.problemNumber,
-    //                 content: reader.result as string,
-    //                 solutions: _currentProblem.solutions,
-    //               };
-    //             }
-
-    //             const newProblem: CreateProblemType[] = [];
-    //             this.state.problems.forEach((problem) => {
-    //               if (problem.problemNumber === index) {
-    //                 newProblem.push(editProblem);
-    //               } else {
-    //                 newProblem.push(problem);
-    //               }
-    //             });
-    //             this.setState({
-    //               ...this.state,
-    //               problems: newProblem,
-    //             });
-    //           };
-    //           reader.readAsDataURL(file);
-    //         }}
-    //       />
-
-    //       <Image
-    //         id="problemset-problem-content-input-file-preview"
-    //         src={
-    //           this.state.problems.filter(
-    //             (problem) => problem.problemNumber === index
-    //           )[0].content
-    //         }
-    //         alt=""
-    //         size="huge"
-    //       />
-    //     </>
-    //   );
-    // };
 
     let createChoice = (
       currentProblem: CreateMultipleChoiceProblemInterface,
@@ -582,7 +510,7 @@ class ProblemSetCreate extends Component<Props, State> {
                 }}
               />
 
-              <Form.Dropdown
+              {/* <Form.Dropdown
                 className="Tag1"
                 item
                 options={tagOptions1.slice(0)}
@@ -602,7 +530,7 @@ class ProblemSetCreate extends Component<Props, State> {
                 onChange={(_, { value }) => {
                   this.setState({ tag: [this.state.tag[0], value as string] });
                 }}
-              />
+              /> */}
 
               <Form.Dropdown
                 className="Difficulty"

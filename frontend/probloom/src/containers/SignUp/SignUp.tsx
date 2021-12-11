@@ -45,7 +45,7 @@ class SignUp extends Component<SignUpProps, SignUpState> {
     let isProperPW = pwCheck.test(data.pw);
     let isSamePW = data.pw === data.pwConfirm;
 
-    const isValid = (isProperEmail || isProperUsername) && isProperPW;
+    const isValid = isProperEmail && isProperUsername && isProperPW;
 
     if (isValid) {
       if (!isSamePW) {

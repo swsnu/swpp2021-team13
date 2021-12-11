@@ -125,7 +125,7 @@ describe('User Reducer', () => {
       lastActiveDays: 2,
       numberOfCreatedProblems: 3,
       numberOfSolvedProblems: 4,
-      numberOfRecommendedProblems: 5,
+      numberOfRecommendedProblemSets: 5,
     };
     const newState = userReducer(oldState, {
       type: GET_USER_STATISTICS,

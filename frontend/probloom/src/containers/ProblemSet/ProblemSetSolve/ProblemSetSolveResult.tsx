@@ -82,19 +82,17 @@ class ProblemSetSolveResult extends Component<
             </Grid.Column>
           </Grid>
           {this.props.selectedSolver.problems.map((result, index) => (
-            <Grid>
+            <Grid key={index}>
               <Grid.Column width={10}>
                 <Card>
                   <Card.Content>
                     <Card.Header>Problem {index + 1}</Card.Header>
                   </Card.Content>
                   <Card.Content extra>
-                    {this.props.selectedSolver?.problems[index] === true && (
+                    {result === true && (
                       <Icon color="blue" name="circle outline" />
                     )}
-                    {this.props.selectedSolver?.problems[index] !== true && (
-                      <Icon color="red" name="x" />
-                    )}
+                    {result !== true && <Icon color="red" name="x" />}
                   </Card.Content>
                 </Card>
               </Grid.Column>

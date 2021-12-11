@@ -1,5 +1,8 @@
 # CI Environment
-dist: bionic
+dist: focal
+
+env:
+  - PROBLOOM_SECRET_KEY: '''django-insecure-1(%62=%6cx5iecishlhd+(*^c@decmumpx+x_e%wt*9b-63ye1'''
 
 # Job Configurations
 jobs:
@@ -7,6 +10,10 @@ jobs:
     - language: node_js
       node_js: 16
       python: "3.8"
+      cache:
+        yarn: true
+        directories:
+          - ~/.cache/pypoetry
       addons:
         sonarcloud:
           organization: swsnu
@@ -27,7 +34,7 @@ jobs:
         - yarn test --coverage --watchAll=false
         - coveralls-lcov -v -n coverage/lcov.info > coverage.json  
         - cd ../../backend/probloom
-        - poetry install
+        - poetry install --no-ansi
         - poetry run pylint -E **/*.py --load-plugins pylint_django
         - poetry run coverage run
         - poetry run coverage xml

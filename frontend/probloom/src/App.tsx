@@ -27,7 +27,10 @@ export interface AppProps extends PropsFromRedux {
 
 class App extends Component<AppProps> {
   render() {
-    if (this.props.selectedUser === null) {
+    // console.log('@@@@@@@@@@@', this.props.selectedUser);
+    // if(this.props.selectedUser?.logged_in){
+    // }
+    if (!this.props.selectedUser) {
       this.props.handleNoUser();
     }
     return (
@@ -47,7 +50,7 @@ class App extends Component<AppProps> {
               exact
               render={() => <SignUp history={this.props.history} />}
             />
-            <Redirect exact from="/" to="signin/" />
+            <Redirect exact from="/" to="/signin/" />
             <Route path="/user/:id/:active/" exact component={Profile} />
             <Redirect from="/user/:id/" to="/user/:id/summary/" exact />
             <Route path="/problem/search/" exact component={ProblemSetSearch} />

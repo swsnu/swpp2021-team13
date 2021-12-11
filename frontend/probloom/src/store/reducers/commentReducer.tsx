@@ -12,13 +12,10 @@ export interface Comment {
 }
 
 export interface CommentState {
-  comments: Comment[];
-  selectedComment: Comment | null;
-}
+  comments: Comment[];}
 
 const initialState: CommentState = {
   comments: [],
-  selectedComment: null,
 };
 
 export type CommentReducer = Reducer<CommentState, CommentAction>;
@@ -28,7 +25,7 @@ const commentReducer: CommentReducer = (state = initialState, action) => {
     case actionTypes.GET_COMMENTS_OF_PROBLEMSET:
       return { ...state, comments: action.comments };
     case actionTypes.CREATE_COMMENT:
-      return { ...state, selectedComment: action.target };
+      return { ...state, comments: [ ...state.comments, action.target ] };
     case actionTypes.UPDATE_COMMENT:
       const modifiedComments = state.comments.map((com) => {
         if (com.id === action.targetID) {
@@ -39,9 +36,9 @@ const commentReducer: CommentReducer = (state = initialState, action) => {
       });
       return { ...state, comments: modifiedComments };
     case actionTypes.DELETE_COMMENT:
-      const remainComment = state.comments.filter((com) => {
-        return com.id !== action.targetID;
-      });
+      const remainComment = state.comments.filter((com) => (
+        com.id !== action.targetID
+      ));
       return { ...state, comments: remainComment };
     default:
       break;

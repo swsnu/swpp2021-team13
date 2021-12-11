@@ -77,19 +77,10 @@ export const getAllSolvers: (
   problemSetID
 ) => {
   return async (dispatch: AppDispatch) => {
-    try {
-      const { data } = await axios.get(
-        `/api/problem_set/${problemSetID}/solvers/`
-      );
-      dispatch(getAllSolvers_(data));
-    } catch (err) {
-      const { status } = (err as any).response;
-      if (status === 404) {
-        dispatch(getAllSolvers_([]));
-      } else {
-        throw err;
-      }
-    }
+    const { data } = await axios.get(
+      `/api/problem_set/${problemSetID}/solvers/`
+    );
+    dispatch(getAllSolvers_(data));
   };
 };
 
@@ -143,14 +134,11 @@ export const getIsRecommender: (
 
 export interface UpdateRecommendAction {
   type: typeof actionTypes.UPDATE_RECOMMEND;
-  isRecommender: boolean;
 }
 
-export const updateRecommend_: (data: any) => UpdateRecommendAction = (
-  isRecommender
+export const updateRecommend_: () => UpdateRecommendAction = (
 ) => ({
   type: actionTypes.UPDATE_RECOMMEND,
-  isRecommender: true,
 });
 
 export const updateRecommend: (
@@ -159,11 +147,11 @@ export const updateRecommend: (
   problemSetID
 ) => {
   return async (dispatch: AppDispatch) => {
-    const { data } = await axios.put(
+    await axios.put(
       `/api/problem_set/${problemSetID}/recommend/`,
       { recommend: true }
     );
-    dispatch(updateRecommend_(data));
+    dispatch(updateRecommend_());
   };
 };
 
