@@ -18,7 +18,7 @@ import {
   Header,
   Tab,
 } from 'semantic-ui-react';
-import { tagOptions1, tagOptions2 } from '../ProblemSetSearch/ProblemSetSearch';
+// import { tagOptions1, tagOptions2 } from '../ProblemSetSearch/ProblemSetSearch';
 
 interface ProblemSetCreateProps {
   history: any;
