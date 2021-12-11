@@ -186,7 +186,7 @@ describe('<ProblemSetSolve />', () => {
     history.push('/');
   });
 
-  it('click next, prev, submit button', () => {
+  it('click next, prev, submit button', async () => {
     const component = mount(problemSetSolve);
     // click next button
     const wrapper_button1 = component.find('button.nextButton');
@@ -199,7 +199,11 @@ describe('<ProblemSetSolve />', () => {
     // solve multiple choice problem and click submit button
     const wrapper_choice = component.find('div.checkbox');
     wrapper_choice.at(0).simulate('change', { target: { value: true } });
+    // check choice one more for testing 'insert_or_delete' function
+    wrapper_choice.at(0).simulate('change', { target: { value: false } });
+    wrapper_choice.at(0).simulate('change', { target: { value: true } });
     const wrapper_button3 = component.find('button.submitButton');
+    expect(spyGetProblem).toBeCalledTimes(3);
     wrapper_button3.simulate('click');
     expect(spyPost).toBeCalledTimes(1);
   });
@@ -251,15 +255,28 @@ describe('<ProblemSetSolve />', () => {
     const wrapper_button = component.find('button.submitButton');
     wrapper_button.simulate('click');
     await Promise.resolve();
-    /*
+
+    component.update();
+
     // click result button
-    const wrapper = component.find('div.ProblemSetSolve');
-    const SolveInstance = component
-      .find(ProblemSetSolve.WrappedComponent)
-      .instance();
-    console.log(SolveInstance.state);
     const wrapper_button2 = component.find('button.resultButton');
     wrapper_button2.simulate('click');
-    history.push('/');*/
+    history.push('/');
+  });
+
+  it('axios post error detect', async () => {
+    spyPost = jest
+      .spyOn(axios, 'post')
+      .mockImplementation(async () =>
+        Promise.reject({ response: { status: 500 } })
+      );
+    console.error = jest.fn();
+    const component = mount(problemSetSolve);
+
+    // solve multiple choice problem and click submit button
+    const wrapper_choice = component.find('div.checkbox');
+    wrapper_choice.at(0).simulate('change', { target: { value: true } });
+    const wrapper_button = component.find('button.submitButton');
+    wrapper_button.simulate('click');
   });
 });
