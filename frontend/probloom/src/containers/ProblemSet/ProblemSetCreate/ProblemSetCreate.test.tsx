@@ -193,13 +193,13 @@ describe('<ProblemSetCreate />', () => {
     const inputScope = wrapper_inputScope.find('DropdownItem');
     inputScope.at(1).simulate('click');
 
-    const wrapper_inputTag1 = component.find({ label: 'Tag1' });
-    const inputTag1 = wrapper_inputTag1.find('DropdownItem');
-    inputTag1.at(1).simulate('click');
+    // const wrapper_inputTag1 = component.find({ label: 'Tag1' });
+    // const inputTag1 = wrapper_inputTag1.find('DropdownItem');
+    // inputTag1.at(1).simulate('click');
 
-    const wrapper_inputTag2 = component.find({ label: 'Tag2' });
-    const inputTag2 = wrapper_inputTag2.find('DropdownItem');
-    inputTag2.at(1).simulate('click');
+    // const wrapper_inputTag2 = component.find({ label: 'Tag2' });
+    // const inputTag2 = wrapper_inputTag2.find('DropdownItem');
+    // inputTag2.at(1).simulate('click');
 
     const wrapper_inputDifficulty = component.find({ label: 'Difficulty' });
     const inputDifficulty = wrapper_inputDifficulty.find('DropdownItem');

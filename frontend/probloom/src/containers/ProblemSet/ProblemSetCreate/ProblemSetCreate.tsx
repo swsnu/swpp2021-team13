@@ -18,7 +18,7 @@ import {
   Header,
   Tab,
 } from 'semantic-ui-react';
-import { tagOptions1, tagOptions2 } from '../ProblemSetSearch/ProblemSetSearch';
+// import { tagOptions1, tagOptions2 } from '../ProblemSetSearch/ProblemSetSearch';
 
 interface ProblemSetCreateProps {
   history: any;
@@ -510,7 +510,7 @@ class ProblemSetCreate extends Component<Props, State> {
                 }}
               />
 
-              <Form.Dropdown
+              {/* <Form.Dropdown
                 className="Tag1"
                 item
                 options={tagOptions1.slice(0)}
@@ -530,7 +530,7 @@ class ProblemSetCreate extends Component<Props, State> {
                 onChange={(_, { value }) => {
                   this.setState({ tag: [this.state.tag[0], value as string] });
                 }}
-              />
+              /> */}
 
               <Form.Dropdown
                 className="Difficulty"

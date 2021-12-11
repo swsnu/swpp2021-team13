@@ -25,10 +25,10 @@ export const signInSuccess = (user) => {
   };
 };
 
-export const signInFail = () => {
+export const signInFail = (user:any) => {
   return {
     type: actionTypes.SIGN_IN,
-    target: null,
+    target: user,
   };
 };
 
@@ -37,7 +37,7 @@ export const signIn = (request: SignInRequest) => {
     return axios
       .post('/api/signin/', request)
       .then((res) => dispatch(signInSuccess(res.data)))
-      .catch((error) => dispatch(signInFail()));
+      .catch((error) => dispatch(signInFail(null)));
   };
 };
 
@@ -118,6 +118,12 @@ export const getCurrentUser: () => ThunkAction<
         axios.isAxiosError(error) &&
         error.response &&
         error.response.status === 404;
+        // dispatch(signInFail({
+        //   id: -1,
+        //   username: 'dummy',
+        //   email: 'dummy@dummy.com',
+        //   logged_in: false,
+        // }));
       if (!pass) {
         throw error;
       }

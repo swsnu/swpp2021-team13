@@ -22,8 +22,8 @@ class ProfileStatistics extends Component<ProfileStatisticsProps> {
       this.props.selectedUserStatistics?.numberOfCreatedProblems ?? 0;
     const numberOfSolvedProblems: number =
       this.props.selectedUserStatistics?.numberOfSolvedProblems ?? 0;
-    const numberOfRecommendedProblems: number =
-      this.props.selectedUserStatistics?.numberOfRecommendedProblems ?? 0;
+    const numberOfRecommendedProblemSets: number =
+      this.props.selectedUserStatistics?.numberOfRecommendedProblemSets ?? 0;
     // const _createdProblems: UserStatisticsProblemSet[] =
     //   this.props.selectedUserStatistics?.createdProblems ?? [];
     // const solvedProblems: number[] = this.props.selectedUserStatistics
@@ -70,8 +70,8 @@ class ProfileStatistics extends Component<ProfileStatisticsProps> {
           {numberOfSolvedProblems}
         </div>
         <div className="number-of-recommended-problems">
-          <h1>Recommended Problems</h1>
-          {numberOfRecommendedProblems}
+          <h1>Recommended ProblemSets</h1>
+          {numberOfRecommendedProblemSets}
         </div>
         {/* <div className="created-problems">
           <h1>Created Problems</h1>
