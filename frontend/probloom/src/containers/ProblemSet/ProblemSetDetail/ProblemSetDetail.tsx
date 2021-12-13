@@ -241,7 +241,7 @@ class ProblemSetDetail extends Component<
           <Container text>
             <ProblemSetView
               id={this.props.match.params.id}
-              creator={this.props.selectedUser.username}
+              creator={this.props.selectedProblemSet.username}
               createdTime={createdTime}
               modifiedTime={modifiedTime}
               difficulty={difficulty}
