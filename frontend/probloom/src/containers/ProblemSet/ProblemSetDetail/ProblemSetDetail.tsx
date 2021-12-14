@@ -50,7 +50,7 @@ interface ProblemSetDetailState {
   editProblemSetTitle: string;
   editProblemSetDescription: string;
   editProblemSetScope: string;
-  editProblemSetDifficulty: string;
+  editProblemSetDifficulty: number;
 }
 
 class ProblemSetDetail extends Component<
@@ -68,7 +68,7 @@ class ProblemSetDetail extends Component<
       editProblemSetTitle: '',
       editProblemSetDescription: '',
       editProblemSetScope: '',
-      editProblemSetDifficulty: '',
+      editProblemSetDifficulty: 0,
     };
   }
 
@@ -86,9 +86,7 @@ class ProblemSetDetail extends Component<
         editProblemSetScope: this.props.selectedProblemSet.isOpen
           ? 'scope-public'
           : 'scope-private',
-        editProblemSetDifficulty: String(
-          this.props.selectedProblemSet.difficulty
-        ),
+        editProblemSetDifficulty: this.props.selectedProblemSet.difficulty,
       });
     }
   }
@@ -115,9 +113,7 @@ class ProblemSetDetail extends Component<
       editProblemSetScope: this.props.selectedProblemSet!.isOpen
         ? 'scope-public'
         : 'scope-private',
-      editProblemSetDifficulty: String(
-        this.props.selectedProblemSet!.difficulty
-      ),
+      editProblemSetDifficulty: this.props.selectedProblemSet!.difficulty,
       isProblemSetEdit: true,
     });
   };
@@ -128,7 +124,7 @@ class ProblemSetDetail extends Component<
       title: this.state.editProblemSetTitle,
       content: this.state.editProblemSetDescription,
       isOpen: this.state.editProblemSetScope === 'scope-public' ? true : false,
-      difficulty: parseInt(this.state.editProblemSetDifficulty),
+      difficulty: this.state.editProblemSetDifficulty,
     };
 
     this.props.onUpdateProblemSet(problemSet);
@@ -380,7 +376,7 @@ class ProblemSetDetail extends Component<
                     defaultValue={this.state.editProblemSetDifficulty}
                     onChange={(_, { value }) => {
                       this.setState({
-                        editProblemSetDifficulty: value as string,
+                        editProblemSetDifficulty: value as number,
                       });
                     }}
                   />
