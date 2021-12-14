@@ -36,7 +36,7 @@ const searchRangeOptions = [
 ];
 
 const creatorOptions = [
-  { key: 'open', text: 'Open Problems', value: 'open' },
+  { key: 'open', text: 'Open & Your Problems', value: 'open' },
   { key: 'own', text: 'Your Problems', value: 'own' },
 ];
 
@@ -215,7 +215,7 @@ class ProblemSetSearch extends Component<
         (prob) =>
           prob.userID === this.props.user?.id || this.state.creator !== 'own'
       )
-//      .filter((prob) => this.state.tag === 'all') //|| prob.tag === this.state.tag)
+      //      .filter((prob) => this.state.tag === 'all') //|| prob.tag === this.state.tag)
       .sort((a, b) => {
         switch (this.state.sort) {
           case 'solved':
@@ -326,8 +326,6 @@ class ProblemSetSearch extends Component<
                   this.setState({ creator: value as string });
                 }}
               />
-
-
 
               <Form.Dropdown
                 width={4}
